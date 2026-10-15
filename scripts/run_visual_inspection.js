@@ -144,6 +144,76 @@ async function run() {
   );
   console.log('✓ Assertion passed: 390px viewport has zero main page overflow and 16th timeline cell is reachable via horizontal scroll.');
 
+  // Verify 390px mobile layout: title does not overlap controls and all five nav choices fit visibly
+  const mobileLayoutCheck = await page.evaluate(() => {
+    const identity = document.querySelector('.masthead-identity');
+    const checkBtn = document.querySelector('.masthead-check-btn');
+    const toggle = document.querySelector('.pact-detail-toggle');
+    const startOver = document.querySelector('.masthead-start-over');
+    if (!identity || !checkBtn) {
+      return { ok: false, error: 'Masthead identity or check button not found' };
+    }
+
+    const bIdentity = identity.getBoundingClientRect();
+    const bCheck = checkBtn.getBoundingClientRect();
+    const bToggle = toggle ? toggle.getBoundingClientRect() : null;
+    const bStart = startOver ? startOver.getBoundingClientRect() : null;
+
+    if (bIdentity.width < 100) {
+      return { ok: false, error: `Masthead identity is squeezed (${bIdentity.width}px wide)` };
+    }
+
+    const overlaps = (r1, r2) => {
+      if (!r1 || !r2) return false;
+      const noX = r1.right <= r2.left || r2.right <= r1.left;
+      const noY = r1.bottom <= r2.top || r2.bottom <= r1.top;
+      return !(noX || noY);
+    };
+
+    if (overlaps(bIdentity, bCheck)) {
+      return { ok: false, error: 'Masthead title overlaps Check this plan button' };
+    }
+    if (bToggle && overlaps(bIdentity, bToggle)) {
+      return { ok: false, error: 'Masthead title overlaps details toggle' };
+    }
+    if (bStart && overlaps(bIdentity, bStart)) {
+      return { ok: false, error: 'Masthead title overlaps Start over button' };
+    }
+    if (bToggle && overlaps(bCheck, bToggle)) {
+      return { ok: false, error: 'Check this plan button overlaps details toggle' };
+    }
+    if (bStart && overlaps(bCheck, bStart)) {
+      return { ok: false, error: 'Check this plan button overlaps Start over button' };
+    }
+
+    // Verify all five navigation buttons fit visibly, auto-width, not oversized, touch targets >= 36px
+    const navViews = ['overview', 'conflicts', 'repairs', 'receipts', 'memory'];
+    const navInfo = [];
+    for (const v of navViews) {
+      const btn = document.querySelector(`[data-testid="nav-${v}"]`);
+      if (!btn) return { ok: false, error: `Nav button for "${v}" not found` };
+      const r = btn.getBoundingClientRect();
+      if (r.width <= 40 || r.width > 370) {
+        return { ok: false, error: `Nav button "${v}" has invalid or oversized width: ${r.width}px` };
+      }
+      if (r.height < 36) {
+        return { ok: false, error: `Nav button "${v}" touch target too small: ${r.height}px` };
+      }
+      if (r.right > window.innerWidth + 4) {
+        return { ok: false, error: `Nav button "${v}" is clipped horizontally (right=${r.right}, window=${window.innerWidth})` };
+      }
+      navInfo.push({ view: v, width: r.width, height: r.height, right: r.right });
+    }
+
+    return { ok: true, navInfo };
+  });
+
+  assert.ok(
+    mobileLayoutCheck.ok,
+    `390px mobile layout validation failed: ${mobileLayoutCheck.error}`
+  );
+  console.log('✓ Assertion passed: 390px mobile layout verified (all 5 nav choices fit visibly with auto width, and masthead title does not overlap controls).');
+
   await page.screenshot({ path: path.join(outDir, 'mobile_390_overview.png') });
   console.log('Saved: mobile_390_overview.png');
 
@@ -560,6 +630,29 @@ async function run() {
   await page.screenshot({ path: path.join(outDir, '11_unknown_duration_checked.png') });
   console.log('Saved: 11_unknown_duration_checked.png');
 
+  // Navigate to Needs attention to assert real metrics read 'Known editing hours' and balance 'Unknown'
+  console.log('   Navigating to Needs attention to assert truthful unknown metrics...');
+  await page.click('[data-testid="nav-conflicts"]');
+  await page.waitForSelector('[data-testid="conflict-view"]');
+  await page.waitForSelector('[data-testid="conflict-metrics"]');
+
+  const conflictMetricsText = await page.locator('[data-testid="conflict-metrics"]').innerText();
+  assert.ok(
+    conflictMetricsText.includes('Known editing hours'),
+    `Conflict metrics must read 'Known editing hours' under unknown duration. Got: "${conflictMetricsText}"`
+  );
+  assert.ok(
+    conflictMetricsText.includes('Unknown'),
+    `Conflict metrics balance must read 'Unknown' under unknown duration. Got: "${conflictMetricsText}"`
+  );
+  console.log('✓ Assertion passed: Truthful unknown metrics verified ("Known editing hours" and balance "Unknown").');
+
+  // Return to Overview for later edits
+  console.log('   Returning to Overview for later edits...');
+  await page.click('[data-testid="nav-overview"]');
+  await page.waitForSelector('[data-testid="overview-view"]');
+  await page.waitForSelector('.paper-card:has-text("Aurora Skincare")');
+
   // 12. Capacity Slot Toggle
   console.log('12. Testing Capacity Slot Toggle...');
   // Restore Aurora hours so schedule is normal
@@ -665,6 +758,7 @@ async function run() {
   console.log('  2. Truthful affected-work titles resolved from workspace commitments (none omitted, zero raw IDs)');
   console.log('  3. Technical disclosures initially collapsed & keyboard openable via Enter');
   console.log('  4. 390px mobile viewport zero page overflow across overview, conflict, and options views');
+  console.log('  4b. 390px mobile layout: title does not overlap controls and all 5 navigation choices fit visibly (auto-width compact buttons)');
   console.log('  5. 390px timeline 16th cell reachable within genuine scroll wrapper after horizontal scrolling');
   console.log('  6. Feasible repair candidate synthesis & Sam policy denial enforcement');
   console.log('  7. Real source titles link to grounded drawer records');
@@ -672,6 +766,7 @@ async function run() {
   console.log('  9. Grounded Studio Memory with $0 billable AI usage');
   console.log(' 10. Sam approval yielding feasible original Day 1 deadlines');
   console.log(' 11. Unknown duration deliverable correctly producing needs_information');
+  console.log(" 11b. Truthful unknown deliverable metrics verified ('Known editing hours' and balance 'Unknown')");
   console.log(' 12. Keyboard accessibility: Escape cleanly dismisses Source Drawer and restores trigger focus');
   console.log(' 13. Real HTTP 409 optimistic locking state handling');
   console.log('======================================================\n');

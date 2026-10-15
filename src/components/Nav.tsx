@@ -223,19 +223,34 @@ export function Nav({
             align-items: center;
           }
           .pact-nav-items {
+            display: flex;
             flex-direction: row;
+            flex-wrap: wrap;
             align-items: center;
-            padding: 4px 8px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            padding: 6px 8px;
+            overflow-x: visible;
             width: 100%;
             min-width: 0;
             box-sizing: border-box;
-            gap: 4px;
-            scrollbar-width: thin;
+            gap: 6px;
           }
           .pact-nav-header-label {
             display: none;
+          }
+          .nav-item-btn {
+            width: auto;
+            max-width: 100%;
+            flex: 0 0 auto;
+            padding: 6px 10px;
+            min-height: 40px;
+            font-size: 0.82rem;
+            border-left: none;
+            border-bottom: 2px solid transparent;
+            border-radius: var(--radius-xs);
+            white-space: nowrap;
+          }
+          .nav-item-btn.active {
+            border-bottom-color: var(--forest-base);
           }
           .pact-nav-footer {
             padding: 6px 12px;

@@ -44,7 +44,7 @@ export function Header({
   return (
     <header className="pact-masthead" data-testid="masthead">
       {/* Masthead Left: studio identity only, no revision jargon up front */}
-      <div className="masthead-identity" style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+      <div className="masthead-identity">
         <div>
           <span className="editorial-subhead" style={{ color: 'var(--clay-700)', letterSpacing: '0.12em' }}>
             Morrow Studio
@@ -56,7 +56,7 @@ export function Header({
       </div>
 
       {/* Masthead Right: health, mode, optional details, and the two real actions */}
-      <div className="masthead-controls" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+      <div className="masthead-controls">
         {/* Service health & mode for desktop view */}
         <div className="masthead-status-desktop" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div

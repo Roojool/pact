@@ -269,6 +269,12 @@ h1, h2, h3, h4, h5, h6, section, article, .paper-card, [tabindex], button, input
   z-index: 15;
 }
 
+.masthead-identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 .masthead-controls {
   display: flex;
   align-items: center;
@@ -1215,33 +1221,24 @@ details .pact-detail-content,
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 4px 8px;
-    gap: 4px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--paper-border-strong) var(--paper-subtle);
-  }
-
-  .pact-nav-items::-webkit-scrollbar {
-    height: 3px;
-  }
-  .pact-nav-items::-webkit-scrollbar-track {
-    background: var(--paper-subtle);
-  }
-  .pact-nav-items::-webkit-scrollbar-thumb {
-    background: var(--paper-border-strong);
-    border-radius: 3px;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow-x: visible;
+    padding: 6px 8px;
+    gap: 6px;
   }
 
   .nav-item-btn {
     border-left: none;
     border-bottom: 2px solid transparent;
-    padding: 7px 11px;
+    padding: 6px 10px;
     white-space: nowrap;
-    min-height: 36px;
+    min-height: 40px;
     font-size: 0.82rem;
+    width: auto;
+    max-width: 100%;
     flex: 0 0 auto;
+    border-radius: var(--radius-xs);
   }
 
   .nav-item-btn.active {
@@ -1250,22 +1247,26 @@ details .pact-detail-content,
     background-color: var(--paper-surface);
   }
 
-  /* Compact mobile masthead: purpose/title and primary Check action prominent */
+  /* Compact mobile masthead: readable studio/title and primary Check action; secondary options and reset in separate row */
   .pact-masthead {
     position: static;
     top: auto;
     padding: 10px 14px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 8px 10px;
   }
 
   .masthead-identity {
-    grid-column: 1;
-    grid-row: 1;
+    order: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
   }
 
   .masthead-identity .editorial-subhead {
@@ -1276,6 +1277,7 @@ details .pact-detail-content,
     font-size: 1.25rem;
     margin-top: 1px;
     line-height: 1.2;
+    white-space: nowrap;
   }
 
   .masthead-controls {
@@ -1291,28 +1293,29 @@ details .pact-detail-content,
   }
 
   .masthead-check-btn {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
-    align-self: center;
+    order: 2;
+    flex: 0 0 auto;
     padding: 6px 14px;
-    min-height: 36px;
+    min-height: 38px;
     font-size: 0.82rem;
   }
 
   .pact-detail-toggle {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: center;
+    order: 3;
+    flex: 1 1 auto;
+  }
+
+  .pact-detail-toggle[open] {
+    flex: 1 0 100%;
+    order: 4;
   }
 
   .masthead-start-over {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: end;
-    align-self: center;
-    padding: 5px 10px;
-    min-height: 32px;
+    order: 3;
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 6px 12px;
+    min-height: 38px;
     font-size: 0.78rem;
   }
 
