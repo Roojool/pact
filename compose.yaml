@@ -93,6 +93,8 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./public/demo:/srv/pact-demo:ro
+      - ${PACT_MEDIA_DIR:-./media}:/srv/pact-media:ro
       - caddy-data:/data
       - caddy-config:/config
     depends_on:

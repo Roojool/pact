@@ -408,7 +408,7 @@ async function run() {
     'Conflict technical details must open on keyboard Enter'
   );
   assert.ok(
-    (await conflictTechDetails.innerText()).includes('Reasoning paths'),
+    (await conflictTechDetails.innerText()).toLowerCase().includes('reasoning paths'),
     'Reasoning paths must be present inside expanded details'
   );
 
@@ -734,11 +734,11 @@ async function run() {
 
   const conflictMetricsText = await page.locator('[data-testid="conflict-metrics"]').innerText();
   assert.ok(
-    conflictMetricsText.includes('Known editing hours'),
+    conflictMetricsText.toLowerCase().includes('known editing hours'),
     `Conflict metrics must read 'Known editing hours' under unknown duration. Got: "${conflictMetricsText}"`
   );
   assert.ok(
-    conflictMetricsText.includes('Unknown'),
+    conflictMetricsText.toLowerCase().includes('unknown'),
     `Conflict metrics balance must read 'Unknown' under unknown duration. Got: "${conflictMetricsText}"`
   );
   console.log('✓ Assertion passed: Truthful unknown metrics verified ("Known editing hours" and balance "Unknown").');

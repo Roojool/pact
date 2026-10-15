@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PACT: check the promises before you make them</title>
+<style>
+  :root { --cream:#f1eee8; --orange:#ff5a1f; --sunflower:#ffc21a; --forest:#1f3b22; --ink:#1b1b1b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink);
+         font:16px/1.5 Georgia, "Times New Roman", serif; }
+  main { max-width:780px; margin:0 auto; padding:32px 20px 56px; }
+  h1 { font-size:clamp(1.6rem, 6vw, 2.4rem); line-height:1.15; margin:0 0 8px; color:var(--forest); }
+  .rule { height:6px; width:72px; background:var(--orange); margin:0 0 24px; }
+  video { width:100%; height:auto; display:block; background:#000; border:2px solid var(--forest); }
+  p { margin:16px 0; }
+  .note { background:#fff8e6; border-left:5px solid var(--sunflower); padding:12px 16px; font-size:0.95rem; }
+  ul.links { list-style:none; margin:20px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:10px; }
+  ul.links a { display:inline-block; padding:9px 14px; border:2px solid var(--forest);
+               color:var(--forest); text-decoration:none; font-weight:bold; font-size:0.95rem; }
+  ul.links a:hover, ul.links a:focus { background:var(--forest); color:var(--cream); }
+  footer { margin-top:28px; font-size:0.85rem; color:#4a4a3f; }
+  @media (max-width:390px) { main { padding:24px 14px 48px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>PACT: check the promises before you make them</h1>
+  <div class="rule" aria-hidden="true"></div>
+
+  <video controls playsinline preload="metadata" aria-label="PACT working-project demo">
+    <source src="/media/PACT_demo.mp4" type="video/mp4">
+    <track kind="captions" src="/media/PACT_demo.vtt" srclang="en" label="English" default>
+    Your browser does not support the video tag. The demo is also available from the release assets.
+  </video>
+
+  <p class="note">
+    Recorded in <strong>deterministic rules mode</strong> (AI off): the full FalkorDB
+    check, repair, approval and memory recall run with <strong>zero paid model
+    calls</strong>. Earlier live two-role AI validation exists in historical evidence
+    and is <strong>not re-run</strong> in this recording. Narration is synthetic
+    offline text-to-speech. Agency data is fictional; approval records an
+    <strong>internal reservation only</strong> — no external publishing.
+  </p>
+
+  <ul class="links">
+    <li><a href="/media/PACT_demo.mp4" download>Download video</a></li>
+    <li><a href="https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com">Open the app</a></li>
+    <li><a href="https://github.com/Roojool/pact">Source</a></li>
+    <li><a href="https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx">Editable deck</a></li>
+    <li><a href="https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf">Deck PDF</a></li>
+    <li><a href="/media/PACT_demo.vtt">Captions</a></li>
+    <li><a href="https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md">Transcript</a></li>
+  </ul>
+
+  <footer>PACT — check the promises before you make them. All fixtures synthetic.</footer>
+</main>
+</body>
+</html>

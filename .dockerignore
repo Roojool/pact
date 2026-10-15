@@ -11,6 +11,7 @@ playwright-report
 .playwright-cli
 .pact-ops
 output
+media
 docs
 scripts
 queries
