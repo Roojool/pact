@@ -122,18 +122,21 @@ export function OverviewView({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }} data-testid="overview-view" data-view="overview">
+    <div className="wrap" style={{ display: 'flex', flexDirection: 'column', gap: '36px', paddingTop: '1.5rem', paddingBottom: '4rem' }} data-testid="overview-view" data-view="overview">
+      {/* Anchor target for hero 'View your work' button */}
+      <div id="studio-work" style={{ scrollMarginTop: '80px' }} />
+
       {/* SECTION 1: CAMPAIGNS & JOBS (Assembly-style numbered section header) */}
       <section>
         <div className="editorial-section-header">
           <div>
             <span className="editorial-section-number">01</span>
             <span className="editorial-label">Your work</span>
-            <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
+            <h2 className="editorial-headline" style={{ fontSize: '2.2rem', marginTop: '2px' }}>
               Jobs in the plan
             </h2>
           </div>
-          <span style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>
+          <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>
             {workspace.campaigns.length} campaigns · {workspace.commitments.length} jobs
           </span>
         </div>
@@ -150,16 +153,75 @@ export function OverviewView({
                 key={camp.id}
                 className="paper-card"
                 style={{
-                  padding: '20px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '14px',
-                  borderTop: `3px solid ${camp.color || 'var(--paper-border-strong)'}`,
+                  overflow: 'hidden',
                 }}
               >
-                {/* Campaign Header */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {/* Restrained Editorial Header Strip */}
+                <div
+                  className="grain"
+                  style={{
+                    position: 'relative',
+                    height: '38px',
+                    background: `linear-gradient(135deg, ${camp.color || '#C22A08'}, #FFA81C)`,
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0 14px',
+                    borderBottom: '1.5px solid var(--ink)',
+                  }}
+                >
+                  <svg
+                    viewBox="0 0 100 100"
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      right: '-8px',
+                      top: '-12px',
+                      width: '60px',
+                      height: '60px',
+                      opacity: 0.3,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <use href="#sf" />
+                  </svg>
+                  <span
+                    className="mono"
+                    style={{
+                      position: 'relative',
+                      zIndex: 2,
+                      fontSize: '0.68rem',
+                      color: '#FFFFFF',
+                      letterSpacing: '0.12em',
+                      fontWeight: 700,
+                      backgroundColor: 'rgba(14, 11, 8, 0.45)',
+                      padding: '2px 8px',
+                      borderRadius: 'var(--radius-xs)',
+                    }}
+                  >
+                    {camp.brand}
+                  </span>
+                  <span
+                    className="mono"
+                    style={{
+                      position: 'relative',
+                      zIndex: 2,
+                      fontSize: '0.64rem',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
+                    {creator?.category || 'Creator'}
+                  </span>
+                </div>
+
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
+                  {/* Campaign Header */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div
                       style={{
                         width: '36px',
@@ -322,6 +384,7 @@ export function OverviewView({
                 ) : (
                   <div style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>No deliverables attached.</div>
                 )}
+                </div>
               </div>
             );
           })}

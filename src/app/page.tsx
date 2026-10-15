@@ -321,7 +321,19 @@ export default function PlanningDeskPage() {
 
   return (
     <div className="pact-app-layout">
-      {/* Left Navigation Rail */}
+      {/* Editorial Top Masthead */}
+      <Header
+        workspace={workspace}
+        analysis={analysis}
+        health={health}
+        isLiveAiEnabled={isLiveAiEnabled}
+        onToggleLiveAi={setIsLiveAiEnabled}
+        onAnalyze={handleAnalyze}
+        onResetClick={() => setIsResetModalOpen(true)}
+        isAnalyzing={isAnalyzing}
+      />
+
+      {/* Horizontal Editorial Navigation Rail */}
       <Nav
         currentView={currentView}
         onSelectView={setCurrentView}
@@ -331,19 +343,7 @@ export default function PlanningDeskPage() {
       />
 
       {/* Main Planning Stage */}
-      <div className="pact-main-stage">
-        <Header
-          workspace={workspace}
-          analysis={analysis}
-          health={health}
-          isLiveAiEnabled={isLiveAiEnabled}
-          onToggleLiveAi={setIsLiveAiEnabled}
-          onAnalyze={handleAnalyze}
-          onResetClick={() => setIsResetModalOpen(true)}
-          isAnalyzing={isAnalyzing}
-        />
-
-        <main className="pact-content-container" data-testid="main-stage" data-view={currentView}>
+      <main className="pact-content-container" data-testid="main-stage" data-view={currentView}>
           {/* Visible Error Banner: Preserved while controls recover */}
           <ErrorAlert
             error={error}
@@ -399,18 +399,7 @@ export default function PlanningDeskPage() {
             </div>
           ) : (
             <>
-              {/* First-use explainer: one short intro on the default screen */}
-              {currentView === 'overview' && (
-                <div className="pact-page-intro" data-testid="page-intro" style={{ marginBottom: '14px' }}>
-                  <p>
-                    PACT checks your studio plan against the briefs, working hours and client approvals before you
-                    commit. Start with what needs attention, then pick a plan option and approve it — nothing changes
-                    without you.
-                  </p>
-                </div>
-              )}
-
-              {/* Hero Callout: Always visible on Overview */}
+              {/* Hero Stage: Always visible on Overview */}
               {currentView === 'overview' && (
                 <HeroBottleneckCard
                   workspace={workspace}
@@ -421,6 +410,23 @@ export default function PlanningDeskPage() {
                   onCheckPlan={handleAnalyze}
                   isChecking={isAnalyzing}
                 />
+              )}
+
+              {/* Concise Studio Notice */}
+              {currentView === 'overview' && (
+                <div
+                  className="mono wrap text-center"
+                  data-testid="page-intro"
+                  style={{
+                    fontSize: '0.72rem',
+                    color: 'var(--muted)',
+                    textAlign: 'center',
+                    padding: '12px 0 0',
+                    letterSpacing: '0.12em',
+                  }}
+                >
+                  Morrow Studio synthetic benchmark plan · Human approval required before booking
+                </div>
               )}
 
               {/* View Router */}
@@ -478,7 +484,6 @@ export default function PlanningDeskPage() {
             </>
           )}
         </main>
-      </div>
 
       {/* Source Evidence Drawer */}
       <SourceDrawer

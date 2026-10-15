@@ -69,15 +69,32 @@ export function Header({
 
   return (
     <header className="pact-masthead" data-testid="masthead">
-      {/* Masthead Left: studio identity */}
+      {/* Masthead Left: Golden Hour brand identity + studio label */}
       <div className="masthead-identity">
-        <div>
-          <span className="editorial-subhead" style={{ color: 'var(--ink-tertiary)', letterSpacing: '0.08em' }}>
-            Morrow Studio
-          </span>
-          <h1 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '1px' }}>
-            Your studio plan
-          </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <i
+            style={{
+              width: '16px',
+              height: '16px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--red)',
+              display: 'inline-block',
+              flexShrink: 0,
+            }}
+          />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', lineHeight: 1 }}>
+              <span className="d" style={{ fontSize: '1.9rem', color: 'var(--ink)' }}>
+                PACT
+              </span>
+              <span className="mono" style={{ fontSize: '0.68rem', color: 'var(--muted)', letterSpacing: '0.12em' }}>
+                Morrow Studio
+              </span>
+            </div>
+            <h1 className="editorial-headline" style={{ fontSize: '0.88rem', marginTop: '1px', color: 'var(--ink-secondary)', fontWeight: 500 }}>
+              Your studio plan
+            </h1>
+          </div>
         </div>
       </div>
 

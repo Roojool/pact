@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: 'Studio planning desk that checks creator briefs, editing hours, and client approvals before you commit.',
 };
 
+import { GoldenHourSymbols } from '@/components/GoldenHourSymbols';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -14,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased font-sans bg-paper-base text-ink-primary">
+        <GoldenHourSymbols />
         {children}
       </body>
     </html>

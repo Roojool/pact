@@ -1,0 +1,1 @@
+Font copyright and license notices are reproduced unchanged in OFL-anton.txt, OFL-instrumentserif.txt, OFL-jetbrainsmono.txt and OFL-inter.txt, downloaded from the official google/fonts repository. The font files are self-hosted under the SIL Open Font License 1.1.

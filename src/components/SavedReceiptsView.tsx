@@ -59,16 +59,28 @@ export function SavedReceiptsView({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }} data-testid="receipts-view" data-view="receipts">
-      <div className="pact-page-intro">
-        <span className="editorial-label">Saved plan</span>
-        <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
-          Decisions you have approved
-        </h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '8px' }}>
-          Each entry below is an internal booking for the studio. Approving never publishes or contacts anyone.
-        </p>
+    <div className="wrap" style={{ display: 'flex', flexDirection: 'column', gap: '32px', paddingTop: '1.5rem', paddingBottom: '4rem' }} data-testid="receipts-view" data-view="receipts">
+      <div className="editorial-section-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <svg width="38" height="38" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <use href="#sf" />
+          </svg>
+          <div>
+            <span className="editorial-section-number">01</span>
+            <span className="editorial-label">Saved plan</span>
+            <h2 className="editorial-headline" style={{ fontSize: '2.2rem', marginTop: '2px' }}>
+              Decisions you have approved
+            </h2>
+          </div>
+        </div>
+        <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>
+          {decisions.length} recorded bookings
+        </span>
       </div>
+
+      <p style={{ fontSize: '0.92rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '-12px' }}>
+        Each entry below is an internal booking for the studio. Approving never publishes or contacts anyone.
+      </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {decisions.map((decision) => (

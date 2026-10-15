@@ -131,17 +131,22 @@ export function RepairComparisonView({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }} data-testid="options-view" data-view="repairs">
+    <div className="wrap" style={{ display: 'flex', flexDirection: 'column', gap: '32px', paddingTop: '1.5rem', paddingBottom: '4rem' }} data-testid="options-view" data-view="repairs">
       {/* SECTION 1: HEADER & INTRO */}
       <div className="editorial-section-header">
-        <div>
-          <span className="editorial-section-number">01</span>
-          <span className="editorial-label">Plan options</span>
-          <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
-            What we can change
-          </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <svg width="38" height="38" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <use href="#sf" />
+          </svg>
+          <div>
+            <span className="editorial-section-number">01</span>
+            <span className="editorial-label">Plan options</span>
+            <h2 className="editorial-headline" style={{ fontSize: '2.2rem', marginTop: '2px' }}>
+              What we can change
+            </h2>
+          </div>
         </div>
-        <span style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>
+        <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>
           {proposals.length} options evaluated
         </span>
       </div>

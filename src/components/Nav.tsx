@@ -177,7 +177,7 @@ export function Nav({
             >
               <span
                 style={{
-                  color: isActive ? 'var(--forest-base)' : 'var(--ink-tertiary)',
+                  color: isActive ? 'var(--paper)' : 'var(--ink-tertiary)',
                   display: 'inline-flex',
                 }}
               >
@@ -185,20 +185,15 @@ export function Nav({
               </span>
               <span>{item.label}</span>
               {typeof item.badge === 'number' && item.badge > 0 && (
-                <span
-                  className="font-mono"
+                <b
+                  className="nav-count-badge"
                   style={{
-                    fontSize: '0.66rem',
-                    padding: '1px 6px',
-                    borderRadius: '10px',
-                    backgroundColor: item.badgeColor ? 'var(--orange-light)' : 'var(--paper-subtle)',
-                    color: item.badgeColor || 'var(--ink-secondary)',
-                    fontWeight: 700,
-                    border: item.badgeColor ? '1px solid var(--orange-border)' : '1px solid var(--paper-border)',
+                    backgroundColor: item.badgeColor ? 'var(--red)' : isActive ? 'var(--paper)' : 'var(--ink)',
+                    color: isActive && !item.badgeColor ? 'var(--ink)' : '#FFFFFF',
                   }}
                 >
                   {item.badge}
-                </span>
+                </b>
               )}
             </button>
           );

@@ -138,16 +138,21 @@ export function ConflictEvidenceView({
   const evidenceCount = checkResult.evidence?.length ?? 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }} data-testid="conflict-view" data-view="conflicts">
+    <div className="wrap" style={{ display: 'flex', flexDirection: 'column', gap: '36px', paddingTop: '1.5rem', paddingBottom: '4rem' }} data-testid="conflict-view" data-view="conflicts">
       {/* SECTION 1: DIAGNOSIS & STRONG TYPOGRAPHIC NUMBERS ON PAPER */}
       <section>
         <div className="editorial-section-header">
-          <div>
-            <span className="editorial-section-number">01</span>
-            <span className="editorial-label">Needs attention</span>
-            <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
-              {copy.headline}
-            </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <svg width="38" height="38" viewBox="0 0 100 100" aria-hidden="true" style={{ flexShrink: 0 }}>
+              <use href="#sf" />
+            </svg>
+            <div>
+              <span className="editorial-section-number">01</span>
+              <span className="editorial-label">Needs attention</span>
+              <h2 className="editorial-headline" style={{ fontSize: '2.2rem', marginTop: '2px' }}>
+                {copy.headline}
+              </h2>
+            </div>
           </div>
           <span
             className={`badge-status ${badgeClass}`}
