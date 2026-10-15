@@ -100,6 +100,29 @@ export function ConflictEvidenceView({
 
   const copy = describeCheck(checkResult);
   const margin = checkResult.availableHours - checkResult.requiredHours;
+  const shortage = Math.abs(margin);
+  let balanceLabel: string;
+  let balanceValue: string;
+
+  if (margin < 0) {
+    balanceLabel = `${shortage} more ${shortage === 1 ? 'hour' : 'hours'} needed`;
+    balanceValue = `-${shortage}h`;
+  } else if (margin > 0) {
+    balanceLabel = `${margin} extra ${margin === 1 ? 'hour' : 'hours'} available`;
+    balanceValue = `+${margin}h`;
+  } else {
+    balanceLabel = 'Exact time match';
+    balanceValue = '0h';
+  }
+
+  const isUnknown = checkResult.status === 'needs_information';
+
+  if (isUnknown) {
+    // Unknown durations mean no honest numeric balance can be shown.
+    balanceLabel = 'Editing balance';
+    balanceValue = 'Unknown';
+  }
+
   const isInfeasible = checkResult.status === 'infeasible';
   const badgeClass = copy.tone === 'good' ? 'feasible' : copy.tone === 'attention' ? 'infeasible' : 'needs-info';
   const statusLabel =
@@ -151,51 +174,47 @@ export function ConflictEvidenceView({
 
           {/* Work needed / time available, straight from the check result */}
           <div
-            className="pact-stat-grid"
+            className="pact-stat-grid conflict-stat-grid"
             data-testid="conflict-metrics"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginTop: '22px' }}
           >
-            <div>
-              <span className="editorial-label" style={{ fontSize: '0.72rem' }}>
-                Editing needed
+            <div className="stat-card">
+              <span className="editorial-label stat-label" style={{ fontSize: '0.72rem' }}>
+                {isUnknown ? 'Known editing hours' : 'Editing needed'}
               </span>
-              <div className="font-serif" style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--ink-primary)', marginTop: '4px' }}>
+              <div className="font-serif stat-value" style={{ fontWeight: 600, color: 'var(--ink-primary)' }}>
                 {checkResult.requiredHours}h
               </div>
             </div>
 
-            <div>
-              <span className="editorial-label" style={{ fontSize: '0.72rem' }}>
+            <div className="stat-card">
+              <span className="editorial-label stat-label" style={{ fontSize: '0.72rem' }}>
                 Time available
               </span>
-              <div className="font-serif" style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--ink-primary)', marginTop: '4px' }}>
+              <div className="font-serif stat-value" style={{ fontWeight: 600, color: 'var(--ink-primary)' }}>
                 {checkResult.availableHours}h
               </div>
             </div>
 
-            <div>
-              <span className="editorial-label" style={{ fontSize: '0.72rem' }}>
-                Difference
+            <div className="stat-card stat-card-balance">
+              <span className="editorial-label stat-label" style={{ fontSize: '0.72rem' }}>
+                {balanceLabel}
               </span>
               <div
-                className="font-serif"
+                className="font-serif stat-value"
                 style={{
-                  fontSize: '2rem',
                   fontWeight: 600,
-                  color: margin < 0 ? 'var(--clay-700)' : 'var(--sage-700)',
-                  marginTop: '4px',
+                  color: isUnknown ? 'var(--ink-secondary)' : margin < 0 ? 'var(--clay-700)' : 'var(--sage-700)',
                 }}
               >
-                {margin > 0 ? '+' : ''}
-                {margin}h
+                {balanceValue}
               </div>
             </div>
           </div>
 
           {checkResult.status === 'needs_information' && (
             <p className="pact-inline-note" data-testid="conflict-unknown-note" style={{ fontSize: '0.78rem', color: 'var(--ink-tertiary)', marginTop: '14px' }}>
-              Some jobs have unknown hours, so &ldquo;editing needed&rdquo; is only a partial total. PACT will not
-              guess a duration.
+              Some jobs have unknown hours, so the known editing hours are only a partial total and the balance
+              cannot be confirmed yet. PACT will not guess a duration.
             </p>
           )}
         </div>

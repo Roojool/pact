@@ -104,6 +104,16 @@ export default function PlanningDeskPage() {
     fetchWorkspace();
   }, [fetchHealth, fetchWorkspace]);
 
+  // View navigation should land at the new view's beginning
+  // (without breaking source-drawer focus return within the same view)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [currentView]);
+
   // 3. Check Plan (Rules check or AI-assisted check)
   const handleAnalyze = async () => {
     if (!workspace || isAnalyzing) return;

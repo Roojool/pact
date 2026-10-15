@@ -128,7 +128,7 @@ h1, h2, h3, h4, h5, h6, section, article, .paper-card, [tabindex], button, input
 
 @media (max-width: 900px) {
   h1, h2, h3, h4, h5, h6, section, article, .paper-card, [tabindex], button, input, select, textarea, details, summary, [role="alert"], :focus-visible {
-    scroll-margin-top: 64px;
+    scroll-margin-top: 92px;
   }
 }
 
@@ -267,6 +267,23 @@ h1, h2, h3, h4, h5, h6, section, article, .paper-card, [tabindex], button, input
   position: sticky;
   top: 0;
   z-index: 15;
+}
+
+.masthead-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.masthead-status-desktop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.masthead-status-mobile {
+  display: none;
 }
 
 /* Subtle botanical / sunflower nod */
@@ -839,6 +856,21 @@ input:disabled + .toggle-slider {
   display: block;
 }
 
+/* Conflict Evidence Specific Compact Stat Grid */
+.conflict-stat-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 16px 0 20px 0;
+}
+
+.conflict-stat-grid > div.stat-card {
+  padding: 12px 16px;
+}
+
+.conflict-stat-grid .stat-value {
+  font-size: 1.75rem;
+}
+
 /* 4. Option Card (Schedule / Repair proposal options) */
 .pact-option-card {
   background-color: var(--paper-surface);
@@ -1147,37 +1179,145 @@ details .pact-detail-content,
     z-index: 25;
     border-right: none;
     border-bottom: 1px solid var(--paper-border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand footer"
+      "items items";
+    background-color: #F8F3E6;
+    padding: 0;
+  }
+
+  .pact-nav-brand {
+    grid-area: brand;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--paper-border);
+    display: flex;
+    align-items: center;
+  }
+
+  .pact-nav-footer {
+    grid-area: footer;
+    padding: 6px 12px;
+    border-top: none;
+    border-left: none;
+    border-bottom: 1px solid var(--paper-border);
+    display: flex;
+    align-items: center;
+    background: transparent;
+  }
+
+  .pact-nav-items {
+    grid-area: items;
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
     flex-direction: row;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 0;
+    padding: 4px 8px;
+    gap: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--paper-border-strong) var(--paper-subtle);
+  }
+
+  .pact-nav-items::-webkit-scrollbar {
+    height: 3px;
+  }
+  .pact-nav-items::-webkit-scrollbar-track {
+    background: var(--paper-subtle);
+  }
+  .pact-nav-items::-webkit-scrollbar-thumb {
+    background: var(--paper-border-strong);
+    border-radius: 3px;
   }
 
   .nav-item-btn {
     border-left: none;
-    border-bottom: 3px solid transparent;
-    padding: 10px 14px;
+    border-bottom: 2px solid transparent;
+    padding: 7px 11px;
     white-space: nowrap;
-    min-height: 42px;
+    min-height: 36px;
+    font-size: 0.82rem;
+    flex: 0 0 auto;
   }
 
   .nav-item-btn.active {
     border-left-color: transparent;
     border-bottom-color: var(--forest-base);
+    background-color: var(--paper-surface);
   }
 
-  /* Sticky header on mobile covers cards when wrapping: make static on narrow screens */
+  /* Compact mobile masthead: purpose/title and primary Check action prominent */
   .pact-masthead {
     position: static;
     top: auto;
-    padding: 14px 18px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 8px 10px;
+  }
+
+  .masthead-identity {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .masthead-identity .editorial-subhead {
+    font-size: 0.72rem;
+  }
+
+  .masthead-identity .editorial-headline {
+    font-size: 1.25rem;
+    margin-top: 1px;
+    line-height: 1.2;
+  }
+
+  .masthead-controls {
+    display: contents;
+  }
+
+  .masthead-status-desktop {
+    display: none !important;
+  }
+
+  .masthead-status-mobile {
+    display: block !important;
+  }
+
+  .masthead-check-btn {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+    padding: 6px 14px;
+    min-height: 36px;
+    font-size: 0.82rem;
+  }
+
+  .pact-detail-toggle {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+  }
+
+  .masthead-start-over {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    align-self: center;
+    padding: 5px 10px;
+    min-height: 32px;
+    font-size: 0.78rem;
   }
 
   .pact-content-container {
-    padding: 20px 16px 48px 16px;
+    padding: 16px 14px 48px 14px;
     min-width: 0;
   }
 
@@ -1197,11 +1337,45 @@ details .pact-detail-content,
 
 @media (max-width: 600px) {
   .pact-masthead {
-    padding: 12px 14px;
+    padding: 10px 12px;
   }
 
-  .pact-masthead h1 {
-    font-size: 1.25rem;
+  .masthead-identity .editorial-headline {
+    font-size: 1.18rem;
+  }
+
+  /* Conflict metrics compact responsive grid */
+  .conflict-stat-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0 16px 0;
+  }
+
+  .conflict-stat-grid > div.stat-card {
+    padding: 10px 12px;
+  }
+
+  .conflict-stat-grid > div.stat-card-balance {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .conflict-stat-grid .stat-card-balance .stat-label {
+    margin-bottom: 0;
+    font-size: 0.78rem;
+  }
+
+  .conflict-stat-grid .stat-card-balance .stat-value {
+    margin-top: 0;
+    font-size: 1.45rem;
+  }
+
+  .conflict-stat-grid .stat-value {
+    font-size: 1.45rem;
+    margin-top: 2px;
   }
 
   /* Button rows wrap comfortably without cramping */
@@ -1215,7 +1389,7 @@ details .pact-detail-content,
   }
 
   .pact-content-container {
-    padding: 16px 12px 40px 12px;
+    padding: 14px 10px 36px 10px;
   }
 }
 

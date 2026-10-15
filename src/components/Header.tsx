@@ -44,7 +44,7 @@ export function Header({
   return (
     <header className="pact-masthead" data-testid="masthead">
       {/* Masthead Left: studio identity only, no revision jargon up front */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+      <div className="masthead-identity" style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
         <div>
           <span className="editorial-subhead" style={{ color: 'var(--clay-700)', letterSpacing: '0.12em' }}>
             Morrow Studio
@@ -56,58 +56,96 @@ export function Header({
       </div>
 
       {/* Masthead Right: health, mode, optional details, and the two real actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-        {/* Service health: truthful state, no default-healthy assumption */}
-        <div
-          className="badge-status"
-          data-testid="service-status"
-          style={{
-            backgroundColor: !isHealthKnown
-              ? 'var(--paper-subtle)'
-              : isServiceOk
-              ? 'var(--sage-50)'
-              : 'var(--clay-50)',
-            color: !isHealthKnown
-              ? 'var(--ink-secondary)'
-              : isServiceOk
-              ? 'var(--sage-700)'
-              : 'var(--clay-700)',
-            borderColor: !isHealthKnown
-              ? 'var(--paper-border)'
-              : isServiceOk
-              ? 'var(--sage-200)'
-              : 'var(--clay-200)',
-          }}
-          title={
-            !isHealthKnown
-              ? 'Connecting to service…'
-              : isServiceOk
-              ? 'Planning service online'
-              : 'Planning service offline'
-          }
-        >
-          <Database size={12} />
-          {!isHealthKnown ? 'Checking service…' : isServiceOk ? 'Service online' : 'Service offline'}
+      <div className="masthead-controls" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        {/* Service health & mode for desktop view */}
+        <div className="masthead-status-desktop" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div
+            className="badge-status"
+            data-testid="service-status"
+            style={{
+              backgroundColor: !isHealthKnown
+                ? 'var(--paper-subtle)'
+                : isServiceOk
+                ? 'var(--sage-50)'
+                : 'var(--clay-50)',
+              color: !isHealthKnown
+                ? 'var(--ink-secondary)'
+                : isServiceOk
+                ? 'var(--sage-700)'
+                : 'var(--clay-700)',
+              borderColor: !isHealthKnown
+                ? 'var(--paper-border)'
+                : isServiceOk
+                ? 'var(--sage-200)'
+                : 'var(--clay-200)',
+            }}
+            title={
+              !isHealthKnown
+                ? 'Connecting to service…'
+                : isServiceOk
+                ? 'Planning service online'
+                : 'Planning service offline'
+            }
+          >
+            <Database size={12} />
+            {!isHealthKnown ? 'Checking service…' : isServiceOk ? 'Service online' : 'Service offline'}
+          </div>
+
+          <div
+            className={`badge-status ${currentMode === 'live' ? 'live' : 'deterministic'}`}
+            data-testid="check-mode"
+            title={
+              currentMode === 'live'
+                ? 'AI-assisted plan analysis active'
+                : 'Rules check: deterministic verification only'
+            }
+          >
+            {currentMode === 'live' ? <Sparkles size={12} /> : <ShieldCheck size={12} />}
+            {modeLabel}
+          </div>
         </div>
 
-        {/* Check mode: Rules check vs AI-assisted check */}
-        <div
-          className={`badge-status ${currentMode === 'live' ? 'live' : 'deterministic'}`}
-          data-testid="check-mode"
-          title={
-            currentMode === 'live'
-              ? 'AI-assisted plan analysis active'
-              : 'Rules check: deterministic verification only'
-          }
-        >
-          {currentMode === 'live' ? <Sparkles size={12} /> : <ShieldCheck size={12} />}
-          {modeLabel}
-        </div>
-
-        {/* Optional details: revision number and the optional AI explanation toggle */}
+        {/* Optional details: technical status (on mobile), revision number and optional AI explanation toggle */}
         <details className="pact-detail-toggle" data-testid="header-details">
           <summary>Plan details &amp; options</summary>
           <div className="pact-inline-note" style={{ marginTop: '10px', maxWidth: '320px' }}>
+            {/* Secondary technical status on mobile */}
+            <div className="masthead-status-mobile" style={{ marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px solid var(--paper-border)' }}>
+              <span className="editorial-label" style={{ fontSize: '0.68rem', display: 'block', marginBottom: '6px' }}>
+                System status
+              </span>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div
+                  className="badge-status"
+                  style={{
+                    backgroundColor: !isHealthKnown
+                      ? 'var(--paper-subtle)'
+                      : isServiceOk
+                      ? 'var(--sage-50)'
+                      : 'var(--clay-50)',
+                    color: !isHealthKnown
+                      ? 'var(--ink-secondary)'
+                      : isServiceOk
+                      ? 'var(--sage-700)'
+                      : 'var(--clay-700)',
+                    borderColor: !isHealthKnown
+                      ? 'var(--paper-border)'
+                      : isServiceOk
+                      ? 'var(--sage-200)'
+                      : 'var(--clay-200)',
+                  }}
+                >
+                  <Database size={12} />
+                  {!isHealthKnown ? 'Checking service…' : isServiceOk ? 'Service online' : 'Service offline'}
+                </div>
+
+                <div className={`badge-status ${currentMode === 'live' ? 'live' : 'deterministic'}`}>
+                  {currentMode === 'live' ? <Sparkles size={12} /> : <ShieldCheck size={12} />}
+                  {modeLabel}
+                </div>
+              </div>
+            </div>
+
             <p style={{ fontSize: '0.8rem', color: 'var(--ink-secondary)', marginBottom: '10px' }}>
               Plan revision <strong>#{workspace?.revision ?? 0}</strong>. Revision numbers change when a plan is
               edited or approved.
@@ -169,7 +207,7 @@ export function Header({
         <button
           type="button"
           onClick={onResetClick}
-          className="btn-editorial-secondary"
+          className="btn-editorial-secondary masthead-start-over"
           data-testid="start-over"
           style={{ padding: '7px 12px', fontSize: '0.8rem' }}
           title="Start over with the sample studio plan"
@@ -183,7 +221,7 @@ export function Header({
           type="button"
           onClick={onAnalyze}
           disabled={isAnalyzing || !workspace}
-          className="btn-editorial-primary pact-primary-action"
+          className="btn-editorial-primary pact-primary-action masthead-check-btn"
           data-testid="check-plan"
           style={{ padding: '7px 16px', fontSize: '0.82rem' }}
         >

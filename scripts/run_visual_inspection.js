@@ -84,13 +84,15 @@ async function run() {
   );
   console.log('✓ Assertion passed: Initial overview loads plain-language headings with collapsed technical disclosures.');
 
-  // Focused 390px viewport check for main-page overflow and timeline horizontal scrollability
-  console.log('   Checking 390px mobile viewport layout behavior...');
-  const mobilePage = await context.newPage();
-  await mobilePage.setViewportSize({ width: 390, height: 844 });
-  await mobilePage.goto(baseUrl, { waitUntil: 'networkidle' });
+  await page.screenshot({ path: path.join(outDir, '01_initial_overview.png') });
+  console.log('Saved: 01_initial_overview.png');
 
-  const hasMainPageOverflow = await mobilePage.evaluate(() => {
+  // Focused 390px viewport check on same page: main-page overflow and timeline 16-cell reachability
+  console.log('   Checking 390px mobile viewport layout behavior on overview...');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(300);
+
+  const hasMainPageOverflow = await page.evaluate(() => {
     return document.documentElement.scrollWidth > document.documentElement.clientWidth;
   });
   assert.strictEqual(
@@ -99,20 +101,55 @@ async function run() {
     '390px viewport must have no main-page horizontal scroll blowout'
   );
 
-  const timelineIsHorizontallyScrollable = await mobilePage.evaluate(() => {
+  const timelineReachability = await page.evaluate(async () => {
     const wrapper = document.querySelector('.timeline-scroll-wrapper');
-    if (!wrapper) return false;
-    return wrapper.scrollWidth > wrapper.clientWidth;
+    if (!wrapper) return { found: false, error: 'timeline-scroll-wrapper not found' };
+    const cells = wrapper.querySelectorAll('.slot-cell');
+    if (cells.length < 16) return { found: false, error: `Expected 16 cells, found ${cells.length}` };
+    const lastCell = cells[15];
+
+    const isScrollable = wrapper.scrollWidth > wrapper.clientWidth;
+    if (!isScrollable) {
+      return { found: true, isScrollable: false, isReachable: false, error: 'Wrapper scrollWidth <= clientWidth' };
+    }
+
+    const initialScrollLeft = wrapper.scrollLeft;
+    // Perform horizontal scroll to reveal the end
+    wrapper.scrollLeft = wrapper.scrollWidth - wrapper.clientWidth;
+    await new Promise((r) => setTimeout(r, 100));
+
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const lastCellRect = lastCell.getBoundingClientRect();
+
+    // Check reachability: the 16th cell must be within the wrapper's visible horizontal window
+    const isReachable = lastCellRect.right <= wrapperRect.right + 4 && lastCellRect.left >= wrapperRect.left - 4;
+
+    // Reset scrollLeft
+    wrapper.scrollLeft = initialScrollLeft;
+
+    return { found: true, isScrollable, isReachable };
   });
+
   assert.ok(
-    timelineIsHorizontallyScrollable,
+    timelineReachability.found,
+    `Timeline elements must be found on 390px mobile view: ${timelineReachability.error}`
+  );
+  assert.ok(
+    timelineReachability.isScrollable,
     'Timeline grid must be genuinely horizontally scrollable inside its wrapper on 390px screen'
   );
-  await mobilePage.close();
-  console.log('✓ Assertion passed: 390px viewport has zero main page overflow and a genuinely scrollable 16-slot timeline.');
+  assert.ok(
+    timelineReachability.isReachable,
+    'The last of all 16 timeline cells (slot #15) must become reachable within its genuine scroll wrapper after horizontal scrolling'
+  );
+  console.log('✓ Assertion passed: 390px viewport has zero main page overflow and 16th timeline cell is reachable via horizontal scroll.');
 
-  await page.screenshot({ path: path.join(outDir, '01_initial_overview.png') });
-  console.log('Saved: 01_initial_overview.png');
+  await page.screenshot({ path: path.join(outDir, 'mobile_390_overview.png') });
+  console.log('Saved: mobile_390_overview.png');
+
+  // Restore desktop viewport before continuing
+  await page.setViewportSize({ width: 1280, height: 860 });
+  await page.waitForTimeout(300);
 
   // 2. Click "Check this plan" and assert initial 12h/8h conflict
   console.log('2. Clicking "Check this plan"...');
@@ -144,19 +181,50 @@ async function run() {
   await page.waitForSelector('[data-testid="conflict-metrics"]');
   await page.waitForSelector('[data-testid="affected-work"]');
 
-  // Verify truthful affected work: human titles only, no raw IDs
-  const affectedItems = await page.locator('[data-testid="affected-work"] li').allInnerTexts();
-  assert.ok(affectedItems.length >= 3, 'Must list all 3 affected work items');
+  // Get actual workspace through authenticated browser API context
+  const wsRes = await context.request.get(`${baseUrl}/api/workspace`);
+  assert.strictEqual(wsRes.status(), 200, 'Must fetch workspace from authenticated API context');
+  const wsData = await wsRes.json();
+  const currentWorkspace = wsData.workspace;
+  assert.ok(currentWorkspace && Array.isArray(currentWorkspace.commitments), 'Workspace must contain commitments array');
+
+  // Resolve analysis.check.conflictIds to real commitment titles
+  const expectedCommitmentTitles = analysis.check.conflictIds.map((id) => {
+    const commitment = currentWorkspace.commitments.find((c) => c.id === id);
+    assert.ok(commitment, `Conflict ID "${id}" must exist in workspace commitments`);
+    return commitment.title;
+  });
+
+  // Verify truthful affected work: human titles only, none omitted, no raw IDs
+  const affectedItems = (await page.locator('[data-testid="affected-work"] li').allInnerTexts()).map((t) => t.trim());
+  assert.strictEqual(
+    affectedItems.length,
+    expectedCommitmentTitles.length,
+    `Affected work list count (${affectedItems.length}) must match conflict commitment count (${expectedCommitmentTitles.length}) with none omitted`
+  );
+
+  for (const title of expectedCommitmentTitles) {
+    assert.ok(
+      affectedItems.includes(title),
+      `Reported affected job "${title}" must be displayed in affected work list (found: ${JSON.stringify(affectedItems)})`
+    );
+  }
+
   for (const item of affectedItems) {
     assert.ok(
-      !item.includes('cm-') && !item.includes('src-'),
+      !item.includes('cm-') && !item.includes('src-') && !item.includes('cp-') && !item.includes('ed-'),
       `Affected work must show human titles, never raw IDs. Got: "${item}"`
     );
   }
-  assert.ok(affectedItems.some((t) => t.includes('Comet Coffee')), 'Must truthfully name Comet Coffee Launch');
-  assert.ok(affectedItems.some((t) => t.includes('Aurora Skincare')), 'Must truthfully name Aurora Skincare Campaign');
-  assert.ok(affectedItems.some((t) => t.includes('Solstice Sunglasses')), 'Must truthfully name Solstice Sunglasses Rebrand');
-  console.log('✓ Assertion passed: Truthful affected-work labels verified (human titles, zero raw IDs).');
+
+  const rawAffectedSectionText = await page.locator('[data-testid="affected-work"]').innerText();
+  for (const id of analysis.check.conflictIds) {
+    assert.ok(
+      !rawAffectedSectionText.includes(id),
+      `Raw conflict ID "${id}" must be absent from affected-work section`
+    );
+  }
+  console.log('✓ Assertion passed: Truthful affected-work labels verified (resolved commitment titles, none omitted, zero raw IDs).');
 
   // Verify technical disclosure is initially collapsed and can be keyboard opened
   const conflictTechDetails = page.locator('[data-testid="conflict-technical-details"]');
@@ -190,6 +258,33 @@ async function run() {
   await page.waitForTimeout(400);
   await page.screenshot({ path: path.join(outDir, '03_conflict_evidence.png') });
   console.log('Saved: 03_conflict_evidence.png');
+
+  // Mobile 390px conflict evidence capture
+  console.log('   Checking 390px mobile viewport on conflict view...');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+  await page.waitForTimeout(300);
+  const hasConflictMobileOverflow = await page.evaluate(() => {
+    return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+  });
+  assert.strictEqual(
+    hasConflictMobileOverflow,
+    false,
+    '390px viewport on conflict view must have no main-page horizontal scroll blowout'
+  );
+  await page.screenshot({ path: path.join(outDir, 'mobile_390_conflict.png') });
+  console.log('Saved: mobile_390_conflict.png');
+  await page.setViewportSize({ width: 1280, height: 860 });
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+  await page.waitForTimeout(300);
 
   // 4. Repair Proposals: Feasible Comet-Day2 Option & Sam Denial
   console.log('4. Navigating to Plan Options ("Plan options")...');
@@ -256,9 +351,50 @@ async function run() {
     console.log('✓ Assertion passed: Real source title opened correct drawer record and closed cleanly on Escape.');
   }
 
+  // Restore collapsed default state and scroll to meaningful view top before default screenshots
+  await optionDetails.locator('summary').click();
+  assert.strictEqual(
+    await optionDetails.getAttribute('open'),
+    null,
+    'Option details must be restored to collapsed default state'
+  );
+
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
   await page.waitForTimeout(400);
+
   await page.screenshot({ path: path.join(outDir, '04_repair_proposals.png') });
   console.log('Saved: 04_repair_proposals.png');
+
+  // Mobile 390px plan options capture
+  console.log('   Checking 390px mobile viewport on plan options view...');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+  await page.waitForTimeout(300);
+  const hasOptionsMobileOverflow = await page.evaluate(() => {
+    return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+  });
+  assert.strictEqual(
+    hasOptionsMobileOverflow,
+    false,
+    '390px viewport on plan options view must have no main-page horizontal scroll blowout'
+  );
+  await page.screenshot({ path: path.join(outDir, 'mobile_390_options.png') });
+  console.log('Saved: mobile_390_options.png');
+  await page.setViewportSize({ width: 1280, height: 860 });
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+  await page.waitForTimeout(300);
 
   // 5. Approve Feasible Repair Proposal & Verify Receipts
   console.log('5. Approving feasible repair proposal...');
@@ -306,7 +442,7 @@ async function run() {
 
   // 7. Studio Memory Inquiry (Deterministic Grounded Reply, $0 Billable AI Cost)
   console.log('7. Asking PACT a grounded question in plain language...');
-  await page.fill('#memory-query-input', 'What was approved and what happens next?');
+  await page.fill('#memory-query-input', 'What was approved for Comet Coffee and what happens next?');
   const [memoryRes] = await Promise.all([
     page.waitForResponse((r) => r.url().includes('/api/memory') && r.status() === 200),
     page.click('button[type="submit"]:has-text("Ask")'),
@@ -319,6 +455,7 @@ async function run() {
   assert.strictEqual(reply.mode, 'deterministic', 'Studio memory must operate in deterministic mode');
   assert.strictEqual(reply.usageUsd ?? 0, 0, 'No billable AI usage allowed (usageUsd must be 0)');
   assert.ok(typeof reply.text === 'string' && reply.text.length > 20, 'Memory response must be non-empty');
+  assert.ok(Array.isArray(reply.sourceIds) && reply.sourceIds.length > 0, 'Memory response must cite grounded sources');
   console.log('✓ Assertion passed: Studio memory returned verified grounded response with zero billable AI cost.');
 
   // Verify response renders grounded source titles
@@ -331,7 +468,7 @@ async function run() {
   // 8. Start Over / Reset Modal
   console.log('8. Testing Start Over / Reset modal...');
   await page.click('[data-testid="start-over"]');
-  await page.waitForSelector('text=Reset to sample agency schedule?');
+  await page.waitForSelector('text=Start over?');
   await page.screenshot({ path: path.join(outDir, '08_start_over_modal.png') });
   console.log('Saved: 08_start_over_modal.png');
 
@@ -476,6 +613,12 @@ async function run() {
   await page.keyboard.press('Escape');
   await page.waitForSelector('[data-testid="source-drawer"]', { state: 'detached', timeout: 3000 });
   console.log('✓ Assertion passed: Source drawer closed cleanly on Escape key press.');
+
+  const isTriggerFocused = await page.evaluate(() => {
+    return document.activeElement === document.querySelector('[data-testid="open-sources"]');
+  });
+  assert.ok(isTriggerFocused, 'Focus must be restored to [data-testid="open-sources"] trigger after Escape dismissal');
+  console.log('✓ Assertion passed: Focus restoration verified.');
   await page.waitForTimeout(400);
 
   // 16. Real Stale 409 State & Error Handling
@@ -516,20 +659,21 @@ async function run() {
 
   await browser.close();
   console.log('\n======================================================');
-  console.log('All 16 visual inspection screenshots captured successfully!');
+  console.log('All 16 visual inspection screenshots + 3 mobile screenshots captured successfully!');
   console.log('All assertions passed:');
   console.log('  1. Initial 12h/8h capacity conflict (infeasible, deterministic rules mode)');
-  console.log('  2. Truthful affected-work titles without raw IDs');
-  console.log('  3. Technical disclosures initially collapsed & keyboard openable');
-  console.log('  4. 390px mobile viewport zero page overflow & scrollable 16-slot grid');
-  console.log('  5. Feasible repair candidate synthesis & Sam denial enforcement');
-  console.log('  6. Real source titles link to grounded drawer records');
-  console.log('  7. Human approval receipt persistence & execution tasks');
-  console.log('  8. Grounded Studio Memory with $0 billable AI usage');
-  console.log('  9. Sam approval yielding feasible original Day 1 deadlines');
-  console.log(' 10. Unknown duration deliverable correctly producing needs_information');
-  console.log(' 11. Keyboard accessibility: Escape cleanly dismisses Source Drawer');
-  console.log(' 12. Real HTTP 409 optimistic locking state handling');
+  console.log('  2. Truthful affected-work titles resolved from workspace commitments (none omitted, zero raw IDs)');
+  console.log('  3. Technical disclosures initially collapsed & keyboard openable via Enter');
+  console.log('  4. 390px mobile viewport zero page overflow across overview, conflict, and options views');
+  console.log('  5. 390px timeline 16th cell reachable within genuine scroll wrapper after horizontal scrolling');
+  console.log('  6. Feasible repair candidate synthesis & Sam policy denial enforcement');
+  console.log('  7. Real source titles link to grounded drawer records');
+  console.log('  8. Human approval receipt persistence & execution checklist tasks');
+  console.log('  9. Grounded Studio Memory with $0 billable AI usage');
+  console.log(' 10. Sam approval yielding feasible original Day 1 deadlines');
+  console.log(' 11. Unknown duration deliverable correctly producing needs_information');
+  console.log(' 12. Keyboard accessibility: Escape cleanly dismisses Source Drawer and restores trigger focus');
+  console.log(' 13. Real HTTP 409 optimistic locking state handling');
   console.log('======================================================\n');
 }
 

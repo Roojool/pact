@@ -117,7 +117,12 @@ export function Nav({
             <button
               key={item.id}
               type="button"
-              onClick={() => onSelectView(item.id)}
+              onClick={() => {
+                onSelectView(item.id);
+                if (typeof window !== 'undefined') {
+                  window.scrollTo(0, 0);
+                }
+              }}
               className={`nav-item-btn ${isActive ? 'active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
               data-testid={`nav-${item.id}`}
@@ -211,29 +216,35 @@ export function Nav({
         }
         @media (max-width: 900px) {
           .pact-nav-brand {
-            padding: 10px 14px;
-            border-bottom: none;
-            border-right: 1px solid var(--paper-border);
-            flex-shrink: 0;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--paper-border);
+            border-right: none;
+            display: flex;
+            align-items: center;
           }
           .pact-nav-items {
             flex-direction: row;
             align-items: center;
-            padding: 0 4px;
+            padding: 4px 8px;
             overflow-x: auto;
-            flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             gap: 4px;
+            scrollbar-width: thin;
           }
           .pact-nav-header-label {
             display: none;
           }
           .pact-nav-footer {
-            padding: 8px 12px;
+            padding: 6px 12px;
             border-top: none;
-            border-left: 1px solid var(--paper-border);
-            flex-shrink: 0;
+            border-bottom: 1px solid var(--paper-border);
+            border-left: none;
             display: flex;
             align-items: center;
+            background: transparent;
           }
           .pact-nav-footer-sub {
             display: none !important;
