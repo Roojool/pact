@@ -1,0 +1,107 @@
+services:
+  graph:
+    image: falkordb/falkordb@sha256:107455e862a824e45e8e9f5a7fbfdf5e00a08b14e13eae2577c72fd9e3f59ba6
+    restart: unless-stopped
+    volumes:
+      - graph-data:/var/lib/falkordb/data
+    environment:
+      REDIS_ARGS: "--appendonly yes --appendfsync everysec"
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+  agent-account-manager:
+    build:
+      context: ./agent-runtime
+    restart: unless-stopped
+    environment:
+      PACT_AGENT_ROLE: account-manager
+      PACT_AGENT_PORT: "3010"
+      PACT_RUNTIME_TOKEN: ${PACT_RUNTIME_TOKEN:?PACT_RUNTIME_TOKEN is required}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-6.1-sol}
+      FALKORDB_URL: redis://graph:6379
+      PACT_API_BUDGET_USD: ${PACT_API_BUDGET_USD:-5}
+      PACT_AGENT_GRAPH: ${PACT_AGENT_GRAPH:-pact_agent}
+      PACT_BUDGET_GRAPH: ${PACT_BUDGET_GRAPH:-pact_budget}
+    expose:
+      - "3010"
+    volumes:
+      - am-workflow-data:/workspace/agents/account-manager/.eve/.workflow-data
+    depends_on:
+      graph:
+        condition: service_healthy
+
+  agent-producer:
+    build:
+      context: ./agent-runtime
+    restart: unless-stopped
+    environment:
+      PACT_AGENT_ROLE: producer
+      PACT_AGENT_PORT: "3011"
+      PACT_RUNTIME_TOKEN: ${PACT_RUNTIME_TOKEN:?PACT_RUNTIME_TOKEN is required}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-6.1-sol}
+      FALKORDB_URL: redis://graph:6379
+      PACT_API_BUDGET_USD: ${PACT_API_BUDGET_USD:-5}
+      PACT_AGENT_GRAPH: ${PACT_AGENT_GRAPH:-pact_agent}
+      PACT_BUDGET_GRAPH: ${PACT_BUDGET_GRAPH:-pact_budget}
+    expose:
+      - "3011"
+    volumes:
+      - producer-workflow-data:/workspace/agents/producer/.eve/.workflow-data
+    depends_on:
+      graph:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      FALKORDB_URL: redis://graph:6379
+      PACT_AGENT_TRANSPORT: eve
+      AGENT_RUNTIME_URL: http://agent-account-manager:3010
+      AGENT_PRODUCER_URL: http://agent-producer:3011
+      PACT_RUNTIME_TOKEN: ${PACT_RUNTIME_TOKEN:?PACT_RUNTIME_TOKEN is required}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-6.1-sol}
+      PACT_API_BUDGET_USD: ${PACT_API_BUDGET_USD:-5}
+      PACT_AGENT_GRAPH: ${PACT_AGENT_GRAPH:-pact_agent}
+      PACT_BUDGET_GRAPH: ${PACT_BUDGET_GRAPH:-pact_budget}
+    expose:
+      - "3000"
+    depends_on:
+      graph:
+        condition: service_healthy
+      agent-account-manager:
+        condition: service_healthy
+      agent-producer:
+        condition: service_healthy
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      PACT_DOMAIN: ${PACT_DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  graph-data:
+  am-workflow-data:
+  producer-workflow-data:
+  caddy-data:
+  caddy-config:

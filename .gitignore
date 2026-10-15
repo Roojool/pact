@@ -1,0 +1,17 @@
+node_modules/
+.next/
+.env*
+!.env.example
+.eve/
+.output/
+coverage/
+*.log
+*.tsbuildinfo
+test-results/
+playwright-report/
+.DS_Store
+*_REPORT.md
+.pact-ops/
+ROOT_DEPENDENCIES.md
+.playwright-cli/
+output/playwright/

@@ -1,0 +1,29 @@
+{
+  "name": "pact-agency",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:integration": "tsx --env-file-if-exists=.env.local --test tests/*.integration.ts"
+  },
+  "dependencies": {
+    "falkordb": "6.8.0",
+    "lucide-react": "1.57.0",
+    "next": "16.4.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "playwright-core": "^1.64.1",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

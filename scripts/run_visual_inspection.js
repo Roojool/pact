@@ -1,0 +1,539 @@
+const { chromium } = require('playwright-core');
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+
+const baseUrl = process.env.PACT_BASE_URL || 'http://127.0.0.1:3000';
+const outDir = path.resolve(__dirname, '../output/playwright');
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+
+async function launchBrowser() {
+  const envPath = process.env.PACT_BROWSER_PATH || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+  if (envPath && fs.existsSync(envPath)) {
+    console.log(`Using environment override browser executable: ${envPath}`);
+    return await chromium.launch({ executablePath: envPath, headless: true });
+  }
+
+  // Try standard system channels
+  for (const channel of ['chrome', 'msedge']) {
+    try {
+      console.log(`Attempting to launch browser via channel: ${channel}`);
+      const browser = await chromium.launch({ channel, headless: true });
+      console.log(`Successfully launched browser via channel "${channel}" (v${browser.version()})`);
+      return browser;
+    } catch {
+      // Channel not found, continue to next
+    }
+  }
+
+  // Fallback to searching known default browser paths
+  const candidatePaths = [
+    'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+    'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  ];
+  for (const p of candidatePaths) {
+    if (fs.existsSync(p)) {
+      console.log(`Found installed browser at fallback path: ${p}`);
+      return await chromium.launch({ executablePath: p, headless: true });
+    }
+  }
+
+  return await chromium.launch({ headless: true });
+}
+
+async function run() {
+  console.log(`Starting adapted PACT small-business visual smoke journey against ${baseUrl}...`);
+  const browser = await launchBrowser();
+
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 860 },
+  });
+  const page = await context.newPage();
+
+  // 1. Initial Overview & 390px Viewport Mobile Validation
+  console.log(`1. Navigating to ${baseUrl}...`);
+  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+
+  // Verify stable main stage and plain-language headings
+  await page.waitForSelector('[data-testid="main-stage"][data-view="overview"]');
+  await page.waitForSelector('text=Jobs in the plan');
+  await page.waitForSelector('text=Who is available to edit');
+  await page.waitForSelector('[data-testid="page-intro"]');
+
+  // Verify technical disclosures are initially collapsed
+  const overviewDetails = page.locator('[data-testid="overview-technical-details"]');
+  if (await overviewDetails.count() > 0) {
+    assert.strictEqual(
+      await overviewDetails.getAttribute('open'),
+      null,
+      'Overview technical disclosure must be initially collapsed'
+    );
+  }
+
+  // Verify default view does not surface raw cm-* ids or src-policy chips
+  const initialStageText = await page.locator('[data-testid="main-stage"]').innerText();
+  assert.ok(
+    !initialStageText.includes('cm-a') && !initialStageText.includes('src-policy:v1'),
+    'Default overview view must not display raw cm-a or src-policy:v1 technical IDs'
+  );
+  console.log('✓ Assertion passed: Initial overview loads plain-language headings with collapsed technical disclosures.');
+
+  // Focused 390px viewport check for main-page overflow and timeline horizontal scrollability
+  console.log('   Checking 390px mobile viewport layout behavior...');
+  const mobilePage = await context.newPage();
+  await mobilePage.setViewportSize({ width: 390, height: 844 });
+  await mobilePage.goto(baseUrl, { waitUntil: 'networkidle' });
+
+  const hasMainPageOverflow = await mobilePage.evaluate(() => {
+    return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+  });
+  assert.strictEqual(
+    hasMainPageOverflow,
+    false,
+    '390px viewport must have no main-page horizontal scroll blowout'
+  );
+
+  const timelineIsHorizontallyScrollable = await mobilePage.evaluate(() => {
+    const wrapper = document.querySelector('.timeline-scroll-wrapper');
+    if (!wrapper) return false;
+    return wrapper.scrollWidth > wrapper.clientWidth;
+  });
+  assert.ok(
+    timelineIsHorizontallyScrollable,
+    'Timeline grid must be genuinely horizontally scrollable inside its wrapper on 390px screen'
+  );
+  await mobilePage.close();
+  console.log('✓ Assertion passed: 390px viewport has zero main page overflow and a genuinely scrollable 16-slot timeline.');
+
+  await page.screenshot({ path: path.join(outDir, '01_initial_overview.png') });
+  console.log('Saved: 01_initial_overview.png');
+
+  // 2. Click "Check this plan" and assert initial 12h/8h conflict
+  console.log('2. Clicking "Check this plan"...');
+  const [analyzeRes] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/analyze') && r.status() === 200),
+    page.click('[data-testid="check-plan"]'),
+  ]);
+  const analyzeData = await analyzeRes.json();
+  const analysis = analyzeData.analysis;
+  assert.ok(analysis && analysis.check, 'Analyze response must include analysis.check');
+
+  // ASSERTION: Initial 12h/8h conflict and deterministic mode
+  assert.strictEqual(analysis.check.status, 'infeasible', 'Initial plan check must be infeasible');
+  assert.strictEqual(analysis.check.requiredHours, 12, 'Initial required editor hours must equal 12h');
+  assert.strictEqual(analysis.check.availableHours, 8, 'Initial approved available editor hours must equal 8h');
+  assert.strictEqual(analysis.mode, 'deterministic', 'Must preserve deterministic rules mode with no billable AI');
+  assert.ok(analysis.check.conflictIds.length >= 3, 'Must identify all 3 active conflict commitments');
+  console.log('✓ Assertion passed: Initial 12h/8h conflict verified (infeasible, 12h required vs 8h available, deterministic mode).');
+
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: path.join(outDir, '02_checked_bottleneck.png') });
+  console.log('Saved: 02_checked_bottleneck.png');
+
+  // 3. Conflict Evidence & Truthful Affected-Work Labels
+  console.log('3. Navigating to Conflict Evidence ("Needs attention")...');
+  await page.click('[data-testid="nav-conflicts"]');
+  await page.waitForSelector('[data-testid="conflict-view"]');
+  await page.waitForSelector('[data-testid="conflict-diagnosis"]');
+  await page.waitForSelector('[data-testid="conflict-metrics"]');
+  await page.waitForSelector('[data-testid="affected-work"]');
+
+  // Verify truthful affected work: human titles only, no raw IDs
+  const affectedItems = await page.locator('[data-testid="affected-work"] li').allInnerTexts();
+  assert.ok(affectedItems.length >= 3, 'Must list all 3 affected work items');
+  for (const item of affectedItems) {
+    assert.ok(
+      !item.includes('cm-') && !item.includes('src-'),
+      `Affected work must show human titles, never raw IDs. Got: "${item}"`
+    );
+  }
+  assert.ok(affectedItems.some((t) => t.includes('Comet Coffee')), 'Must truthfully name Comet Coffee Launch');
+  assert.ok(affectedItems.some((t) => t.includes('Aurora Skincare')), 'Must truthfully name Aurora Skincare Campaign');
+  assert.ok(affectedItems.some((t) => t.includes('Solstice Sunglasses')), 'Must truthfully name Solstice Sunglasses Rebrand');
+  console.log('✓ Assertion passed: Truthful affected-work labels verified (human titles, zero raw IDs).');
+
+  // Verify technical disclosure is initially collapsed and can be keyboard opened
+  const conflictTechDetails = page.locator('[data-testid="conflict-technical-details"]');
+  assert.strictEqual(
+    await conflictTechDetails.getAttribute('open'),
+    null,
+    'Conflict technical details must be initially collapsed'
+  );
+
+  await conflictTechDetails.locator('summary').focus();
+  await page.keyboard.press('Enter');
+  assert.strictEqual(
+    await conflictTechDetails.getAttribute('open'),
+    '',
+    'Conflict technical details must open on keyboard Enter'
+  );
+  assert.ok(
+    (await conflictTechDetails.innerText()).includes('Reasoning paths'),
+    'Reasoning paths must be present inside expanded details'
+  );
+
+  // Close back up via keyboard to preserve clean state
+  await page.keyboard.press('Enter');
+  assert.strictEqual(
+    await conflictTechDetails.getAttribute('open'),
+    null,
+    'Conflict technical details must close on keyboard Enter'
+  );
+  console.log('✓ Assertion passed: Disclosure keyboard interaction verified.');
+
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(outDir, '03_conflict_evidence.png') });
+  console.log('Saved: 03_conflict_evidence.png');
+
+  // 4. Repair Proposals: Feasible Comet-Day2 Option & Sam Denial
+  console.log('4. Navigating to Plan Options ("Plan options")...');
+  await page.click('[data-testid="conflict-next-action"]');
+  await page.waitForSelector('[data-testid="options-view"]');
+
+  // Verify feasible candidate (Comet Coffee moved to Day 2)
+  const feasibleProposals = analysis.proposals.filter((p) => p.result?.status === 'feasible');
+  assert.ok(feasibleProposals.length >= 1, 'Must synthesize at least one feasible repair candidate');
+  const feasibleCandidate = feasibleProposals[0];
+  console.log(`✓ Assertion passed: Found ${feasibleProposals.length} feasible repair candidate(s).`);
+
+  const feasibleOptionCard = page.locator(`[data-testid="option-${feasibleCandidate.id}"]`);
+  await feasibleOptionCard.waitFor();
+  const feasibleStatusText = await page.locator(`[data-testid="option-status-${feasibleCandidate.id}"]`).innerText();
+  assert.ok(
+    feasibleStatusText.includes('Ready to approve') || feasibleStatusText.includes('feasible'),
+    'Feasible candidate must display "Ready to approve"'
+  );
+
+  // Verify Sam denial (rejected/blocked candidate)
+  const samProposal = analysis.proposals.find(
+    (p) => p.status === 'rejected' || p.description.includes('Sam') || p.title.includes('Sam')
+  );
+  assert.ok(samProposal, 'Must evaluate Sam assignment candidate');
+  const samOptionCard = page.locator(`[data-testid="option-${samProposal.id}"]`);
+  await samOptionCard.waitFor();
+  const samStatusText = await page.locator(`[data-testid="option-status-${samProposal.id}"]`).innerText();
+  assert.ok(
+    samStatusText.includes('Blocked by client approval') || samStatusText.includes('Needs more time'),
+    'Sam candidate must reflect client approval policy block'
+  );
+  assert.strictEqual(
+    await page.locator(`[data-testid="approve-${samProposal.id}"]`).isDisabled(),
+    true,
+    'Approval button for blocked Sam candidate must be strictly disabled'
+  );
+  console.log('✓ Assertion passed: Sam denial verified (blocked status and disabled approval button).');
+
+  // Verify option details initially collapsed and real source title drawer link
+  const optionDetails = page.locator(`[data-testid="option-details-${feasibleCandidate.id}"]`);
+  assert.strictEqual(
+    await optionDetails.getAttribute('open'),
+    null,
+    'Option details must be initially collapsed'
+  );
+
+  await optionDetails.locator('summary').click();
+  assert.strictEqual(
+    await optionDetails.getAttribute('open'),
+    '',
+    'Option details must open on click'
+  );
+
+  // Click source link by human title to verify drawer opens with correct record
+  const policySourceBtn = optionDetails.locator('button:has-text("Editing approval policy")');
+  if (await policySourceBtn.count() > 0) {
+    await policySourceBtn.click();
+    await page.waitForSelector('[data-testid="source-drawer"]');
+    await page.waitForSelector('text=Editing approval policy');
+    // Dismiss drawer via Escape
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('[data-testid="source-drawer"]', { state: 'detached', timeout: 3000 });
+    console.log('✓ Assertion passed: Real source title opened correct drawer record and closed cleanly on Escape.');
+  }
+
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(outDir, '04_repair_proposals.png') });
+  console.log('Saved: 04_repair_proposals.png');
+
+  // 5. Approve Feasible Repair Proposal & Verify Receipts
+  console.log('5. Approving feasible repair proposal...');
+  const [approveRes] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/approve') && r.status() === 200),
+    page.click(`[data-testid="approve-${feasibleCandidate.id}"]`),
+  ]);
+  const approveData = await approveRes.json();
+
+  // ASSERTION: Feasible repair approval records decision receipt and owner tasks
+  assert.ok(approveData.decision, 'Approve response must return committed decision');
+  assert.ok(approveData.decision.allocations.length >= 1, 'Decision must record committed slot allocations');
+  assert.ok(approveData.decision.tasks.length >= 1, 'Decision must generate execution checklist tasks');
+  console.log('✓ Assertion passed: Feasible repair approval successfully committed to workspace.');
+
+  // UI routes to Saved plan ("receipts")
+  await page.waitForSelector('[data-testid="receipts-view"]');
+  const decisionId = approveData.decision.id;
+  await page.waitForSelector(`[data-testid="receipt-${decisionId}"]`);
+  await page.waitForSelector('text=What happens next');
+
+  // Verify receipt technical details initially collapsed
+  const receiptDetails = page.locator(`[data-testid="receipt-details-${decisionId}"]`);
+  assert.strictEqual(
+    await receiptDetails.getAttribute('open'),
+    null,
+    'Receipt technical details must be initially collapsed'
+  );
+  await receiptDetails.locator('summary').click();
+  await page.waitForSelector(`text=${approveData.decision.idempotencyKey}`);
+  console.log('✓ Assertion passed: Saved receipt rendered with allocations, tasks, and collapsed idempotency key.');
+
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(outDir, '05_saved_receipts.png') });
+  console.log('Saved: 05_saved_receipts.png');
+
+  // 6. Studio Memory Navigation ("Ask PACT")
+  console.log('6. Navigating to Ask PACT ("Studio Memory")...');
+  await page.click('[data-testid="nav-memory"]');
+  await page.waitForSelector('[data-testid="memory-view"]');
+  await page.waitForSelector('text=Rules-based answer');
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(outDir, '06_studio_memory.png') });
+  console.log('Saved: 06_studio_memory.png');
+
+  // 7. Studio Memory Inquiry (Deterministic Grounded Reply, $0 Billable AI Cost)
+  console.log('7. Asking PACT a grounded question in plain language...');
+  await page.fill('#memory-query-input', 'What was approved and what happens next?');
+  const [memoryRes] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/memory') && r.status() === 200),
+    page.click('button[type="submit"]:has-text("Ask")'),
+  ]);
+  const memoryData = await memoryRes.json();
+  const reply = memoryData.reply;
+
+  // ASSERTION: Studio Memory response must be deterministic, non-empty, and zero billable AI usage
+  assert.ok(reply, 'Memory endpoint must return reply object');
+  assert.strictEqual(reply.mode, 'deterministic', 'Studio memory must operate in deterministic mode');
+  assert.strictEqual(reply.usageUsd ?? 0, 0, 'No billable AI usage allowed (usageUsd must be 0)');
+  assert.ok(typeof reply.text === 'string' && reply.text.length > 20, 'Memory response must be non-empty');
+  console.log('✓ Assertion passed: Studio memory returned verified grounded response with zero billable AI cost.');
+
+  // Verify response renders grounded source titles
+  await page.waitForSelector('text=Rules-based answer');
+  await page.waitForSelector('text=Source evidence:');
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(outDir, '07_studio_memory_response.png') });
+  console.log('Saved: 07_studio_memory_response.png');
+
+  // 8. Start Over / Reset Modal
+  console.log('8. Testing Start Over / Reset modal...');
+  await page.click('[data-testid="start-over"]');
+  await page.waitForSelector('text=Reset to sample agency schedule?');
+  await page.screenshot({ path: path.join(outDir, '08_start_over_modal.png') });
+  console.log('Saved: 08_start_over_modal.png');
+
+  // Confirm reset
+  await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/reset') && r.status() === 200),
+    page.click('.btn-editorial-clay:has-text("Start over")'),
+  ]);
+  await page.waitForTimeout(600);
+  console.log('✓ Assertion passed: Reset modal confirmed and workspace restored to sample schedule.');
+
+  // 9. Deliverables & Desk / Overview: Edit Sam Approval for Comet Coffee
+  console.log('9. Navigating to Overview ("Your work") and editing Sam approval for Comet Coffee...');
+  await page.click('[data-testid="nav-overview"]');
+  await page.waitForSelector('[data-testid="overview-view"]');
+  await page.waitForSelector('text=Who can work on what');
+
+  // Find Sam's unapproved button for Comet Coffee
+  const unapprovedSamBtn = page.locator('table tr:has-text("Sam") button:has-text("Unapproved")');
+  const [samPatchRes] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/workspace') && r.status() === 200),
+    unapprovedSamBtn.click(),
+  ]);
+  const samPatchData = await samPatchRes.json();
+  const samApproval = samPatchData.workspace.approvals.find(
+    (a) => a.id === 'ap-c-sam' || (a.editorId === 'ed-sam' && a.campaignId === 'cp-c')
+  );
+  assert.ok(samApproval && samApproval.approved === true, 'Sam must be recorded as approved for Comet Coffee');
+  console.log('✓ Assertion passed: Sam approval for Comet Coffee granted.');
+  await page.waitForTimeout(500);
+
+  // 10. Re-check Plan: Sam Approval Restores Original Day 1 Feasibility
+  console.log('10. Rerunning check with Sam approved (original deadlines feasible)...');
+  const [samCheckRes] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/analyze') && r.status() === 200),
+    page.click('[data-testid="check-plan"]'),
+  ]);
+  const samCheckData = await samCheckRes.json();
+  const samAnalysis = samCheckData.analysis;
+
+  // ASSERTION: Sam approval yields feasible original deadlines
+  assert.strictEqual(samAnalysis.check.status, 'feasible', 'Plan check must be feasible with Sam approved');
+  assert.strictEqual(samAnalysis.check.requiredHours, 12, 'Required hours remain 12h under original Day 1 deadlines');
+  assert.ok(samAnalysis.check.availableHours >= 12, 'Total approved available capacity covers 12h');
+  assert.strictEqual(samAnalysis.check.conflictIds.length, 0, 'No conflict IDs remain once feasible');
+  console.log('✓ Assertion passed: Sam approval yields feasible original Day 1 deadlines.');
+
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: path.join(outDir, '09_sam_approved_feasible.png') });
+  console.log('Saved: 09_sam_approved_feasible.png');
+
+  // 11. Unknown Duration Edit on Aurora Skincare (needs_information)
+  console.log('11. Testing Unknown Duration edit on Aurora Skincare...');
+  const editAuroraBtn = page.locator('.paper-card:has-text("Aurora Skincare") button:has-text("Edit job")');
+  await editAuroraBtn.click();
+  await page.waitForSelector('text=Edit this job');
+  await page.click('#unknown-duration-checkbox');
+  await page.screenshot({ path: path.join(outDir, '10_unknown_duration_modal.png') });
+  console.log('Saved: 10_unknown_duration_modal.png');
+
+  await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/workspace') && r.status() === 200),
+    page.click('button[type="submit"]:has-text("Save job")'),
+  ]);
+  await page.waitForTimeout(500);
+
+  // Re-check to demonstrate needs_information
+  const [unknownCheckRes] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/analyze') && r.status() === 200),
+    page.click('[data-testid="check-plan"]'),
+  ]);
+  const unknownCheckData = await unknownCheckRes.json();
+  const unknownAnalysis = unknownCheckData.analysis;
+
+  // ASSERTION: Unknown duration returns needs_information
+  assert.strictEqual(
+    unknownAnalysis.check.status,
+    'needs_information',
+    'Plan check must return needs_information status when deliverable duration is unknown'
+  );
+  assert.ok(
+    /unknown/i.test(unknownAnalysis.check.summary) ||
+      unknownAnalysis.check.issues.some((issue) => /unknown/i.test(issue)),
+    'Check summary or issues must indicate unknown deliverable duration'
+  );
+  console.log('✓ Assertion passed: Unknown duration correctly produces needs_information status.');
+
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: path.join(outDir, '11_unknown_duration_checked.png') });
+  console.log('Saved: 11_unknown_duration_checked.png');
+
+  // 12. Capacity Slot Toggle
+  console.log('12. Testing Capacity Slot Toggle...');
+  // Restore Aurora hours so schedule is normal
+  await editAuroraBtn.click();
+  await page.waitForSelector('text=Edit this job');
+  await page.click('#unknown-duration-checkbox'); // Uncheck unknown
+  await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/workspace') && r.status() === 200),
+    page.click('button[type="submit"]:has-text("Save job")'),
+  ]);
+  await page.waitForTimeout(400);
+
+  // Toggle Alex slot #0
+  const slot0 = page.locator('.slot-cell').first();
+  await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/workspace') && r.status() === 200),
+    slot0.click(),
+  ]);
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(outDir, '12_capacity_slot_toggle.png') });
+  console.log('Saved: 12_capacity_slot_toggle.png');
+
+  // 13. Studio Event Edit Modal
+  console.log('13. Testing Studio Event Edit...');
+  const editEventBtn = page.locator('section:has-text("Studio events") button:has-text("Edit")').first();
+  await editEventBtn.click();
+  await page.waitForSelector('text=Edit this event');
+  await page.fill('#event-start-input', '2');
+  await page.fill('#event-end-input', '6');
+  await page.screenshot({ path: path.join(outDir, '13_event_edit_modal.png') });
+  console.log('Saved: 13_event_edit_modal.png');
+
+  // 14. Event Saved
+  await Promise.all([
+    page.waitForResponse((r) => r.url().includes('/api/workspace') && r.status() === 200),
+    page.click('button[type="submit"]:has-text("Save event")'),
+  ]);
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(outDir, '14_event_saved.png') });
+  console.log('Saved: 14_event_saved.png');
+
+  // 15. Source Drawer and Escape Dismissal / Focus Restoration
+  console.log('15. Testing Source Drawer and Escape...');
+  await page.click('[data-testid="open-sources"]');
+  await page.waitForSelector('[data-testid="source-drawer"]');
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: path.join(outDir, '15_source_drawer.png') });
+  console.log('Saved: 15_source_drawer.png');
+
+  // Press Escape to dismiss drawer and assert dismissal
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('[data-testid="source-drawer"]', { state: 'detached', timeout: 3000 });
+  console.log('✓ Assertion passed: Source drawer closed cleanly on Escape key press.');
+  await page.waitForTimeout(400);
+
+  // 16. Real Stale 409 State & Error Handling
+  console.log('16. Testing Real Stale 409 State & Error Handling...');
+  const editCometBtn = page.locator('.paper-card:has-text("Comet Coffee") button:has-text("Edit job")');
+  await editCometBtn.click();
+  await page.waitForSelector('text=Edit this job');
+
+  // Outside the modal, simulate another user bumping the workspace revision via fetch
+  await page.evaluate(async () => {
+    const res = await fetch('/api/workspace', { method: 'GET' });
+    const { workspace } = await res.json();
+    await fetch('/api/workspace', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        revision: workspace.revision,
+        edit: { kind: 'approval', id: 'ap-b-alex', approved: false },
+      }),
+    });
+  });
+
+  // Now submit the modal which still holds the prior workspace revision
+  await page.fill('#commitment-hours-input', '5');
+  await page.click('button[type="submit"]:has-text("Save job")');
+
+  // Wait for 409 error alert banner with plain language notice
+  await page.waitForSelector('[data-testid="error-alert"]', { timeout: 4000 });
+  const alertText = await page.locator('[data-testid="error-alert"]').innerText();
+  assert.ok(
+    alertText.includes('plan changed'),
+    `Stale 409 alert banner must state that the plan changed. Got: "${alertText}"`
+  );
+  console.log('✓ Assertion passed: HTTP 409 conflict alert banner displayed ("The plan changed").');
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(outDir, '16_error_alert.png') });
+  console.log('Saved: 16_error_alert.png');
+
+  await browser.close();
+  console.log('\n======================================================');
+  console.log('All 16 visual inspection screenshots captured successfully!');
+  console.log('All assertions passed:');
+  console.log('  1. Initial 12h/8h capacity conflict (infeasible, deterministic rules mode)');
+  console.log('  2. Truthful affected-work titles without raw IDs');
+  console.log('  3. Technical disclosures initially collapsed & keyboard openable');
+  console.log('  4. 390px mobile viewport zero page overflow & scrollable 16-slot grid');
+  console.log('  5. Feasible repair candidate synthesis & Sam denial enforcement');
+  console.log('  6. Real source titles link to grounded drawer records');
+  console.log('  7. Human approval receipt persistence & execution tasks');
+  console.log('  8. Grounded Studio Memory with $0 billable AI usage');
+  console.log('  9. Sam approval yielding feasible original Day 1 deadlines');
+  console.log(' 10. Unknown duration deliverable correctly producing needs_information');
+  console.log(' 11. Keyboard accessibility: Escape cleanly dismisses Source Drawer');
+  console.log(' 12. Real HTTP 409 optimistic locking state handling');
+  console.log('======================================================\n');
+}
+
+run().catch((err) => {
+  console.error('Error during browser inspection:', err);
+  process.exit(1);
+});

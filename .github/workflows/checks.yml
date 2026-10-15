@@ -1,0 +1,42 @@
+name: Check PACT
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      falkordb:
+        image: falkordb/falkordb@sha256:107455e862a824e45e8e9f5a7fbfdf5e00a08b14e13eae2577c72fd9e3f59ba6
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli PING"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      FALKORDB_URL: redis://127.0.0.1:6379
+      SESSION_SECRET: ci-only-secret-not-for-production-at-least-32-characters
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Start app and verify real graph/API flow
+        run: |
+          npm start > /tmp/pact-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/api/health; then break; fi
+            sleep 2
+          done
+          npm run test:integration
+      - name: Show server diagnostics on failure
+        if: failure()
+        run: cat /tmp/pact-server.log 2>/dev/null || true

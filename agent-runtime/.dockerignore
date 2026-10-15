@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+.eve
+**/.eve
+.output
+**/.output
+.vercel
+.next
+dist
+*.tsbuildinfo
+.env*
+.DS_Store
