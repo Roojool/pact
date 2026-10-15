@@ -12,7 +12,7 @@ brand approvals, source documents and decision owners in a graph, then answers:
 makes them fit?*
 
 > **Submission status:** the app is **deployed and reachable over HTTPS**, the
-> **public source repository shell exists (source publication pending reviewed push)**,
+> **reviewed source is published in the public repository**,
 > and a **real live AI session has been verified** against that deployment (both
 > agent roles plus live graph memory, executed in an independent verification run; see
 > [Verification evidence](#verification-evidence)). The **demo video is pending
@@ -25,7 +25,7 @@ makes them fit?*
 ## Live links
 
 - **Live app (HTTPS):** <https://pact-roojool-20261015.malaysiawest.cloudapp.azure.com>
-- **Public source repository:** <https://github.com/Roojool/pact> *(repository shell exists; reviewed source publication pending)*
+- **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
 - **Demo video:** *pending recording* — capture script in
   [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md)
 
@@ -109,8 +109,7 @@ persists an internal reservation, owner tasks and an internal decision record.
 
 **Not verified / not claimed:**
 
-- The **demo video is pending recording**; the **live deployment exists**, while
-  **source publication to the public repository is pending reviewed push** (see [Live links](#live-links)).
+- The **demo video is pending recording**. The **live deployment and published source** are available (see [Live links](#live-links)).
 - The **participant walkthrough is not yet completed** (see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md)).
 - The live AI verification above is **not re-run in this documentation pass**:
   it was a single real production session driven in an independent verification run,
@@ -571,7 +570,7 @@ decisions, and should personally validate the code before submission.
 | Artifact | Status |
 | --- | --- |
 | Live deployment (HTTPS) | ✅ **live** — <https://pact-roojool-20261015.malaysiawest.cloudapp.azure.com> (verified by independent visual smoke; not re-run in this docs pass) |
-| Public source repository | ⏳ **pending push** — <https://github.com/Roojool/pact> (repository shell exists; reviewed source publication pending) |
+| Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (source, setup, graph model, Cypher and tests) |
 | Demo video (working project) | ⏳ **pending recording** — reusable 3-minute capture script in [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md) |
 | Live AI session | ✅ **verified once** — real live production session (both roles + live memory) executed against the HTTPS deployment in an independent verification run; conservative budget ledger estimate $0.136371 of $5 cap ($0 reserved); not re-run in this docs pass |
 | Participant walkthrough | ⏳ **not yet completed** — see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md) |

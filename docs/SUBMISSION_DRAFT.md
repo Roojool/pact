@@ -1,7 +1,7 @@
 # PACT — submission draft
 
 > Verify every field against the finished build before filing. The live app link
-> is real, the public repository shell exists (with source publication pending reviewed push),
+> is real, reviewed source is published in the public repository,
 > and the demo video is marked **pending** — do not replace a pending field with a fabricated URL.
 
 ## Project title
@@ -61,7 +61,7 @@ From the official rules (<https://www.wemakedevs.org/hackathons/falkordb/rules>)
 | FalkorDB is the primary graph database and central to the product | ✅ graph holds all state; no fallback |
 | Data is public/synthetic/own | ✅ entirely synthetic fixture |
 | Track(s) named | ✅ all three above |
-| Public source-code repository | ⏳ **pending push** — <https://github.com/Roojool/pact> (repository shell exists; reviewed source publication pending) |
+| Public source-code repository | ✅ **published** — <https://github.com/Roojool/pact> |
 | README with setup instructions and graph data model | ✅ [`README.md`](../README.md) |
 | Cypher queries / graph algorithms the product depends on | ✅ [`queries/`](../queries/) |
 | Demo video showing the working project | ⏳ **pending recording** (script: [`docs/DEMO_SCRIPT.md`](./DEMO_SCRIPT.md)) |
@@ -76,8 +76,7 @@ From the official rules (<https://www.wemakedevs.org/hackathons/falkordb/rules>)
 
 ## Fields to complete from actual artifacts
 
-- **Repository:** <https://github.com/Roojool/pact> (repository shell exists; reviewed
-  source publication is pending).
+- **Repository:** <https://github.com/Roojool/pact> (reviewed source published).
 - **Demo video:** upload the recording of the working project (not a storyboard),
   following `docs/DEMO_SCRIPT.md`. *Pending recording.*
 - **Live deployment:** <https://pact-roojool-20261015.malaysiawest.cloudapp.azure.com>
@@ -96,7 +95,7 @@ From the official rules (<https://www.wemakedevs.org/hackathons/falkordb/rules>)
 
 ## Do not submit while…
 
-- Required links remain unverified — the **demo video is still pending recording**, and **reviewed source publication is pending push**.
+- Required links remain unverified — the **demo video is still pending recording**.
 - A live AI result is claimed beyond the single verified session above, or the
   deterministic path is described as live.
 - The AI-assistance disclosure is missing.

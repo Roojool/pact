@@ -77,7 +77,7 @@ normally without `--test-force-exit`.
 **Still not verified (do not claim these):**
 
 - The **demo video** is still pending recording.
-- The **public source repository shell exists**, but **source publication is pending reviewed push**.
+- The **reviewed source is published** at <https://github.com/Roojool/pact>.
 - The **participant walkthrough is not yet completed** (see below).
 - The production `npm run build`, the HTTP integration suite, and the local
   Playwright inspection were not re-run in this docs pass (the HTTP suite needs a
