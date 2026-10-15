@@ -205,6 +205,29 @@ async function run() {
       navInfo.push({ view: v, width: r.width, height: r.height, right: r.right });
     }
 
+    // The real Sources launcher must stay visible and contained on mobile (not hidden).
+    const sourcesBtn = document.querySelector('[data-testid="open-sources"]');
+    if (!sourcesBtn) {
+      return { ok: false, error: 'Sources launcher [data-testid="open-sources"] not found at 390px' };
+    }
+    const sourcesStyle = getComputedStyle(sourcesBtn);
+    const sourcesRect = sourcesBtn.getBoundingClientRect();
+    if (
+      sourcesStyle.display === 'none' ||
+      sourcesStyle.visibility === 'hidden' ||
+      sourcesRect.width === 0 ||
+      sourcesRect.height === 0
+    ) {
+      return { ok: false, error: 'Sources launcher must remain visible at 390px' };
+    }
+    if (sourcesRect.height < 36) {
+      return { ok: false, error: `Sources launcher touch target too small: ${sourcesRect.height}px` };
+    }
+    if (sourcesRect.right > window.innerWidth + 4) {
+      return { ok: false, error: `Sources launcher overflows viewport (right=${sourcesRect.right}, window=${window.innerWidth})` };
+    }
+    navInfo.push({ view: 'sources', width: sourcesRect.width, height: sourcesRect.height, right: sourcesRect.right });
+
     return { ok: true, navInfo };
   });
 
@@ -212,7 +235,7 @@ async function run() {
     mobileLayoutCheck.ok,
     `390px mobile layout validation failed: ${mobileLayoutCheck.error}`
   );
-  console.log('✓ Assertion passed: 390px mobile layout verified (all 5 nav choices fit visibly with auto width, and masthead title does not overlap controls).');
+  console.log('✓ Assertion passed: 390px mobile layout verified (all 5 nav choices fit visibly with auto width, masthead title does not overlap controls, and the real Sources launcher stays visible and contained).');
 
   await page.screenshot({ path: path.join(outDir, 'mobile_390_overview.png') });
   console.log('Saved: mobile_390_overview.png');
@@ -831,7 +854,7 @@ async function run() {
   console.log('  2. Truthful affected-work titles resolved from workspace commitments (none omitted, zero raw IDs)');
   console.log('  3. Technical disclosures initially collapsed & keyboard openable via Enter');
   console.log('  4. 390px mobile viewport zero page overflow across overview, conflict, and options views');
-  console.log('  4b. 390px mobile layout: title does not overlap controls and all 5 navigation choices fit visibly (auto-width compact buttons)');
+  console.log('  4b. 390px mobile layout: title does not overlap controls, all 5 navigation choices fit visibly, and the Sources launcher stays visible/contained');
   console.log('  5. 390px timeline 16th cell reachable within genuine scroll wrapper after horizontal scrolling');
   console.log('  6. Feasible repair candidate synthesis & Sam policy denial enforcement');
   console.log('  7. Real source titles link to grounded drawer records');
