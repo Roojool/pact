@@ -951,14 +951,15 @@ export async function recallMemory(id: string, message: string): Promise<AgentRe
     })
     .slice(0, 3);
   for (const campaign of matchedCampaigns) {
-    sourceIds.add(campaign.sourceId);
+    if (campaign.sourceId) sourceIds.add(campaign.sourceId);
     const commitments = await run(g,
       `MATCH (c:Campaign {key:$ck})<-[:FOR_CAMPAIGN]-(m:Commitment)
        RETURN m.key AS id, m.title AS title, m.hours AS hours, m.deadlineDay AS deadlineDay, m.flexUntilDay AS flexUntilDay
        ORDER BY id`, { ck: campaign.id }, true);
     const approvals = await run(g,
-      `MATCH (c:Campaign {key:$ck})<-[:ABOUT_CAMPAIGN]-(a:Approval)-[:FOR_EDITOR]->(e:Editor)
-       RETURN a.approved AS approved, a.key AS approvalId, a.sourceId AS sourceId,
+      `MATCH (c:Campaign {key:$ck})<-[:ABOUT_CAMPAIGN]-(a:Approval)-[:FOR_EDITOR]->(e:Editor),
+             (a)-[:FROM_SOURCE]->(s:Source)
+       RETURN a.approved AS approved, a.key AS approvalId, s.key AS sourceId,
               e.key AS editorId, e.name AS editorName
        ORDER BY editorId`, { ck: campaign.id }, true);
     const events = await run(g,
@@ -975,7 +976,8 @@ export async function recallMemory(id: string, message: string): Promise<AgentRe
       );
     }
     for (const a of approvals) {
-      sourceIds.add(str(a.sourceId));
+      const sid = str(a.sourceId);
+      if (sid) sourceIds.add(sid);
       lines.push(
         ` - ${str(a.editorName)} (${str(a.editorId)}) is ` +
         `${bool(a.approved) ? `approved (${str(a.approvalId)})` : `recorded as NOT approved (${str(a.approvalId)})`}.`,
@@ -993,17 +995,21 @@ export async function recallMemory(id: string, message: string): Promise<AgentRe
     })
     .slice(0, 2);
   for (const editor of matchedEditors) {
-    sourceIds.add(editor.sourceId);
+    if (editor.sourceId) sourceIds.add(editor.sourceId);
     const rows = await run(g,
-      `MATCH (e:Editor {key:$ek})<-[:FOR_EDITOR]-(a:Approval)-[:ABOUT_CAMPAIGN]->(c:Campaign)
-       RETURN c.key AS campaignId, c.name AS campaignName, a.approved AS approved, a.sourceId AS sourceId
+      `MATCH (e:Editor {key:$ek})<-[:FOR_EDITOR]-(a:Approval)-[:ABOUT_CAMPAIGN]->(c:Campaign),
+             (a)-[:FROM_SOURCE]->(s:Source)
+       RETURN c.key AS campaignId, c.name AS campaignName, a.approved AS approved, s.key AS sourceId
        ORDER BY campaignId`, { ek: editor.id }, true);
     const approvals = rows.map((r) => `${str(r.campaignName)}: ${bool(r.approved) ? 'approved' : 'NOT approved'}`);
     lines.push(
       `${editor.name} (${editor.id}) holds slots [${editor.slots.join(', ')}]. Approvals: ` +
       `${approvals.length > 0 ? approvals.join('; ') : 'none on record (unknown eligibility)'}.`,
     );
-    for (const r of rows) sourceIds.add(str(r.sourceId));
+    for (const r of rows) {
+      const sid = str(r.sourceId);
+      if (sid) sourceIds.add(sid);
+    }
   }
 
   if (matchedCampaigns.length === 0 && matchedEditors.length === 0) {

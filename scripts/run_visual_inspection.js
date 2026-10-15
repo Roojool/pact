@@ -622,7 +622,15 @@ async function run() {
   assert.strictEqual(reply.usageUsd ?? 0, 0, 'No billable AI usage allowed (usageUsd must be 0)');
   assert.ok(typeof reply.text === 'string' && reply.text.length > 20, 'Memory response must be non-empty');
   assert.ok(Array.isArray(reply.sourceIds) && reply.sourceIds.length > 0, 'Memory response must cite grounded sources');
-  console.log('✓ Assertion passed: Studio memory returned verified grounded response with zero billable AI cost.');
+  assert.ok(reply.sourceIds.includes('src-policy'), 'Memory response for Comet query must cite src-policy approval source');
+
+  const knownWorkspaceSources = new Set(approveData.workspace.sources.map((s) => s.id));
+
+  for (const srcId of reply.sourceIds) {
+    assert.ok(typeof srcId === 'string' && srcId.length > 0, 'Cited source ID must be a non-empty string');
+    assert.ok(knownWorkspaceSources.has(srcId), `Cited source ID "${srcId}" must be a real workspace source`);
+  }
+  console.log('✓ Assertion passed: Studio memory returned verified grounded response with zero billable AI cost and valid non-empty sources including src-policy.');
 
   // Verify response renders grounded source titles
   await page.waitForSelector('text=Rules-based answer');

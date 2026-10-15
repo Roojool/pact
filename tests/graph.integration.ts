@@ -347,12 +347,20 @@ test('recallMemory: graph-grounded reply, memory persisted, chained and revision
   assert.match(first.text, /Sam Ashby/);
   assert.match(first.text, /NOT approved/);
   assert.match(first.text, /Workspace revision: 1/);
-  assert.ok(first.sourceIds.includes('src-brief-c'));
+  assert.ok(first.sourceIds.includes('src-brief-c'), 'first recall must cite campaign brief src-brief-c');
+  assert.ok(first.sourceIds.includes('src-policy'), 'first recall matching Comet must include approval source src-policy');
+  assert.ok(first.sourceIds.every((sid) => typeof sid === 'string' && sid.length > 0), 'first recall citations must all be nonempty');
+  assert.ok(!first.sourceIds.includes(''), 'first recall citations must not contain empty string');
   assert.equal(first.activity.length, 1);
 
   const second = await recallMemory(id, 'Can Sam Ashby take the Comet edit?');
   assert.match(second.text, /Memory: 1 earlier note/);
   assert.match(second.text, /Sam Ashby/);
+  assert.ok(second.sourceIds.includes('src-policy'), 'second recall matching Comet and Sam must include approval source src-policy');
+  assert.ok(second.sourceIds.includes('src-brief-c'), 'second recall must include campaign brief src-brief-c');
+  assert.ok(second.sourceIds.includes('src-cal'), 'second recall must include editor calendar src-cal');
+  assert.ok(second.sourceIds.every((sid) => typeof sid === 'string' && sid.length > 0), 'second recall citations must all be nonempty');
+  assert.ok(!second.sourceIds.includes(''), 'second recall citations must not contain empty string');
 
   // memory chain persisted: NEXT edge + two Memory nodes through a fresh client
   const client = await rawClient();
@@ -373,6 +381,22 @@ test('recallMemory: graph-grounded reply, memory persisted, chained and revision
   assert.ok(stored);
   assert.equal(stored.revision, 1);
   assert.equal(stored.activity.length, 3, 'two memory activities plus the seeded one');
+
+  const actualSourceIds = new Set(stored.sources.map((s) => s.id));
+  assert.ok(actualSourceIds.size > 0, 'workspace must have sources');
+  for (const sid of first.sourceIds) {
+    assert.ok(actualSourceIds.has(sid), `first recall citation "${sid}" must be drawn from actual workspace sources`);
+  }
+  for (const sid of second.sourceIds) {
+    assert.ok(actualSourceIds.has(sid), `second recall citation "${sid}" must be drawn from actual workspace sources`);
+  }
+  for (const act of stored.activity) {
+    for (const sid of act.sourceIds) {
+      assert.ok(typeof sid === 'string' && sid.length > 0, 'activity citation must be nonempty');
+      assert.ok(actualSourceIds.has(sid), `activity citation "${sid}" must be drawn from actual workspace sources`);
+    }
+  }
+
   const afterMemory = await analyzeWorkspace(id, 1);
   assert.equal(afterMemory.workspace.revision, 2, 'analyze at the pre-memory revision still succeeds');
 });
