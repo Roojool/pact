@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   MessageSquare,
   FileText,
-  Compass,
 } from 'lucide-react';
 import { Workspace, Analysis } from '@/lib/types';
 import { VIEW_LABELS } from './ui-copy';
@@ -21,6 +20,45 @@ interface NavProps {
   workspace: Workspace | null;
   analysis: Analysis | null;
   onOpenSourceDrawer: () => void;
+}
+
+/**
+ * Small code-native sunflower / horizon anchor:
+ * Warm ochre/orange disc, olive/forest green horizon curve, cream space.
+ * aria-hidden="true" decorative anchor.
+ */
+function SunflowerHorizonIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      style={{ flexShrink: 0 }}
+    >
+      {/* Warm ochre sun disc */}
+      <circle cx="12" cy="14" r="8" fill="var(--sunflower-base)" />
+      {/* Orange horizon glow arc */}
+      <path
+        d="M3 15C6.5 13.5 17.5 13.5 21 15"
+        stroke="var(--orange-base)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      {/* Olive/Forest horizon ground */}
+      <path
+        d="M2 17C6 15 18 15 22 17V22H2V17Z"
+        fill="var(--forest-base)"
+      />
+      {/* Small subtle petal accent */}
+      <path
+        d="M12 4C12.6 6.5 13 8 12 9.5C11 8 11.4 6.5 12 4Z"
+        fill="var(--orange-base)"
+      />
+    </svg>
+  );
 }
 
 export function Nav({
@@ -36,45 +74,43 @@ export function Nav({
   const decisionCount = workspace?.decisions?.length ?? 0;
   const sourceCount = workspace?.sources?.length ?? 0;
 
-  // Small-business navigation: What needs attention? What can we change?
-  // Who approves it? Saved plan and optional AI explanation.
   const navItems: { id: NavView; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
     {
       id: 'overview',
       label: VIEW_LABELS.overview,
-      icon: <Layers size={16} />,
+      icon: <Layers size={15} />,
       badge: workspace?.commitments?.length,
     },
     {
       id: 'conflicts',
       label: VIEW_LABELS.conflicts,
-      icon: <AlertTriangle size={16} />,
+      icon: <AlertTriangle size={15} />,
       badge: conflictCount,
-      badgeColor: conflictCount > 0 ? 'var(--clay-600)' : undefined,
+      badgeColor: conflictCount > 0 ? 'var(--orange-base)' : undefined,
     },
     {
       id: 'repairs',
       label: VIEW_LABELS.repairs,
-      icon: <ArrowRightLeft size={16} />,
+      icon: <ArrowRightLeft size={15} />,
       badge: proposalCount,
-      badgeColor: proposalCount > 0 ? 'var(--sage-700)' : undefined,
+      badgeColor: proposalCount > 0 ? 'var(--forest-base)' : undefined,
     },
     {
       id: 'receipts',
       label: VIEW_LABELS.receipts,
-      icon: <CheckCircle2 size={16} />,
+      icon: <CheckCircle2 size={15} />,
       badge: decisionCount,
     },
     {
       id: 'memory',
       label: VIEW_LABELS.memory,
-      icon: <MessageSquare size={16} />,
+      icon: <MessageSquare size={15} />,
     },
   ];
 
   return (
     <nav className="pact-nav-rail" aria-label="Studio planning navigation" data-testid="nav-rail">
-      {/* Studio Brand Mark */}
+      {/* Studio Brand Mark with Sunflower / Horizon Anchor */}
       <div className="pact-nav-brand">
         <div
           style={{
@@ -86,31 +122,42 @@ export function Nav({
             alignItems: 'center',
             justifyContent: 'center',
             fontFamily: 'var(--font-serif)',
-            fontSize: '1rem',
+            fontSize: '0.98rem',
             fontWeight: 700,
             borderRadius: 'var(--radius-xs)',
+            flexShrink: 0,
           }}
         >
           P
         </div>
-        <div>
-          <span style={{ fontWeight: 700, fontSize: '0.92rem', letterSpacing: '0.04em', display: 'block' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+          <span
+            style={{
+              fontWeight: 800,
+              fontSize: '0.92rem',
+              letterSpacing: '0.06em',
+              color: 'var(--ink-primary)',
+            }}
+          >
             PACT
           </span>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span
+            style={{
+              fontSize: '0.62rem',
+              color: 'var(--ink-tertiary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              fontWeight: 600,
+            }}
+          >
             Planning Desk
           </span>
         </div>
+        <SunflowerHorizonIcon />
       </div>
 
-      {/* Navigation Links */}
+      {/* Horizontal Navigation Links */}
       <div className="pact-nav-items">
-        <div className="pact-nav-header-label">
-          <span className="editorial-label" style={{ fontSize: '0.68rem' }}>
-            Your planning desk
-          </span>
-        </div>
-
         {navItems.map((item) => {
           const isActive = currentView === item.id;
           return (
@@ -128,20 +175,26 @@ export function Nav({
               data-testid={`nav-${item.id}`}
               data-view={item.id}
             >
-              <span style={{ color: isActive ? 'var(--clay-700)' : 'var(--ink-tertiary)', display: 'inline-flex' }}>
+              <span
+                style={{
+                  color: isActive ? 'var(--forest-base)' : 'var(--ink-tertiary)',
+                  display: 'inline-flex',
+                }}
+              >
                 {item.icon}
               </span>
-              <span style={{ flex: 1, whiteSpace: 'nowrap' }}>{item.label}</span>
+              <span>{item.label}</span>
               {typeof item.badge === 'number' && item.badge > 0 && (
                 <span
                   className="font-mono"
                   style={{
-                    fontSize: '0.68rem',
+                    fontSize: '0.66rem',
                     padding: '1px 6px',
                     borderRadius: '10px',
-                    backgroundColor: item.badgeColor ? 'var(--clay-100)' : 'var(--paper-subtle)',
+                    backgroundColor: item.badgeColor ? 'var(--orange-light)' : 'var(--paper-subtle)',
                     color: item.badgeColor || 'var(--ink-secondary)',
-                    fontWeight: 600,
+                    fontWeight: 700,
+                    border: item.badgeColor ? '1px solid var(--orange-border)' : '1px solid var(--paper-border)',
                   }}
                 >
                   {item.badge}
@@ -152,7 +205,7 @@ export function Nav({
         })}
       </div>
 
-      {/* Grounding / Source Drawer Launcher */}
+      {/* Sources Launcher */}
       <div className="pact-nav-footer">
         <button
           type="button"
@@ -160,112 +213,29 @@ export function Nav({
           className="btn-editorial-secondary"
           data-testid="open-sources"
           style={{
-            width: '100%',
-            justifyContent: 'flex-start',
             fontSize: '0.78rem',
-            padding: '8px 12px',
-            whiteSpace: 'nowrap',
+            padding: '6px 12px',
+            minHeight: '36px',
           }}
         >
-          <FileText size={14} style={{ color: 'var(--clay-700)', flexShrink: 0 }} />
+          <FileText size={13} style={{ color: 'var(--forest-base)', flexShrink: 0 }} />
           <span>Sources</span>
           <span
             className="font-mono"
             style={{
-              marginLeft: 'auto',
+              marginLeft: '4px',
               fontSize: '0.68rem',
-              backgroundColor: 'var(--paper-inset)',
-              padding: '1px 5px',
+              backgroundColor: 'var(--paper-subtle)',
+              border: '1px solid var(--paper-border)',
+              padding: '1px 6px',
               borderRadius: 'var(--radius-xs)',
+              fontWeight: 600,
             }}
           >
             {sourceCount}
           </span>
         </button>
-
-        <div className="pact-nav-footer-sub" style={{ marginTop: '10px', padding: '0 4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Compass size={11} style={{ color: 'var(--ink-tertiary)' }} />
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-tertiary)' }}>
-            Sample agency: Morrow Studio
-          </span>
-        </div>
       </div>
-
-      <style jsx>{`
-        .pact-nav-brand {
-          padding: 24px 20px 16px 20px;
-          border-bottom: 1px solid var(--paper-border);
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .pact-nav-items {
-          flex: 1;
-          padding: 16px 0;
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        .pact-nav-header-label {
-          padding: 0 16px 8px 16px;
-        }
-        .pact-nav-footer {
-          padding: 16px;
-          border-top: 1px solid var(--paper-border);
-          background-color: #FAF7EE;
-        }
-        @media (max-width: 900px) {
-          .pact-nav-brand {
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--paper-border);
-            border-right: none;
-            display: flex;
-            align-items: center;
-          }
-          .pact-nav-items {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            align-items: center;
-            padding: 6px 8px;
-            overflow-x: visible;
-            width: 100%;
-            min-width: 0;
-            box-sizing: border-box;
-            gap: 6px;
-          }
-          .pact-nav-header-label {
-            display: none;
-          }
-          .nav-item-btn {
-            width: auto;
-            max-width: 100%;
-            flex: 0 0 auto;
-            padding: 6px 10px;
-            min-height: 40px;
-            font-size: 0.82rem;
-            border-left: none;
-            border-bottom: 2px solid transparent;
-            border-radius: var(--radius-xs);
-            white-space: nowrap;
-          }
-          .nav-item-btn.active {
-            border-bottom-color: var(--forest-base);
-          }
-          .pact-nav-footer {
-            padding: 6px 12px;
-            border-top: none;
-            border-bottom: 1px solid var(--paper-border);
-            border-left: none;
-            display: flex;
-            align-items: center;
-            background: transparent;
-          }
-          .pact-nav-footer-sub {
-            display: none !important;
-          }
-        }
-      `}</style>
     </nav>
   );
 }

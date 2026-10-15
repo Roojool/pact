@@ -58,28 +58,28 @@ export function StudioMemoryView({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }} data-testid="memory-view" data-view="memory">
       {/* SECTION 1: HEADER & INTRO */}
-      <div className="pact-page-intro">
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '8px', gap: '8px', flexWrap: 'wrap' }}>
-          <div>
-            <span className="editorial-label">Ask PACT</span>
-            <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
-              Ask about your plan
-            </h2>
-          </div>
-          <span
-            className={`badge-status ${
-              isLiveActive ? 'live' : 'deterministic'
-            }`}
-            style={{ fontSize: '0.75rem' }}
-          >
-            {isLiveActive ? <Sparkles size={12} /> : <ShieldCheck size={12} />}
-            {isLiveActive ? 'AI-assisted answer' : 'Rules-based answer'}
-          </span>
+      <div className="editorial-section-header">
+        <div>
+          <span className="editorial-section-number">01</span>
+          <span className="editorial-label">Ask PACT</span>
+          <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
+            Ask about your plan
+          </h2>
         </div>
-        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '8px' }}>
-          Ask in plain language. Answers are grounded in the studio&rsquo;s own records, and PACT says when it is unsure.
-        </p>
+        <span
+          className={`badge-status ${
+            isLiveActive ? 'live' : 'deterministic'
+          }`}
+          style={{ fontSize: '0.75rem' }}
+        >
+          {isLiveActive ? <Sparkles size={12} /> : <ShieldCheck size={12} />}
+          {isLiveActive ? 'AI-assisted answer' : 'Rules-based answer'}
+        </span>
       </div>
+
+      <p style={{ fontSize: '0.92rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '-12px' }}>
+        Ask in plain language. Answers are grounded in the studio&rsquo;s own records, and PACT says when it is unsure.
+      </p>
 
       {/* SECTION 2: INTERACTIVE QUERY BOX & SUGGESTED PROMPTS */}
       <div className="paper-card" style={{ padding: '24px' }}>
@@ -145,9 +145,15 @@ export function StudioMemoryView({
       {/* SECTION 3: RECENT RESPONSES */}
       {replies.length > 0 && (
         <section>
-          <span className="editorial-label" style={{ display: 'block', marginBottom: '14px' }}>
-            Answers ({replies.length})
-          </span>
+          <div className="editorial-section-header">
+            <div>
+              <span className="editorial-section-number">02</span>
+              <span className="editorial-label">Answers</span>
+              <h3 className="editorial-headline" style={{ fontSize: '1.25rem', marginTop: '2px' }}>
+                Recorded answers ({replies.length})
+              </h3>
+            </div>
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {replies.map((reply, rIdx) => {
@@ -159,7 +165,7 @@ export function StudioMemoryView({
                   className="paper-card"
                   style={{
                     padding: '22px',
-                    borderLeft: isDeterministic ? '4px solid var(--paper-border-strong)' : '4px solid var(--clay-600)',
+                    borderLeft: isDeterministic ? '4px solid var(--paper-border-strong)' : '4px solid var(--orange-base)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '12px',
@@ -175,8 +181,8 @@ export function StudioMemoryView({
                     </span>
 
                     {reply.usageUsd !== undefined && reply.usageUsd > 0 && (
-                      <details className="pact-detail-toggle">
-                        <summary>Technical details</summary>
+                      <details>
+                        <summary style={{ fontSize: '0.74rem' }}>Technical details</summary>
                         <span className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--ink-tertiary)' }}>
                           Answer cost: ${reply.usageUsd.toFixed(4)}
                         </span>
@@ -200,11 +206,11 @@ export function StudioMemoryView({
                     <div
                       style={{
                         padding: '8px 12px',
-                        backgroundColor: 'var(--clay-50)',
-                        border: '1px solid var(--clay-200)',
+                        backgroundColor: 'var(--orange-light)',
+                        border: '1px solid var(--orange-border)',
                         borderRadius: 'var(--radius-xs)',
                         fontSize: '0.78rem',
-                        color: 'var(--clay-800)',
+                        color: 'var(--orange-text)',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
@@ -247,11 +253,12 @@ export function StudioMemoryView({
 
       {/* SECTION 4: STUDIO ACTIVITY LEDGER */}
       <section>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <div className="editorial-section-header">
           <div>
+            <span className="editorial-section-number">{replies.length > 0 ? '03' : '02'}</span>
             <span className="editorial-label">Recent activity</span>
-            <h3 className="editorial-headline" style={{ fontSize: '1.2rem', marginTop: '2px' }}>
-              Recent activity ({workspace.activity?.length ?? 0})
+            <h3 className="editorial-headline" style={{ fontSize: '1.25rem', marginTop: '2px' }}>
+              Activity ledger ({workspace.activity?.length ?? 0})
             </h3>
           </div>
           <span style={{ fontSize: '0.78rem', color: 'var(--ink-tertiary)' }}>

@@ -123,12 +123,13 @@ export function OverviewView({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }} data-testid="overview-view" data-view="overview">
-      {/* SECTION 1: CAMPAIGNS & JOBS */}
+      {/* SECTION 1: CAMPAIGNS & JOBS (Assembly-style numbered section header) */}
       <section>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+        <div className="editorial-section-header">
           <div>
+            <span className="editorial-section-number">01</span>
             <span className="editorial-label">Your work</span>
-            <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
+            <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
               Jobs in the plan
             </h2>
           </div>
@@ -145,7 +146,17 @@ export function OverviewView({
             const isUnknownHours = commitment ? commitment.hours === null : false;
 
             return (
-              <div key={camp.id} className="paper-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div
+                key={camp.id}
+                className="paper-card"
+                style={{
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                  borderTop: `3px solid ${camp.color || 'var(--paper-border-strong)'}`,
+                }}
+              >
                 {/* Campaign Header */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -159,8 +170,8 @@ export function OverviewView({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        fontSize: '0.82rem',
                       }}
                     >
                       {creator?.initials || 'CR'}
@@ -169,7 +180,7 @@ export function OverviewView({
                       <h3 style={{ fontSize: '0.98rem', fontWeight: 600, color: 'var(--ink-primary)' }}>
                         {creator?.name || camp.name}
                       </h3>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--ink-tertiary)' }}>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--ink-tertiary)' }}>
                         {creator?.handle} • {creator?.category}
                       </div>
                     </div>
@@ -196,16 +207,16 @@ export function OverviewView({
                   }}
                 >
                   <div>
-                    <span style={{ color: 'var(--ink-tertiary)', display: 'block', fontSize: '0.7rem' }}>
+                    <span style={{ color: 'var(--ink-tertiary)', display: 'block', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       Campaign Title
                     </span>
-                    <span style={{ fontWeight: 500 }}>{camp.name}</span>
+                    <span style={{ fontWeight: 600 }}>{camp.name}</span>
                   </div>
                   <div>
-                    <span style={{ color: 'var(--ink-tertiary)', display: 'block', fontSize: '0.7rem' }}>
+                    <span style={{ color: 'var(--ink-tertiary)', display: 'block', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       Lead Producer
                     </span>
-                    <span style={{ fontWeight: 500 }}>{owner?.name || 'Producer'}</span>
+                    <span style={{ fontWeight: 600 }}>{owner?.name || 'Producer'}</span>
                   </div>
                 </div>
 
@@ -221,7 +232,7 @@ export function OverviewView({
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span className="editorial-label" style={{ fontSize: '0.7rem' }}>
+                      <span className="editorial-label" style={{ fontSize: '0.68rem' }}>
                         Job
                       </span>
                       <span
@@ -234,7 +245,9 @@ export function OverviewView({
                       </span>
                     </div>
 
-                    <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{commitment.title}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--ink-primary)' }}>
+                      {commitment.title}
+                    </div>
 
                     {/* Hours & Deadline Display */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.82rem' }}>
@@ -259,7 +272,7 @@ export function OverviewView({
                         <Calendar size={14} style={{ color: 'var(--ink-tertiary)' }} />
                         <span>
                           Deadline:{' '}
-                          <strong style={{ color: commitment.deadlineDay === 1 ? 'var(--clay-700)' : 'var(--sage-700)' }}>
+                          <strong style={{ color: commitment.deadlineDay === 1 ? 'var(--orange-base)' : 'var(--forest-base)' }}>
                             Day {commitment.deadlineDay}
                           </strong>
                         </span>
@@ -285,8 +298,9 @@ export function OverviewView({
                         style={{
                           padding: '5px 10px',
                           fontSize: '0.75rem',
-                          backgroundColor: commitment.deadlineDay === 1 ? 'var(--clay-50)' : 'var(--sage-50)',
-                          borderColor: commitment.deadlineDay === 1 ? 'var(--clay-200)' : 'var(--sage-200)',
+                          backgroundColor: commitment.deadlineDay === 1 ? 'var(--orange-light)' : 'var(--forest-light)',
+                          borderColor: commitment.deadlineDay === 1 ? 'var(--orange-border)' : 'var(--forest-border)',
+                          color: commitment.deadlineDay === 1 ? 'var(--orange-text)' : 'var(--forest-base)',
                         }}
                         title={`Shift deadline to Day ${commitment.deadlineDay === 1 ? 2 : 1}`}
                       >
@@ -316,10 +330,11 @@ export function OverviewView({
 
       {/* SECTION 2: EDITING AVAILABILITY & WORKING HOURS */}
       <section>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div className="editorial-section-header">
           <div>
+            <span className="editorial-section-number">02</span>
             <span className="editorial-label">Working hours</span>
-            <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
+            <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
               Who is available to edit
             </h2>
           </div>
@@ -338,13 +353,13 @@ export function OverviewView({
                 borderRadius: 'var(--radius-xs)',
                 fontWeight: 600,
                 fontSize: '0.8rem',
-                borderLeft: '3px solid var(--clay-600)',
+                borderLeft: '3px solid var(--orange-base)',
                 display: 'flex',
                 justifyContent: 'space-between',
               }}
             >
               <span>Day 1: 09:00 – 17:00</span>
-              <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--clay-700)' }}>
+              <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--orange-text)' }}>
                 Demand {day1DemandDisplay} vs Alex {alexDay1Hours}h Capacity
               </span>
             </div>
@@ -356,13 +371,13 @@ export function OverviewView({
                 borderRadius: 'var(--radius-xs)',
                 fontWeight: 600,
                 fontSize: '0.8rem',
-                borderLeft: '3px solid var(--sage-600)',
+                borderLeft: '3px solid var(--forest-base)',
                 display: 'flex',
                 justifyContent: 'space-between',
               }}
             >
               <span>Day 2: 09:00 – 17:00</span>
-              <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--sage-700)' }}>
+              <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--forest-base)' }}>
                 Demand {day2DemandDisplay} vs Alex {alexDay2Hours}h Capacity
               </span>
             </div>
@@ -389,7 +404,7 @@ export function OverviewView({
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '0.72rem',
-                          fontWeight: 600,
+                          fontWeight: 700,
                         }}
                       >
                         {editor.initials}
@@ -454,10 +469,11 @@ export function OverviewView({
 
       {/* SECTION 3: POLICY APPROVAL MATRIX */}
       <section>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div className="editorial-section-header">
           <div>
+            <span className="editorial-section-number">03</span>
             <span className="editorial-label">Client approvals</span>
-            <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
+            <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
               Who can work on what
             </h2>
           </div>
@@ -470,11 +486,11 @@ export function OverviewView({
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ backgroundColor: 'var(--paper-subtle)', borderBottom: '1px solid var(--paper-border-strong)' }}>
-                <th style={{ padding: '12px 18px', textAlign: 'left', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                <th style={{ padding: '12px 18px', textAlign: 'left', fontWeight: 600, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   Editor
                 </th>
                 {workspace.campaigns.map((camp) => (
-                  <th key={camp.id} style={{ padding: '12px 18px', textAlign: 'center', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <th key={camp.id} style={{ padding: '12px 18px', textAlign: 'center', fontWeight: 600, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     {camp.name} ({camp.brand})
                   </th>
                 ))}
@@ -496,6 +512,7 @@ export function OverviewView({
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '0.65rem',
+                          fontWeight: 700,
                         }}
                       >
                         {editor.initials}
@@ -526,7 +543,7 @@ export function OverviewView({
                           style={{
                             cursor: 'pointer',
                             padding: '4px 12px',
-                            border: approval.approved ? '1px solid var(--sage-400)' : '1px solid var(--clay-400)',
+                            border: approval.approved ? '1px solid var(--forest-border)' : '1px solid var(--orange-border)',
                           }}
                           title={`Click to ${approval.approved ? 'revoke' : 'grant'} approval for ${editor.name} on ${camp.name}`}
                         >
@@ -553,10 +570,11 @@ export function OverviewView({
       {/* SECTION 4: STUDIO EVENTS (0..48 HOURS FROM DAY 1 START) */}
       {workspace.events && workspace.events.length > 0 && (
         <section>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div className="editorial-section-header">
             <div>
+              <span className="editorial-section-number">04</span>
               <span className="editorial-label">Studio calendar</span>
-              <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
+              <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
                 Studio events
               </h2>
             </div>
@@ -616,19 +634,19 @@ export function OverviewView({
         </section>
       )}
 
-      {/* OPTIONAL TECHNICAL DETAILS (collapsed by default) */}
+      {/* OPTIONAL TECHNICAL DETAILS (initially collapsed) */}
       <section>
-        <details className="pact-detail-toggle" data-testid="overview-technical-details">
+        <details data-testid="overview-technical-details">
           <summary>How PACT checks</summary>
           <div
-            className="paper-card-subtle pact-inline-note"
+            className="pact-inline-note"
             style={{
-              marginTop: '12px',
+              marginTop: '10px',
               padding: '12px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              fontSize: '0.78rem',
+              fontSize: '0.8rem',
               color: 'var(--ink-secondary)',
             }}
           >

@@ -221,6 +221,79 @@ async function run() {
   await page.setViewportSize({ width: 1280, height: 860 });
   await page.waitForTimeout(300);
 
+  // FOCUSED ASSERTION: Opening settings at desktop (Direction 6 popover containment)
+  console.log('   Checking desktop settings-open layout behavior (Direction 6 popover containment)...');
+  const initialCheckBtnBox = await page.locator('.masthead-check-btn').boundingBox();
+  assert.ok(initialCheckBtnBox, 'Check this plan button bounding box must be available');
+
+  await page.click('[data-testid="header-details"] summary');
+  await page.waitForTimeout(200);
+
+  const desktopSettingsCheck = await page.evaluate((beforeBox) => {
+    const identity = document.querySelector('.masthead-identity');
+    const checkBtn = document.querySelector('.masthead-check-btn');
+    const startBtn = document.querySelector('.masthead-start-over');
+    const popover = document.querySelector('.pact-detail-popover');
+    if (!identity || !checkBtn || !popover) {
+      return { ok: false, error: 'Identity, check button, or popover missing when settings open' };
+    }
+
+    const bId = identity.getBoundingClientRect();
+    const bCheck = checkBtn.getBoundingClientRect();
+    const bStart = startBtn ? startBtn.getBoundingClientRect() : null;
+    const bPop = popover.getBoundingClientRect();
+
+    // 1. Stable header action visibility (check button and start over remain visible and not wrapped down)
+    if (bCheck.width === 0 || bCheck.height === 0 || bCheck.top < 0) {
+      return { ok: false, error: 'Check this plan button is not visible when settings open' };
+    }
+    if (bStart && (bStart.width === 0 || bStart.height === 0)) {
+      return { ok: false, error: 'Start over button is not visible when settings open' };
+    }
+    if (Math.abs(bCheck.top - beforeBox.y) > 6) {
+      return {
+        ok: false,
+        error: `Check this plan button wrapped vertically: before ${beforeBox.y}px vs after ${bCheck.top}px`,
+      };
+    }
+
+    // 2. Non-overlapping title and settings
+    const overlaps = (r1, r2) => {
+      const noX = r1.right <= r2.left || r2.right <= r1.left;
+      const noY = r1.bottom <= r2.top || r2.bottom <= r1.top;
+      return !(noX || noY);
+    };
+    if (overlaps(bId, bPop)) {
+      return { ok: false, error: 'Title overlaps settings popover' };
+    }
+
+    // 3. Bounded settings width (<= 360px)
+    if (bPop.width > 360) {
+      return { ok: false, error: `Settings popover exceeds bounded width: ${bPop.width}px` };
+    }
+
+    // 4. Full labels
+    const text = popover.innerText;
+    if (!text.includes('Plan revision') || !text.includes('Use AI for explanations')) {
+      return { ok: false, error: 'Settings popover missing full labels' };
+    }
+
+    return { ok: true, popoverWidth: bPop.width };
+  }, initialCheckBtnBox);
+
+  assert.ok(
+    desktopSettingsCheck.ok,
+    `Desktop settings-open validation failed: ${desktopSettingsCheck.error}`
+  );
+  console.log(`✓ Assertion passed: Desktop settings-open verified (stable action visibility, non-overlapping title/settings, bounded width ${Math.round(desktopSettingsCheck.popoverWidth)}px <= 360px, full labels).`);
+
+  await page.screenshot({ path: path.join(outDir, 'desktop_settings_open.png') });
+  console.log('Saved: desktop_settings_open.png');
+
+  // Dismiss settings by pressing Escape
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+
   // 2. Click "Check this plan" and assert initial 12h/8h conflict
   console.log('2. Clicking "Check this plan"...');
   const [analyzeRes] = await Promise.all([

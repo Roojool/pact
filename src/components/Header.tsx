@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Workspace, Analysis } from '@/lib/types';
 import { RefreshCw, Play, RotateCcw, Sparkles, Database, ShieldCheck, HelpCircle } from 'lucide-react';
 
@@ -31,6 +31,9 @@ export function Header({
   onResetClick,
   isAnalyzing,
 }: HeaderProps) {
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
+
   const isLiveCapable = Boolean(health?.liveAvailable);
 
   // Do not infer healthy on an unknown state.
@@ -41,24 +44,47 @@ export function Header({
   const currentMode = analysis?.mode ?? 'deterministic';
   const modeLabel = currentMode === 'live' ? 'AI-assisted check' : 'Rules check';
 
+  // Keyboard accessibility & click-outside dismissal for settings popover
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && detailsRef.current?.open) {
+        detailsRef.current.open = false;
+        summaryRef.current?.focus();
+      }
+    }
+
+    function handleClickOutside(e: MouseEvent) {
+      if (detailsRef.current?.open && !detailsRef.current.contains(e.target as Node)) {
+        detailsRef.current.open = false;
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <header className="pact-masthead" data-testid="masthead">
-      {/* Masthead Left: studio identity only, no revision jargon up front */}
+      {/* Masthead Left: studio identity */}
       <div className="masthead-identity">
         <div>
-          <span className="editorial-subhead" style={{ color: 'var(--clay-700)', letterSpacing: '0.12em' }}>
+          <span className="editorial-subhead" style={{ color: 'var(--ink-tertiary)', letterSpacing: '0.08em' }}>
             Morrow Studio
           </span>
-          <h1 className="editorial-headline" style={{ fontSize: '1.45rem', marginTop: '2px' }}>
+          <h1 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '1px' }}>
             Your studio plan
           </h1>
         </div>
       </div>
 
-      {/* Masthead Right: health, mode, optional details, and the two real actions */}
+      {/* Masthead Right: status, contained settings popover, start-over, and Check this plan */}
       <div className="masthead-controls">
-        {/* Service health & mode for desktop view */}
-        <div className="masthead-status-desktop" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Desktop Service Health & Mode Indicators */}
+        <div className="masthead-status-desktop">
           <div
             className="badge-status"
             data-testid="service-status"
@@ -66,18 +92,18 @@ export function Header({
               backgroundColor: !isHealthKnown
                 ? 'var(--paper-subtle)'
                 : isServiceOk
-                ? 'var(--sage-50)'
-                : 'var(--clay-50)',
+                ? 'var(--forest-light)'
+                : 'var(--orange-light)',
               color: !isHealthKnown
                 ? 'var(--ink-secondary)'
                 : isServiceOk
-                ? 'var(--sage-700)'
-                : 'var(--clay-700)',
+                ? 'var(--forest-base)'
+                : 'var(--orange-text)',
               borderColor: !isHealthKnown
                 ? 'var(--paper-border)'
                 : isServiceOk
-                ? 'var(--sage-200)'
-                : 'var(--clay-200)',
+                ? 'var(--forest-border)'
+                : 'var(--orange-border)',
             }}
             title={
               !isHealthKnown
@@ -105,12 +131,20 @@ export function Header({
           </div>
         </div>
 
-        {/* Optional details: technical status (on mobile), revision number and optional AI explanation toggle */}
-        <details className="pact-detail-toggle" data-testid="header-details">
-          <summary>Plan details &amp; options</summary>
-          <div className="pact-inline-note" style={{ marginTop: '10px', maxWidth: '320px' }}>
+        {/* Dedicated Contained Popover for 'Plan details & options'
+            Bug fix: Opening this NEVER displaces the flex row actions or squeezes the title */}
+        <details ref={detailsRef} className="pact-detail-toggle" data-testid="header-details">
+          <summary ref={summaryRef}>Plan details &amp; options</summary>
+          <div className="pact-detail-popover">
             {/* Secondary technical status on mobile */}
-            <div className="masthead-status-mobile" style={{ marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px solid var(--paper-border)' }}>
+            <div
+              className="masthead-status-mobile"
+              style={{
+                marginBottom: '12px',
+                paddingBottom: '10px',
+                borderBottom: '1px solid var(--paper-border)',
+              }}
+            >
               <span className="editorial-label" style={{ fontSize: '0.68rem', display: 'block', marginBottom: '6px' }}>
                 System status
               </span>
@@ -121,18 +155,18 @@ export function Header({
                     backgroundColor: !isHealthKnown
                       ? 'var(--paper-subtle)'
                       : isServiceOk
-                      ? 'var(--sage-50)'
-                      : 'var(--clay-50)',
+                      ? 'var(--forest-light)'
+                      : 'var(--orange-light)',
                     color: !isHealthKnown
                       ? 'var(--ink-secondary)'
                       : isServiceOk
-                      ? 'var(--sage-700)'
-                      : 'var(--clay-700)',
+                      ? 'var(--forest-base)'
+                      : 'var(--orange-text)',
                     borderColor: !isHealthKnown
                       ? 'var(--paper-border)'
                       : isServiceOk
-                      ? 'var(--sage-200)'
-                      : 'var(--clay-200)',
+                      ? 'var(--forest-border)'
+                      : 'var(--orange-border)',
                   }}
                 >
                   <Database size={12} />
@@ -146,7 +180,7 @@ export function Header({
               </div>
             </div>
 
-            <p style={{ fontSize: '0.8rem', color: 'var(--ink-secondary)', marginBottom: '10px' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--ink-secondary)', marginBottom: '10px' }}>
               Plan revision <strong>#{workspace?.revision ?? 0}</strong>. Revision numbers change when a plan is
               edited or approved.
             </p>

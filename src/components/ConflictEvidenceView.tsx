@@ -118,7 +118,6 @@ export function ConflictEvidenceView({
   const isUnknown = checkResult.status === 'needs_information';
 
   if (isUnknown) {
-    // Unknown durations mean no honest numeric balance can be shown.
     balanceLabel = 'Editing balance';
     balanceValue = 'Unknown';
   }
@@ -140,12 +139,13 @@ export function ConflictEvidenceView({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }} data-testid="conflict-view" data-view="conflicts">
-      {/* SECTION 1: ONE SHORT DIAGNOSIS + WORK/AVAILABLE METRICS */}
+      {/* SECTION 1: DIAGNOSIS & STRONG TYPOGRAPHIC NUMBERS ON PAPER */}
       <section>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+        <div className="editorial-section-header">
           <div>
+            <span className="editorial-section-number">01</span>
             <span className="editorial-label">Needs attention</span>
-            <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
+            <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
               {copy.headline}
             </h2>
           </div>
@@ -164,46 +164,45 @@ export function ConflictEvidenceView({
           data-testid="conflict-diagnosis"
           style={{
             padding: '24px 28px',
-            backgroundColor: isInfeasible ? '#FCFAF5' : 'var(--paper-surface)',
-            borderLeft: copy.tone === 'attention' ? '4px solid var(--clay-600)' : copy.tone === 'good' ? '4px solid var(--sage-600)' : '4px solid var(--sand-600)',
+            backgroundColor: 'var(--paper-surface)',
+            borderLeft: copy.tone === 'attention' ? '4px solid var(--orange-base)' : copy.tone === 'good' ? '4px solid var(--forest-base)' : '4px solid var(--sunflower-base)',
           }}
         >
           <p style={{ fontSize: '1.02rem', color: 'var(--ink-primary)', lineHeight: 1.55, maxWidth: '820px' }}>
             {copy.diagnosis}
           </p>
 
-          {/* Work needed / time available, straight from the check result */}
+          {/* Strong Typographic Numbers Directly on Paper (No nested beige boxes inside another box) */}
           <div
-            className="pact-stat-grid conflict-stat-grid"
+            className="conflict-stat-grid"
             data-testid="conflict-metrics"
           >
             <div className="stat-card">
-              <span className="editorial-label stat-label" style={{ fontSize: '0.72rem' }}>
+              <span className="stat-label">
                 {isUnknown ? 'Known editing hours' : 'Editing needed'}
               </span>
-              <div className="font-serif stat-value" style={{ fontWeight: 600, color: 'var(--ink-primary)' }}>
+              <div className="font-serif stat-value" style={{ color: 'var(--ink-primary)' }}>
                 {checkResult.requiredHours}h
               </div>
             </div>
 
             <div className="stat-card">
-              <span className="editorial-label stat-label" style={{ fontSize: '0.72rem' }}>
+              <span className="stat-label">
                 Time available
               </span>
-              <div className="font-serif stat-value" style={{ fontWeight: 600, color: 'var(--ink-primary)' }}>
+              <div className="font-serif stat-value" style={{ color: 'var(--ink-primary)' }}>
                 {checkResult.availableHours}h
               </div>
             </div>
 
             <div className="stat-card stat-card-balance">
-              <span className="editorial-label stat-label" style={{ fontSize: '0.72rem' }}>
+              <span className="stat-label">
                 {balanceLabel}
               </span>
               <div
                 className="font-serif stat-value"
                 style={{
-                  fontWeight: 600,
-                  color: isUnknown ? 'var(--ink-secondary)' : margin < 0 ? 'var(--clay-700)' : 'var(--sage-700)',
+                  color: isUnknown ? 'var(--ink-secondary)' : margin < 0 ? 'var(--orange-base)' : 'var(--forest-base)',
                 }}
               >
                 {balanceValue}
@@ -223,27 +222,48 @@ export function ConflictEvidenceView({
       {/* SECTION 2: AFFECTED WORK BY NAME */}
       {work.length > 0 && (
         <section>
-          <span className="editorial-label" style={{ display: 'block', marginBottom: '10px' }}>
-            Work involved
-          </span>
+          <div className="editorial-section-header">
+            <div>
+              <span className="editorial-section-number">02</span>
+              <span className="editorial-label">Work involved</span>
+              <h3 className="editorial-headline" style={{ fontSize: '1.25rem', marginTop: '2px' }}>
+                Affected deliverables
+              </h3>
+            </div>
+            <span style={{ fontSize: '0.78rem', color: 'var(--ink-tertiary)' }}>
+              {work.length} {work.length === 1 ? 'promise' : 'promises'} in the bottleneck
+            </span>
+          </div>
+
           <ul
             className="pact-source-list"
             data-testid="affected-work"
-            style={{ listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: '8px' }}
+            style={{ listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: '10px' }}
           >
             {work.map((item) => (
               <li
                 key={item.id}
                 style={{
-                  fontSize: '0.85rem',
-                  padding: '6px 12px',
+                  fontSize: '0.86rem',
+                  padding: '8px 14px',
                   backgroundColor: 'var(--paper-surface)',
                   border: '1px solid var(--paper-border-strong)',
                   borderRadius: 'var(--radius-xs)',
                   color: 'var(--ink-primary)',
-                  fontWeight: 500,
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
+                <span
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--orange-base)',
+                  }}
+                />
                 {item.title}
               </li>
             ))}
@@ -258,37 +278,32 @@ export function ConflictEvidenceView({
           onClick={onNavigateToRepairs}
           className={copy.tone === 'good' ? 'btn-editorial-sage pact-primary-action' : 'btn-editorial-clay pact-primary-action'}
           data-testid="conflict-next-action"
-          style={{ fontSize: '0.85rem' }}
+          style={{ padding: '9px 24px', fontSize: '0.88rem' }}
         >
           <span>See plan options</span>
           <ArrowRight size={14} />
         </button>
       </section>
 
-      {/* SECTION 4: OPTIONAL TECHNICAL DETAILS (collapsed by default) */}
-      <details className="pact-detail-toggle" data-testid="conflict-technical-details">
-        <summary>How PACT checked this</summary>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
+      {/* SECTION 4: GROUNDED EVIDENCE & PROOF CHAINS (collapsed by default) */}
+      <details data-testid="conflict-technical-details">
+        <summary>Technical reasoning &amp; evidence paths</summary>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <p style={{ fontSize: '0.82rem', color: 'var(--ink-secondary)', lineHeight: 1.5 }}>
-            PACT checks the whole plan against the briefs, working hours and client approvals, and never changes a
-            result or hides a blocker. The exact wording and relationship paths from the check are kept below.
+            Evidence paths show how PACT reached this verdict using recorded facts. Raw database IDs are preserved
+            here for technical audits.
           </p>
 
-          {checkResult.issues && checkResult.issues.length > 0 && (
-            <div>
-              <span className="editorial-label" style={{ fontSize: '0.72rem', display: 'block', marginBottom: '8px' }}>
-                What the checker reported
+          {checkResult.conflictIds && checkResult.conflictIds.length > 0 && (
+            <div style={{ padding: '10px 12px', backgroundColor: 'var(--paper-subtle)', borderRadius: 'var(--radius-xs)' }}>
+              <span className="editorial-label" style={{ fontSize: '0.68rem', display: 'block', marginBottom: '4px' }}>
+                Conflict IDs
               </span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {checkResult.issues.map((issue, idx) => (
-                  <div
-                    key={idx}
-                    className="paper-card-subtle"
-                    style={{ padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}
-                  >
-                    <AlertTriangle size={15} style={{ color: 'var(--clay-600)', flexShrink: 0, marginTop: '2px' }} />
-                    <p style={{ fontSize: '0.84rem', color: 'var(--ink-primary)', lineHeight: 1.5 }}>{issue}</p>
-                  </div>
+              <div className="font-mono" style={{ fontSize: '0.78rem', color: 'var(--ink-secondary)', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {checkResult.conflictIds.map((cid) => (
+                  <span key={cid} style={{ padding: '2px 6px', backgroundColor: 'var(--paper-surface)', border: '1px solid var(--paper-border)', borderRadius: 'var(--radius-xs)' }}>
+                    {cid}
+                  </span>
                 ))}
               </div>
             </div>
@@ -303,7 +318,7 @@ export function ConflictEvidenceView({
                 {checkResult.evidence.map((path) => (
                   <div key={path.id} className="paper-card" style={{ padding: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                      <GitBranch size={15} style={{ color: 'var(--clay-700)' }} />
+                      <GitBranch size={15} style={{ color: 'var(--orange-base)' }} />
                       <span className="font-mono" style={{ fontSize: '0.75rem', fontWeight: 600 }}>
                         {path.id}
                       </span>

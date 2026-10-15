@@ -133,20 +133,27 @@ export function RepairComparisonView({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }} data-testid="options-view" data-view="repairs">
       {/* SECTION 1: HEADER & INTRO */}
-      <div className="pact-page-intro">
-        <span className="editorial-label">Plan options</span>
-        <h2 className="editorial-headline" style={{ fontSize: '1.35rem', marginTop: '2px' }}>
-          What we can change
-        </h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '8px' }}>
-          Each option shows the change, why it helps, and any trade-off. You approve one at a time — PACT never
-          approves for you.
-        </p>
+      <div className="editorial-section-header">
+        <div>
+          <span className="editorial-section-number">01</span>
+          <span className="editorial-label">Plan options</span>
+          <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
+            What we can change
+          </h2>
+        </div>
+        <span style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>
+          {proposals.length} options evaluated
+        </span>
       </div>
 
-      {/* SECTION 2: OPTION CARDS */}
+      <p style={{ fontSize: '0.92rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '-12px' }}>
+        Each option shows the change, why it helps, and any trade-off. You approve one at a time — PACT never
+        approves for you.
+      </p>
+
+      {/* SECTION 2: OPTION CARDS — Two Clear Decisions (One Ready, One Blocked) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
-        {proposals.map((proposal) => {
+        {proposals.map((proposal, idx) => {
           const isCurrentChecked = analysis !== null;
           // Stale when the revision moved on OR any tracked source changed since the check.
           const isStale =
@@ -207,18 +214,19 @@ export function RepairComparisonView({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
-                borderLeft: isFeasible
-                  ? '4px solid var(--sage-600)'
+                borderTop: isFeasible
+                  ? '3px solid var(--forest-base)'
                   : !isCurrentChecked
-                  ? '4px solid var(--paper-border-strong)'
-                  : '4px solid var(--clay-600)',
-                backgroundColor: isApproved ? 'var(--sage-50)' : 'var(--paper-surface)',
+                  ? '3px solid var(--paper-border-strong)'
+                  : '3px solid var(--orange-base)',
+                backgroundColor: isApproved ? 'var(--forest-light)' : 'var(--paper-surface)',
               }}
             >
               {/* Option Header */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                    <span className="editorial-section-number">DECISION 0{idx + 1}</span>
                     <span className={`badge-status ${badgeClass}`} data-testid={`option-status-${proposal.id}`} style={{ fontSize: '0.72rem' }}>
                       <BadgeIcon size={12} />
                       {statusLabel}
@@ -230,7 +238,7 @@ export function RepairComparisonView({
                       </span>
                     )}
                   </div>
-                  <h3 className="editorial-headline" style={{ fontSize: '1.2rem' }}>
+                  <h3 className="editorial-headline" style={{ fontSize: '1.25rem' }}>
                     {proposal.title}
                   </h3>
                 </div>
@@ -301,8 +309,8 @@ export function RepairComparisonView({
                       justifyContent: 'center',
                       gap: '6px',
                       padding: '8px',
-                      color: 'var(--sage-700)',
-                      fontSize: '0.82rem',
+                      color: 'var(--forest-base)',
+                      fontSize: '0.84rem',
                       fontWeight: 600,
                     }}
                   >
@@ -353,9 +361,9 @@ export function RepairComparisonView({
               </div>
 
               {/* Optional technical details, collapsed by default */}
-              <details className="pact-detail-toggle" data-testid={`option-details-${proposal.id}`}>
+              <details data-testid={`option-details-${proposal.id}`}>
                 <summary>Full check &amp; sources</summary>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                   <p style={{ fontSize: '0.78rem', color: 'var(--ink-secondary)', lineHeight: 1.5 }}>
                     {formatEditorNames(proposal.description, workspace.editors)}
                   </p>

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Workspace, Analysis } from '@/lib/types';
 import { ArrowRight, FileText, CheckCircle2, AlertCircle, HelpCircle, Play } from 'lucide-react';
 import { describeCheck } from './ui-copy';
@@ -12,6 +13,55 @@ interface Props {
   onOpenSourceDrawer: (sourceId?: string) => void;
   onCheckPlan?: () => void;
   isChecking?: boolean;
+}
+
+/**
+ * Code-native sunflower / horizon composition anchor:
+ * Warm ochre/orange disc, olive/forest stems & hills, cream negative space.
+ * Pure CSS/SVG, aria-hidden="true" decorative anchor.
+ */
+function SunflowerHorizonAnchor() {
+  return (
+    <svg
+      width="48"
+      height="36"
+      viewBox="0 0 48 36"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      style={{ flexShrink: 0 }}
+    >
+      {/* Warm ochre sun disc */}
+      <circle cx="24" cy="22" r="14" fill="var(--sunflower-base)" />
+      {/* Burnt orange horizon glow arc */}
+      <path
+        d="M4 23C10 21 17 20 24 20C31 20 38 21 44 23"
+        stroke="var(--orange-base)"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+      {/* Deep olive / forest green hills */}
+      <path
+        d="M0 27C8 24 16 25 24 27C32 29 40 26 48 27V36H0V27Z"
+        fill="var(--forest-base)"
+      />
+      {/* Architectural petal / ray flourish */}
+      <path
+        d="M24 7C24.8 11.5 25.5 13.5 24 16C22.5 13.5 23.2 11.5 24 7Z"
+        fill="var(--orange-base)"
+      />
+      <path
+        d="M16 10C19.5 12.5 20.5 14.5 19 16.5C17.5 15.5 16 13 16 10Z"
+        fill="var(--sunflower-base)"
+        opacity="0.9"
+      />
+      <path
+        d="M32 10C28.5 12.5 27.5 14.5 29 16.5C30.5 15.5 32 13 32 10Z"
+        fill="var(--sunflower-base)"
+        opacity="0.9"
+      />
+    </svg>
+  );
 }
 
 export function HeroBottleneckCard({
@@ -27,7 +77,10 @@ export function HeroBottleneckCard({
   const check = analysis?.check;
   const feasible = check?.status === 'feasible';
   const blocked = check?.status === 'infeasible';
-  const sourceId = check?.evidence.flatMap(path => path.sourceIds).find(id => workspace.sources.some(source => source.id === id));
+  const sourceId = check?.evidence
+    ?.flatMap((path) => path.sourceIds)
+    .find((id) => workspace.sources.some((source) => source.id === id));
+
   const labels = {
     feasible: 'Fits the recorded constraints',
     infeasible: 'Plan needs a change',
@@ -39,67 +92,119 @@ export function HeroBottleneckCard({
 
   return (
     <section
-      className="paper-card"
+      className="pact-editorial-hero"
       data-testid="hero-card"
       aria-labelledby="plan-headline"
       style={{
-        padding: '22px 24px',
-        marginBottom: '20px',
-        borderLeft: `4px solid ${feasible ? 'var(--sage-600)' : blocked ? 'var(--clay-600)' : 'var(--paper-border-strong)'}`,
+        borderLeft: `4px solid ${
+          feasible
+            ? 'var(--forest-base)'
+            : blocked
+            ? 'var(--orange-base)'
+            : 'var(--paper-border-strong)'
+        }`,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
-        <span className={`badge-status ${feasible ? 'feasible' : blocked ? 'infeasible' : 'neutral'}`}>
-          {feasible ? <CheckCircle2 size={14} /> : blocked ? <AlertCircle size={14} /> : <HelpCircle size={14} />}
-          {check ? labels[check.status] : 'Ready to check'}
-        </span>
-        <span className="editorial-label">Morrow Studio · fictional agency</span>
+      {/* Top Meta Line: Status Badge + Studio Label + Horizon Anchor */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
+          marginBottom: '10px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span className={`badge-status ${feasible ? 'feasible' : blocked ? 'infeasible' : 'neutral'}`}>
+            {feasible ? <CheckCircle2 size={13} /> : blocked ? <AlertCircle size={13} /> : <HelpCircle size={13} />}
+            {check ? labels[check.status] : 'Ready to check'}
+          </span>
+          <span className="editorial-label">Morrow Studio · Planning Desk</span>
+        </div>
+        <SunflowerHorizonAnchor />
       </div>
 
-      <h2 id="plan-headline" className="editorial-headline" style={{ fontSize: 'clamp(1.45rem, 2.6vw, 2rem)', lineHeight: 1.2 }}>
+      {/* Expressive Editorial Headline (roughly 48-60px desktop, 32-38px mobile) */}
+      <h2
+        id="plan-headline"
+        className="editorial-hero-headline"
+      >
         {title ? (
-          title
+          title.includes('short') ? (
+            <>
+              {title.split('short')[0]}
+              <em className="editorial-hero-italic-orange">short{title.split('short')[1]}</em>
+            </>
+          ) : (
+            <>
+              {title}{' '}
+              <em className="editorial-hero-italic">
+                {feasible ? '— ready to commit' : ''}
+              </em>
+            </>
+          )
         ) : (
           <>
-            Can we keep these promises, <em style={{ fontStyle: 'italic', fontWeight: 400 }}>before we commit</em>?
+            Good work. <em className="editorial-hero-italic">Better planned.</em>
           </>
         )}
       </h2>
 
-      <p className="pact-summary" data-testid="hero-summary" style={{ maxWidth: '780px', marginTop: '10px', marginBottom: '18px', color: 'var(--ink-secondary)', lineHeight: 1.55 }}>
-        {copy?.diagnosis ?? 'Three campaigns share the same studio time. Check the whole plan against briefs, working hours, and client approvals before you commit.'}
+      {/* One Plain-Language Supporting Sentence */}
+      <p
+        className="pact-summary"
+        data-testid="hero-summary"
+        style={{
+          maxWidth: '780px',
+          marginTop: '6px',
+          marginBottom: '18px',
+          color: 'var(--ink-secondary)',
+          lineHeight: 1.55,
+        }}
+      >
+        {copy?.diagnosis ??
+          'Three campaigns share the same studio time. Check the whole plan against briefs, working hours, and client approvals before you commit.'}
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '12px' }}>
-        {workspace.campaigns.map(campaign => {
-          const creator = workspace.creators.find(person => person.id === campaign.creatorId);
-          const commitments = workspace.commitments.filter(item => item.campaignId === campaign.id);
-          return (
-            <article key={campaign.id} style={{ borderTop: `3px solid ${campaign.color}`, paddingTop: '10px' }}>
-              <span className="editorial-label" style={{ fontSize: '0.72rem' }}>{campaign.brand}</span>
-              <h3 style={{ margin: '4px 0 6px 0', fontWeight: 600, fontSize: '0.94rem' }}>{campaign.name}</h3>
-              <p style={{ color: 'var(--ink-secondary)', fontSize: '0.82rem', marginBottom: '8px' }}>{creator?.name ?? 'Creator not recorded'} {creator?.handle}</p>
-              {commitments.map(commitment => (
-                <div key={commitment.id} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '0.82rem', paddingBottom: '4px' }}>
-                  <span>{commitment.hours === null ? 'Duration unknown' : `${commitment.hours} hours of editing`}</span>
-                  <strong>Day {commitment.deadlineDay}</strong>
-                </div>
-              ))}
-            </article>
-          );
-        })}
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginTop: '18px', paddingTop: '14px', borderTop: '1px solid var(--paper-border)' }}>
-        <button type="button" onClick={() => onOpenSourceDrawer(sourceId)} className="btn-editorial-secondary" data-testid="hero-open-sources">
-          <FileText size={14} /> Read the sources
+      {/* Action Row: ONE Clear Main Action + Secondary Links */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          paddingTop: '14px',
+          borderTop: '1px solid var(--paper-border)',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => onOpenSourceDrawer(sourceId)}
+          className="btn-editorial-secondary"
+          data-testid="hero-open-sources"
+        >
+          <FileText size={13} /> Read the sources
         </button>
+
         {check ? (
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <button type="button" onClick={onNavigateToConflicts} className="btn-editorial-secondary" data-testid="hero-see-attention">
+            <button
+              type="button"
+              onClick={onNavigateToConflicts}
+              className="btn-editorial-secondary"
+              data-testid="hero-see-attention"
+            >
               What needs attention
             </button>
-            <button type="button" onClick={onNavigateToRepairs} className="btn-editorial-primary pact-primary-action" data-testid="hero-see-options">
+            <button
+              type="button"
+              onClick={onNavigateToRepairs}
+              className="btn-editorial-primary pact-primary-action"
+              data-testid="hero-see-options"
+            >
               See plan options <ArrowRight size={14} />
             </button>
           </div>
