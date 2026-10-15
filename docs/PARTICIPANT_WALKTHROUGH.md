@@ -1,9 +1,18 @@
 # Explain PACT in your own words
 
-This is a review guide for the solo participant (Rujul Talekar), not a substitute
-for reading and understanding the implementation. The full AI-assistance
-disclosure, verified-checks summary and cost notes are in
-[`AI_ASSISTANCE.md`](./AI_ASSISTANCE.md).
+> **Status: UNCOMPLETED — for the human participant.** This is a review guide for
+> the solo participant (Rujul Talekar), not a substitute for reading and
+> understanding the implementation. No boxes are checked here and no understanding
+> is assumed on your behalf. The full AI-assistance disclosure, verified-checks
+> summary and cost notes are in [`AI_ASSISTANCE.md`](./AI_ASSISTANCE.md).
+
+The live UI is the **Golden Hour editorial** design with five plain-language views —
+**Your work**, **Needs attention**, **Plan options**, **Saved plan** and **Ask
+PACT**. It is a presentation-layer change only and is **deployed** on the verified
+India production release
+(<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>); be ready to
+explain what each view shows and where the underlying logic lives. Setup, the Cypher
+queries and the graph model stay in the README and `queries/`.
 
 ## Five things to demonstrate
 
@@ -37,7 +46,14 @@ history. Do not claim to have manually authored AI-generated code.
 - Run `npm test` and `npm run test:integration` yourself and read the output.
 - Re-read `queries/reads.cypher` and `queries/mutations.cypher` and be able to say
   which statements are read-only and which mutate.
-- State plainly what is **not** verified (no live model turn; repo/video/deployment
-  pending) without overclaiming.
+- State plainly what is **not** verified without overclaiming: the **demo video and
+  deck are not published yet** (intended release `v1.0.0` asset URLs are targets
+  only), and the **participant walkthrough is not completed**. The **Golden Hour
+  redesign is deployed** on the verified India production release
+  (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>), the reviewed
+  source **is** published at <https://github.com/Roojool/pact>, and one real live AI
+  session was verified once (both roles plus live memory) — but the total number of
+  live requests made across the project is not established, and the project has not
+  spent nothing historically.
 
 See [`AI_ASSISTANCE.md`](./AI_ASSISTANCE.md) for the full question list.

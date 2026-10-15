@@ -12,9 +12,16 @@ walkthrough and a question list to personally validate the work before submittin
 
 - **Codex** — orchestration, integration review, and cross-checking of worker
   output.
-- **OpenCode and Antigravity** — implementation, UI, and documentation repair passes
-  across models including GLM 5.3, DeepSeek Flash, and Gemini 3.8 Flash (High), with
-  free fallback models used where appropriate.
+- **OpenCode and Gemini-based assistants** — implementation, UI and documentation
+  passes across several models (for example GLM, DeepSeek and Gemini variants),
+  with free fallback models used where appropriate.
+- **Runtime OpenAI** — the optional live AI path in the shipped app calls OpenAI
+  models through the budgeted provider proxy. That is product behaviour, not a
+  development assistant.
+
+The number of assistant/model requests made across the whole project is **not**
+tracked here and is deliberately **not** stated. Earlier work included repeated
+recording and validation attempts, so no "total call count" is claimed as verified.
 
 AI-generated changes were reviewed and checked with the test suites listed below;
 the participant is responsible for understanding and validating the result. The
@@ -42,8 +49,8 @@ Record any further design or debugging decisions in the commit history.
 These checks were **executed before this documentation pass** on 15 Oct 2026 and
 are **not re-run here** (this pass only edits docs). The unit and integration
 suites ran against the local build, with FalkorDB reachable at `127.0.0.1:16379`;
-the visual smoke journey and one live AI session ran against the **live HTTPS
-deployment**. No paid model call was made by this documentation pass.
+the desktop/mobile deterministic journey and one live AI session ran against the
+**live HTTPS deployment**. No paid model call was made by this documentation pass.
 
 | Check | Command | Result |
 | --- | --- | --- |
@@ -54,10 +61,17 @@ deployment**. No paid model call was made by this documentation pass.
 | Budget integration (real FalkorDB) | `npx tsx --test tests/budget.integration.ts` | 6 pass / 0 fail |
 | Runtime budgeted-provider tests | `npx tsx --test agent-runtime/tests/budgeted-model.test.ts` | 8 pass / 0 fail |
 | Runtime tenant-binding tests | `npx tsx --test agent-runtime/tests/handoff-binding.test.ts` | 7 pass / 0 fail |
-| Visual smoke journey (live HTTPS deployment) | `node scripts/run_visual_inspection.js` | 16 screenshots / 7 grouped checks pass |
+| Desktop/mobile deterministic journey (earlier live release) | `node scripts/run_visual_inspection.js` | passed, zero paid calls |
 
 The graph suite closes its shared FalkorDB connection in teardown, so it exits
 normally without `--test-force-exit`.
+
+**Dated evidence note:** the **current India production release** (commit `3985edf`,
+2026-10-15) was independently reviewed live and passed the full deterministic
+production journey with **0 provider calls** and the **$5 cap unchanged**. Earlier,
+on the prior release (commit `6e04796`, 2026-10-15) the deterministic journey against
+the live HTTPS deployment passed with **19 captures / 13 numbered groups** and **0
+paid calls**.
 
 **Verified before this pass, not re-run here (executed in an independent verification run):**
 
@@ -66,51 +80,65 @@ normally without `--test-force-exit`.
   against the HTTPS deployment on 2026-10-15 06:56 UTC and passed. Analysis mode was
   live, both Account Manager and Campaign Producer executed, one human-approved
   decision was recorded, and live graph memory returned six sources. The conservative
-  application budget ledger estimated **$0.136371** used against a **$5** cap with
-  **$0** reserved (this is an application budget ledger estimate, not an OpenAI billing
-  measurement). The durable budget gate was independently verified before those calls.
-  A first attempt failed with a network `fetch failed` before any ledger existed; the
-  second attempt passed. The Eve HTTP contract and the app's stream parser are
-  additionally verified against a loopback fake server, and the budgeted-provider
-  wrapper is unit-tested against a fake model.
+  application budget ledger recorded that session as **$0.136371** of a **$5**
+  application cap with **$0** reserved. That figure is a **historical
+  application-ledger estimate, not an OpenAI billing measurement, current balance or
+  cash-cost guarantee**; the durable budget gate was independently verified before
+  those calls. A first attempt failed with a network `fetch failed` before any ledger
+  existed; the second attempt passed. The Eve HTTP contract and the app's stream
+  parser are additionally verified against a loopback fake server, and the
+  budgeted-provider wrapper is unit-tested against a fake model.
+- **No total live-request count is established.** The earlier demo-video worker
+  launched recording attempts more than once, and the final captured attempt
+  recording 1 analysis / 1 memory does **not** prove that only one live request was
+  ever made. Do not state a project-wide call total.
 
-**Still not verified (do not claim these):**
+**Publication and remaining verification:**
 
-- The **demo video** is still pending recording.
-- The **reviewed source is published** at <https://github.com/Roojool/pact>.
+- The **demo video and deck are not published yet** — the intended release `v1.0.0`
+  asset URLs are targets only; the plan is in [`docs/DEMO_SCRIPT.md`](./DEMO_SCRIPT.md).
+- The **Golden Hour redesign is deployed** — it is the live UI on the verified India
+  production release (Hyderabad / `indiasouthcentral`).
 - The **participant walkthrough is not yet completed** (see below).
 - The production `npm run build`, the HTTP integration suite, and the local
   Playwright inspection were not re-run in this docs pass (the HTTP suite needs a
-  running app server). The live HTTPS smoke and the live AI session were executed
-  in an independent verification run, not here.
+  running app server). The live HTTPS deterministic journey and the live AI session
+  were executed in an independent verification run, not here.
+
+The **reviewed source is published** at <https://github.com/Roojool/pact>.
 
 ## Deployment and cost considerations (no cash outlay)
 
-- **Cash spent on this build: $0.** No accounts or credentials were purchased.
-  One real live AI session was run against the configured provider (the conservative
-  application budget ledger estimated $0.136371 used against the $5 cap with $0 reserved;
-  this is an application ledger estimate, not an OpenAI billing measurement). The
-  full stack is self-hosted on a single
-  small Azure VM (`Standard_B2als_v2`, MalaysiaWest) funded by an **Azure for
-  Students credit balance** — a credit grant, not cash — and the deterministic
-  build also runs entirely locally with a Docker FalkorDB container plus
-  `npm run dev`.
+- **No accounts or credentials were purchased for this build.** The full stack is
+  self-hosted on a single small Azure VM (`Standard_B2als_v2`, **India South Central
+  / Hyderabad**, `indiasouthcentral`) funded by an **Azure for Students credit
+  balance** — a credit grant, not cash. The deterministic build also runs entirely
+  locally with a Docker FalkorDB container plus `npm run dev`.
+- **The $5 cap is an application guard, not a bill.** One real live AI session was
+  run against the configured provider. The conservative application budget ledger
+  recorded that session as a $0.136371 cumulative estimate against the $5 cap with $0 reserved; the
+  durable ledger now estimates $0.855696 used after later recording attempts. These
+  are **historical application-ledger estimates, not OpenAI billing measurements, not
+  current balances, and not guarantees of cash costs**. The project has **not** spent
+  nothing historically. The Golden Hour UI release/capture made **0 provider calls**
+  and the durable cap remained $5. The durable budget gate was independently verified
+  before those calls.
 - **Deterministic mode is free.** PACT performs the full graph check, repair
   proposals, approvals, reservations and memory recall with no provider spend.
-  The live deployment is normally exercised in this deterministic mode; it has
-  also passed one real live AI session (both roles plus live memory) with conservative
-  budget ledger estimated spend of $0.136371 against the $5 cap.
+  The live deployment is normally exercised in this deterministic mode.
 - **Live mode would cost money.** A live agent turn bills the configured provider
   (default pricing assumptions `$3`/M input and `$15`/M output tokens). The
   durable budget ledger caps total spend at `PACT_API_BUDGET_USD` (default `$5`)
-  and fails closed, but it does not make calls free. A public live demo would
-  therefore need either a small prepaid provider balance or to stay in
-  deterministic mode.
+  and fails closed, but it does not make calls free and it is not a provider
+  guarantee. A public live demo would therefore need either a small prepaid
+  provider balance or to stay in deterministic mode.
 - **Deployment.** The stack (FalkorDB + web + two Eve runtimes + Caddy) is
   deployed behind Caddy on ports 80/443, with the app, graph and runtimes on a
-  private Docker network and the session cookie signed server-side. Any live
-  model usage remains a paid dependency; the complete local/Docker setup
-  instructions remain in the README.
+  private Docker network and the session cookie signed server-side. The live URL is
+  the verified Golden Hour production release
+  (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>), served from a
+  permitted Azure for Students region in Hyderabad. Any live model usage remains a
+  paid dependency; the complete local/Docker setup instructions remain in the README.
 
 ## Participant walkthrough
 

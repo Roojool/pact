@@ -11,31 +11,42 @@ brand approvals, source documents and decision owners in a graph, then answers:
 *do these promises fit together, and if not, what is the smallest change that
 makes them fit?*
 
-> **Submission status:** the app is **deployed and reachable over HTTPS**, the
-> **reviewed source is published in the public repository**,
-> and a **real live AI session has been verified** against that deployment (both
-> agent roles plus live graph memory, executed in an independent verification run; see
-> [Verification evidence](#verification-evidence)). The **demo video is pending
-> recording**, and the **participant walkthrough is not yet completed**. See
-> [Live links](#live-links) and [Publication status](#publication-status). Nothing
-> here fabricates a link, a live-model result, or a test result that was not actually executed.
+> **Submission status:** the app is **live over HTTPS** at the verified India
+> (Hyderabad, `indiasouthcentral`) production release linked below, with the
+> **Golden Hour visual redesign deployed and independently reviewed**, and the
+> **reviewed source is published in the public repository**. A **real live AI
+> session has been verified** against an earlier deployment (both agent roles plus
+> live graph memory, executed in an independent verification run; see
+> [Verification evidence](#verification-evidence)). The **demo video and pitch deck
+> are prepared and pending reviewed publication** to the GitHub release below, and
+> the **participant walkthrough is not yet completed**. See [Live links](#live-links)
+> and [Publication status](#publication-status). Nothing here fabricates a link, a
+> live-model result, or a test result that was not actually executed.
 
 ---
 
 ## Live links
 
-- **Live app (HTTPS):** <https://pact-roojool-20261015.malaysiawest.cloudapp.azure.com>
+- **Live app (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>
+  — the verified production release (Golden Hour UI, commit `3985edf`, 2026-10-15),
+  served from a permitted **Azure for Students** region in **Hyderabad, India South
+  Central (`indiasouthcentral`)**. Independently reviewed live with **0 provider
+  calls** for the capture; the **$5 application budget cap is unchanged**.
+- **Demo watchpage (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo>
+  — prepared self-hosted page, pending media publication, with video and captions
+  (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`).
 - **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
-- **Demo video:** *pending recording* — capture script in
-  [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md)
+- **Demo video & pitch deck:** *pending reviewed publication* to release
+  [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); intended asset
+  URLs are listed under [Publication status](#publication-status), and the recording
+  plan is in [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md).
 
-An independent verification run verified the live deployment with
-`node scripts/run_visual_inspection.js` against the HTTPS URL on 2026-10-15
-(16 screenshots / 7 grouped checks passed, deterministic mode); see
-[Verification evidence](#verification-evidence). An independent verification run
-also drove a real **live** AI session against the same deployment (both agent roles plus
-live graph memory) and verified the live path. This documentation
-pass did not re-run either live check.
+The desktop/mobile deterministic journey passed on the **current India production
+release** (independent review, deterministic mode, zero paid calls); the dated
+capture and check counts are in [Verification evidence](#verification-evidence). An
+independent verification run also drove a real **live** AI session against an
+**earlier** deployment (both agent roles plus live graph memory) and verified the
+live path. This documentation pass did not re-run either check.
 
 ---
 
@@ -44,6 +55,7 @@ pass did not re-run either live check.
 - [Live links](#live-links)
 - [The use case](#the-use-case)
 - [Honest product status](#honest-product-status)
+- [Visual design (Golden Hour editorial)](#visual-design-golden-hour-editorial)
 - [Hackathon tracks](#hackathon-tracks)
 - [How it works](#how-it-works)
 - [Graph model](#graph-model)
@@ -89,7 +101,7 @@ persists an internal reservation, owner tasks and an internal decision record.
 
 ## Honest product status
 
-**Working and verified locally (this build):**
+**Working and verified:**
 
 - Deterministic, bounded feasibility checker over the graph-derived workspace
   (`checkPlan`), with explainable evidence paths.
@@ -99,33 +111,67 @@ persists an internal reservation, owner tasks and an internal decision record.
 - FalkorDB persistence with traversal-only snapshot recovery, optimistic
   concurrency (409 `stale_revision`), idempotent approvals, version-checked
   approvals, reservation/double-booking guards, and durable graph memory.
-- A Next.js UI (warm editorial "planning desk") that consumes the API contract.
+- A Next.js UI that consumes the API contract. The **Golden Hour editorial**
+  direction described in [Visual design](#visual-design-golden-hour-editorial) is
+  **deployed** on the live India production release.
 - Two-role agent integration and a durable, atomic, global paid-call budget
   ledger. Agent **unit** tests use a fake provider and never touch the network.
-- A **live AI path that has been exercised end-to-end** against the HTTPS
+- A **live AI path that has been exercised end-to-end** against an earlier HTTPS
   deployment — both agent roles (`account_manager` → `producer`) and live graph
-  memory — with conservative budget ledger estimated spend inside the $5 cap. Executed in
-  an independent verification run before this pass; see [Verification evidence](#verification-evidence).
+  memory — with conservative budget ledger estimated spend inside the $5
+  application cap. Executed in an independent verification run before this pass;
+  see [Verification evidence](#verification-evidence).
 
 **Not verified / not claimed:**
 
-- The **demo video is pending recording**. The **live deployment and published source** are available (see [Live links](#live-links)).
+- The **demo video and pitch deck are pending reviewed publication**. The **live
+  deployment and published source** are available (see [Live links](#live-links)).
 - The **participant walkthrough is not yet completed** (see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md)).
 - The live AI verification above is **not re-run in this documentation pass**:
   it was a single real production session driven in an independent verification run,
-  and actual provider billing is not measured (the conservative application budget ledger
-  estimated $0.136371 used against a $5 cap with $0 reserved; the durable budget gate was
-  independently verified before those calls). The Eve HTTP *contract* (health, session create,
-  followed stream, cancel, reset) and the app's stream parser are additionally verified
-  against a loopback fake server, and the budgeted-provider wrapper is unit-tested
-  against a fake model.
-- The UI was verified in an independent verification run with headless Chrome/Chromium
-  (`node scripts/run_visual_inspection.js`) against the **HTTPS deployment**,
-  capturing 16 screenshots under `output/playwright/` (git-ignored) with all 7
-  grouped checks passing in deterministic mode. This documentation pass did not
-  re-run it.
-- No external campaign delivery, signed cryptographic receipts, or benchmark
-  latencies are claimed. Approvals represent internal reservations in the graph only.
+  and actual provider billing is not measured. That session's conservative
+  application-ledger cumulative estimate was **$0.136371**; the durable ledger now reads an
+  estimated **$0.855696** used against the **$5** application cap with **$0**
+  reserved (the later increase reflects subsequent recording attempts, not this
+  documentation pass). Both figures are historical application-ledger estimates, not
+  provider bills, not a current balance, and not guarantees of cash costs (the
+  durable budget gate was independently verified before those calls). **No claim is
+  made that the project spent nothing historically.** The Golden Hour UI
+  release/capture itself made **0 provider calls** and left the **$5 cap unchanged**.
+  The Eve HTTP *contract* (health, session create, followed stream, cancel, reset) and
+  the app's stream parser are additionally verified against a loopback fake server,
+  and the budgeted-provider wrapper is unit-tested against a fake model.
+- The UI was verified in an independent review run with headless Chrome/Chromium
+  (`node scripts/run_visual_inspection.js`) against the **live HTTPS deployment** as
+  a desktop/mobile **deterministic journey** with zero paid calls (screenshots land
+  under `output/playwright/`, git-ignored). This documentation pass did not re-run
+  it; the dated capture/check counts are in
+  [Verification evidence](#verification-evidence).
+- No external campaign delivery, social posting, signed cryptographic receipts, or
+  benchmark latencies are claimed. Approvals represent internal reservations in the
+  graph only.
+
+## Visual design (Golden Hour editorial)
+
+The local build's interface uses a **Golden Hour editorial** direction (warm sky
+and sunflower gold over forest green, with Anton display type, Instrument Serif,
+Inter and JetBrains Mono). It is adapted from a design reference the participant
+supplied and explicitly permitted, and it is a **presentation-layer change only**:
+it does not alter any check, evidence path, proposal or approval behaviour.
+
+The plan is organised into five plain-language views, using their actual on-screen
+labels:
+
+- **Your work** — the studio plan overview.
+- **Needs attention** — the conflict and its graph-grounded evidence.
+- **Plan options** — checked repairs, including blocked candidates.
+- **Saved plan** — approved internal reservations and owner tasks.
+- **Ask PACT** — graph-grounded studio memory recall.
+
+Setup, the Cypher queries and the graph model stay discoverable in this README and
+in [`queries/`](./queries/). The redesign has **not** been through a user study:
+there is no usability result and no "zero learning curve" claim. The Golden Hour
+design is now the **deployed** live UI on the India production release.
 
 ## Hackathon tracks
 
@@ -343,7 +389,7 @@ The deterministic "rules check" works with **no** API key. The optional
 npm run typecheck                     # tsc --noEmit
 npm test                              # root unit tests (deterministic + agent + http)
 npm run test:integration              # graph + budget + http integration (needs FalkorDB)
-node scripts/run_visual_inspection.js # 16-screenshot visual smoke journey & 7 grouped checks
+node scripts/run_visual_inspection.js # deterministic desktop/mobile journey (zero paid calls)
 ```
 
 `npm run test:integration` runs `tsx --env-file-if-exists=.env.local --test
@@ -352,13 +398,16 @@ FalkorDB. The HTTP suite needs a running app server at `PACT_BASE_URL`
 (default `http://127.0.0.1:3000`). The graph suite closes its shared FalkorDB
 connection during teardown and exits normally.
 
-`node scripts/run_visual_inspection.js` runs a portable visual smoke journey
-using `playwright-core` (auto-detects installed Google Chrome or Microsoft Edge,
-or can be overridden with `PACT_BROWSER_PATH`). It captures 16 screenshots under
-`output/playwright/` while validating 7 grouped checks: initial 12h/8h capacity
-conflict, feasible repair proposal approval, studio memory grounded retrieval,
-Sam approval yielding feasible original Day 1 deadlines, unknown duration handling,
-keyboard Escape dismissal of the Source drawer, and real HTTP 409 optimistic locking.
+`node scripts/run_visual_inspection.js` runs a portable **deterministic
+desktop/mobile journey** using `playwright-core` (auto-detects installed Google
+Chrome or Microsoft Edge, or can be overridden with `PACT_BROWSER_PATH`). It
+captures screenshots under `output/playwright/` while validating grouped checks —
+initial 12h/8h capacity conflict, mobile layout, feasible repair proposal approval,
+studio memory grounded retrieval, Sam approval yielding feasible original Day 1
+deadlines, unknown duration handling, keyboard Escape dismissal of the Source
+drawer, and real HTTP 409 optimistic locking. It makes **zero paid model calls**.
+The dated counts from the production review are recorded in
+[Verification evidence](#verification-evidence).
 
 ### Docker (full stack)
 
@@ -415,6 +464,7 @@ All values below are **names with placeholders only**; never commit real secrets
 | `PACT_MODEL_INPUT_USD_PER_MTOK` / `PACT_MODEL_OUTPUT_USD_PER_MTOK` | web + runtimes | `3` / `15` | Pricing used for reservations |
 | `PACT_AGENT_TIMEOUT_MS` | web | `60000` | Agent call deadline |
 | `PACT_DOMAIN` | compose/Caddy | `localhost` | Public hostname for the proxy |
+| `PACT_MEDIA_DIR` | compose/Caddy | `./media` | Read-only directory for the published video, captions and deck assets |
 | `PACT_BASE_URL` | HTTP test / visual inspection | `http://127.0.0.1:3000` | App under test |
 | `PACT_BROWSER_PATH` | visual inspection | `<optional browser path>` | Optional browser executable override |
 | `PACT_MCP_WORKSPACE_ID` | MCP adapter | `<workspace id>` | Fixed tenant for the read-only MCP tools |
@@ -494,16 +544,18 @@ Every billable call is gated by a **durable, atomic, global** ledger in FalkorDB
   full conservative reservation; a failed settle leaves the reservation open; a
   missing ledger/`FALKORDB_URL` refuses the call. The input-token ceiling is one
   token per UTF-8 byte (a true upper bound), not `bytes/4`.
-- Default cap `$5` (`PACT_API_BUDGET_USD`). With `OPENAI_API_KEY` blank, no
-  billable call is possible and the app returns a labeled deterministic result.
+- Default cap `$5` (`PACT_API_BUDGET_USD`). The cap is an **application-level
+  guard**: it is not a provider bill, not a guarantee of cash costs, and not a
+  measured invoice. With `OPENAI_API_KEY` blank, no billable call is possible and
+  the app returns a labeled deterministic result.
 
 ## Verification evidence
 
 The results below were **executed before this documentation pass** (15 Oct 2026)
 and are **not re-run here** — this pass only edits docs. The unit and integration
 suites ran against the local build (FalkorDB reachable at `127.0.0.1:16379`); the
-visual smoke journey and one live AI session ran against the **live HTTPS
-deployment**. No paid model call was made by this documentation pass.
+desktop/mobile deterministic journey and one live AI session ran against the
+**live HTTPS deployment**. No paid model call was made by this documentation pass.
 
 | Check | Command | Result |
 | --- | --- | --- |
@@ -515,7 +567,7 @@ deployment**. No paid model call was made by this documentation pass.
 | Budget integration (real FalkorDB) | `npx tsx --test tests/budget.integration.ts` | **6 pass / 0 fail** |
 | Runtime budgeted-provider tests | `npx tsx --test agent-runtime/tests/budgeted-model.test.ts` | **8 pass / 0 fail** |
 | Runtime tenant-binding tests | `npx tsx --test agent-runtime/tests/handoff-binding.test.ts` | **7 pass / 0 fail** |
-| Visual smoke journey (live HTTPS deployment) | `node scripts/run_visual_inspection.js` | **16 screenshots / 7 grouped checks pass** |
+| Desktop/mobile deterministic journey (India production release) | `node scripts/run_visual_inspection.js` | **passed, zero paid calls** |
 
 The root unit suite includes the six requirement tests in
 `tests/requirements.test.ts` and the three HTTP contract tests in
@@ -524,25 +576,36 @@ The root unit suite includes the six requirement tests in
 closes its shared FalkorDB connection in teardown, so it exits normally without
 `--test-force-exit`.
 
-**Live deployment evidence (executed before this pass, not re-run here):** an
-independent verification run ran the 16-screenshot / 7-check visual smoke journey
-against the HTTPS deployment in deterministic mode dated 2026-10-15 02:17 UTC,
-alongside checks that workspace isolation, the secure `HttpOnly` / `SameSite` session
-cookie, cross-origin write rejection, and approval persistence after replacing the graph
-container all hold. Those live checks are **not** re-asserted by this
-documentation pass; see [Live links](#live-links).
+**Live deployment evidence (executed before this pass, not re-run here):** the
+**current India production release** (commit `3985edf`, 2026-10-15) was independently
+reviewed live: the full deterministic production
+check/repair/human-approval/persisted-allocation/owner-task/grounded-recall journey
+passed on desktop and mobile, with **0 provider calls**, **49 source graphs
+preserved**, and the **$5 budget cap unchanged** (`$0.855696` historical ledger
+estimate, `$0` reserved). Earlier, on the prior release (commit `6e04796`,
+2026-10-15), an independent verification run passed the desktop/mobile deterministic
+journey against HTTPS — **19 captures / 13 numbered groups, 0 paid calls** — alongside
+checks that workspace isolation, the secure `HttpOnly` / `SameSite` session cookie,
+cross-origin write rejection, and approval persistence after replacing the graph
+container all hold. These live checks are **not** re-asserted by this documentation
+pass; see [Live links](#live-links).
 
 **Live AI evidence (executed before this pass, not re-run here):** an independent
 verification run drove one real **live** AI session against the HTTPS deployment on
 2026-10-15 06:56 UTC. It passed: both agent roles (`account_manager` → `producer`)
 and live graph memory ran end to end; the analysis reported the 12h/8h joint conflict
 with source citations, one human-approved decision was recorded, and memory recalled
-six sources. Tracked live spend in the conservative application budget ledger was
-estimated at **$0.136371** against the **$5** application cap with **$0** reserved;
-this is an application ledger estimate, not an OpenAI billing measurement (the durable
-budget gate was independently verified before those calls). A first attempt failed with
-a network `fetch failed` before any ledger existed; the second attempt passed. This
-documentation pass did not re-run the live session.
+six sources. The conservative application budget ledger recorded that session as a
+**$0.136371** cumulative estimate against the **$5** application cap with **$0** reserved; the
+durable ledger now reads an estimated **$0.855696** used with **$0** reserved (the
+later increase reflects subsequent recording attempts; the Golden Hour UI
+release/capture itself made **0 provider calls**). Both figures are historical
+application-ledger estimates, **not** OpenAI billing measurements, current balances or
+cash-cost guarantees (the durable budget gate was independently verified before those
+calls). A first attempt failed with a network `fetch failed` before any ledger
+existed; the second attempt passed. This documentation pass did not re-run the live
+session, and the number of live requests made across the whole project is **not**
+claimed.
 
 **Reported by prior verification (not re-run here):** production build (`next build`),
 typecheck (`tsc --noEmit`), and the unit and integration suites. The live agent
@@ -559,9 +622,12 @@ private or login-protected data is loaded into the graph. The fixture lives in
 
 ## AI assistance
 
-Development used AI coding assistants; the disclosure, the exact models used, a
-participant walkthrough, and a questions-to-answer list for the participant are
-in [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md). The participant must be
+Development used AI coding assistants. In brief: **Codex** orchestrated and
+cross-checked the work; **OpenCode and Gemini-based assistants** did development and
+documentation passes; and the runtime's optional AI path calls **OpenAI** models
+through the budgeted provider proxy. The full disclosure, the participant
+walkthrough, and a questions-to-answer list are in
+[`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md). The participant must be
 able to explain the graph model, the queries, the architecture and the technical
 decisions, and should personally validate the code before submission.
 
@@ -569,16 +635,16 @@ decisions, and should personally validate the code before submission.
 
 | Artifact | Status |
 | --- | --- |
-| Live deployment (HTTPS) | ✅ **live** — <https://pact-roojool-20261015.malaysiawest.cloudapp.azure.com> (verified by independent visual smoke; not re-run in this docs pass) |
+| Live deployment (HTTPS) | ✅ **live** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com> (Golden Hour UI, commit `3985edf`, Hyderabad / `indiasouthcentral`; independently reviewed deterministic journey, **0 provider calls** for the capture, **$5 cap unchanged**; not re-run in this docs pass). |
+| Demo watchpage (HTTPS) | ⏳ **prepared; publication pending** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (self-hosted video + captions). |
 | Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (source, setup, graph model, Cypher and tests) |
-| Demo video (working project) | ⏳ **pending recording** — reusable 3-minute capture script in [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md) |
-| Live AI session | ✅ **verified once** — real live production session (both roles + live memory) executed against the HTTPS deployment in an independent verification run; conservative budget ledger estimate $0.136371 of $5 cap ($0 reserved); not re-run in this docs pass |
+| Demo video & pitch deck | ⏳ **pending reviewed publication** — intended release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). Root publishes after review; **not yet published**. |
+| Live AI session | ✅ **verified once (earlier deployment)** — real live production session (both roles + live memory) executed in an independent verification run; ledger estimate at that checkpoint $0.136371, durable ledger now estimates $0.855696 of the $5 cap ($0 reserved) after later recording attempts; not a provider bill; not re-run in this docs pass |
 | Participant walkthrough | ⏳ **not yet completed** — see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md) |
 
-No link above is invented: the live URL and repository URL are the real,
-operator-provided endpoints, and the demo-video link is left pending rather than
-fabricated. Complete local and Docker setup instructions are provided above,
-which the rules accept if the project cannot be deployed.
+The app and repository are verified public endpoints. The watchpage and release
+assets are prepared publication targets; final playback and link checks are pending.
+Complete local and Docker setup instructions are provided above.
 
 Submission draft: [`docs/SUBMISSION_DRAFT.md`](./docs/SUBMISSION_DRAFT.md).
 
