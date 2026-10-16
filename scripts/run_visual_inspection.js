@@ -696,7 +696,7 @@ async function run() {
   // Confirm reset
   await Promise.all([
     page.waitForResponse((r) => r.url().includes('/api/reset') && r.status() === 200),
-    page.click('.btn-editorial-clay:has-text("Start over")'),
+    page.getByRole('dialog').getByRole('button', { name: 'Start over', exact: true }).click(),
   ]);
   await page.waitForTimeout(600);
   console.log('✓ Assertion passed: Reset modal confirmed and workspace restored to sample schedule.');

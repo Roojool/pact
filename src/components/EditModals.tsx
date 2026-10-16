@@ -26,6 +26,8 @@ function useModalFocusTrap(isOpen: boolean, onClose: () => void) {
   useEffect(() => {
     if (!isOpen) return;
     previousActiveElement.current = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
     const timer = setTimeout(() => {
       const container = containerRef.current;
@@ -73,6 +75,7 @@ function useModalFocusTrap(isOpen: boolean, onClose: () => void) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
+      document.body.style.overflow = previousOverflow;
       clearTimeout(timer);
       window.removeEventListener('keydown', handleKeyDown);
       if (previousActiveElement.current && typeof previousActiveElement.current.focus === 'function') {
@@ -495,6 +498,7 @@ interface ResetModalProps {
 
 export function ResetModal({ isOpen, onClose, onConfirm }: ResetModalProps) {
   const [isResetting, setIsResetting] = useState(false);
+  const [resetError, setResetError] = useState('');
   const containerRef = useModalFocusTrap(isOpen, onClose);
 
   if (!isOpen) return null;
@@ -502,9 +506,12 @@ export function ResetModal({ isOpen, onClose, onConfirm }: ResetModalProps) {
   const handleConfirm = async () => {
     if (isResetting) return;
     setIsResetting(true);
+    setResetError('');
     try {
       await onConfirm();
       onClose();
+    } catch {
+      setResetError('Could not start over. Your current workspace is still here. Try again.');
     } finally {
       setIsResetting(false);
     }
@@ -550,7 +557,8 @@ export function ResetModal({ isOpen, onClose, onConfirm }: ResetModalProps) {
           edits you have made here will be cleared.
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+        {resetError && <p role="alert" style={{ marginBottom: 16, color: '#9a2818' }}>{resetError}</p>}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '10px' }}>
           <button
             type="button"
             onClick={onClose}
@@ -562,7 +570,7 @@ export function ResetModal({ isOpen, onClose, onConfirm }: ResetModalProps) {
           <button
             type="button"
             onClick={handleConfirm}
-            className="btn-editorial-clay"
+            className="btn-editorial-primary"
             disabled={isResetting}
           >
             {isResetting ? 'Resetting schedule…' : 'Start over'}

@@ -266,6 +266,7 @@ export default function PlanningDeskPage() {
         message: typedErr.message || 'The planning service is unavailable. Try again.',
         code: typedErr.code || 'RESET_ERROR',
       });
+      throw err;
     }
   };
 
