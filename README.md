@@ -10,7 +10,10 @@ planner. A short AI prompt proposes a complete starting setup, with assumptions
 separately accepted before saving. Manual setup and two clearly labelled examples
 (agency and BunStop burger shop) work without paid AI. Live generation
 requires a configured provider key and the existing shared budget store; its
-contract is tested with injected responses, not a fresh paid model run.
+contract is tested with injected responses. One real short-prompt setup generation
+was also verified on 2026-10-16 against the existing shared cap; it returned two
+team roles, three tasks and explicit assumptions. The recorded burger demo predates
+that verification and still makes zero AI calls.
 
 Watch the [93-second BunStop burger-shop demo](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#burger-shop): actual local browser/API/FalkorDB work with labelled example inputs and zero provider calls. This fork is not deployed as the original live planner.
 

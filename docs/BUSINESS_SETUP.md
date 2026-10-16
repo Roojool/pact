@@ -76,8 +76,19 @@ and `node scripts/check_burger_business.cjs` checks food-shop setup, real checki
 repair/approval/memory/edit, six mobile views and server/client assumption gates.
 Private screenshots/results are under `output/business-setup/`.
 
-No fresh live model request was run for this change. The short-prompt generation
-contract uses injected responses; manual and labelled examples use the actual
-browser, API and FalkorDB. The burger demo is recorded from that local example,
+One real short-prompt setup request was verified on 2026-10-16: two team roles,
+three tasks and explicit reviewable assumptions. Its ledger estimate was $0.024456;
+the existing $5 cap remains unchanged (spent $0.880152, reserved $0 at that
+checkpoint, not a provider billing statement). Credentials remain server-side.
+The local test uses a source-IP-restricted SSH tunnel to the existing India
+production ledger; the workspace database stays separate on port 17379. If the
+tunnel or VM is unavailable, generation must fail closed.
+
+The contract also uses injected responses; manual and labelled examples use the
+actual browser, API and FalkorDB. The burger demo is recorded from that local example,
 not a deployed multi-business feature or an AI-generated result. The original
 production app and its original video remain available unchanged.
+
+**Start over** in this fork returns to new business setup, instead of implicitly
+loading the original sample. The dialog is centered, traps focus, restores focus
+on cancel and stays open if the reset fails.

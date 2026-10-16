@@ -240,10 +240,10 @@ export default function PlanningDeskPage() {
 
   // 6. Start Over / Reset Workspace
   // Invalidate analysis and clear session replies
-  const handleResetWorkspace = async () => {
+  const handleResetWorkspace = async (sample = true) => {
     setError(null);
     try {
-      const res = await fetch('/api/reset', {
+      const res = await fetch(sample ? '/api/reset' : '/api/new-workspace', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
@@ -267,6 +267,7 @@ export default function PlanningDeskPage() {
         message: typedErr.message || 'The planning service is unavailable. Try again.',
         code: typedErr.code || 'RESET_ERROR',
       });
+      throw err;
     }
   };
 
@@ -491,7 +492,7 @@ export default function PlanningDeskPage() {
         <ResetModal
           isOpen={isResetModalOpen}
           onClose={() => setIsResetModalOpen(false)}
-          onConfirm={handleResetWorkspace}
+          onConfirm={() => handleResetWorkspace(false)}
         />
       )}
     </div>

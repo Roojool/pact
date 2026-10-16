@@ -1,8 +1,8 @@
 {
-  "verifiedAt": "2026-10-16T10:07:00.405862+00:00",
+  "verifiedAt": "2026-10-16T10:45:04.463458+00:00",
   "scope": "Separate PACT business setup fork; original production deployment unchanged",
   "productionBuild": true,
-  "unitTests": 85,
+  "unitTests": 86,
   "baselineGraphIntegrationTests": 21,
   "setupGraphIntegrationTests": 4,
   "httpIntegrationTests": 1,
@@ -28,14 +28,14 @@
   "mobileWidth": 390,
   "longNamesChecked": true,
   "providerCalls": 0,
-  "liveExtractionVerified": false,
+  "liveExtractionVerified": true,
   "aiContract": "Injected provider response tests: extraction schema, no mutation tools, unavailable key, budget rejection, invalid JSON, invented quote and incomplete response",
   "screenshots": "Generated locally under ignored output/business-setup",
   "preview": "http://127.0.0.1:3101",
   "limitations": [
-    "Fresh live provider generation not run; current local preview has no key/shared budget connection",
-    "Fork is local, not deployed to a second public URL",
-    "Two-day staff/task model; no POS, inventory quantities, live orders or task-dependency sequencing"
+    "Local preview needs the private SSH tunnel and VM to remain available; the budget gate fails closed otherwise",
+    "Two-day staff/task model; no POS, inventory quantities, live orders or task-dependency sequencing",
+    "Live setup generates a draft; the user must review/accept and create it"
   ],
   "shortPromptSetup": "Structured-output contract verified with injected responses; defaults require explicit acceptance",
   "businessTypes": [
@@ -49,5 +49,25 @@
     "eligibleDay1Hours": 4,
     "repair": "Only team training moves to Day 2"
   },
-  "assumptionGates": "Client and actual HTTP server acceptance checks passed"
+  "assumptionGates": "Client and actual HTTP server acceptance checks passed",
+  "liveSetupResult": {
+    "passed": true,
+    "mode": "live",
+    "usageUsd": 0.024456,
+    "providerRequests": 1,
+    "businessType": "food_shop",
+    "team": 2,
+    "tasks": 3,
+    "suggestions": 9,
+    "missingApprovalStillRequired": true,
+    "checkedAt": "2026-10-16T10:41:54.634Z"
+  },
+  "resetDialog": "Actual desktop/mobile centering, focus, failed-reset recovery and return to new business setup verified",
+  "budgetRouting": "Explicit PACT_BUDGET_URL points through loopback-only SSH tunnel to existing India production ledger; isolated workspace graph remains separate",
+  "budget": {
+    "totalUsd": 5,
+    "spentUsd": 0.880152,
+    "reservedUsd": 0,
+    "setupGenerationEstimateUsd": 0.024456
+  }
 }

@@ -17,3 +17,6 @@ ROOT_DEPENDENCIES.md
 output/playwright/
 output/business-setup/
 media/
+
+/output/reset-dialog/
+/output/live-setup/

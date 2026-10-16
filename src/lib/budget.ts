@@ -409,7 +409,7 @@ export function resolveBudgetConfig(env: EnvLike = process.env): BudgetConfig {
   const totalUsd = Number.isFinite(raw) && raw > 0 ? round6(raw) : DEFAULT_TOTAL_USD;
   return {
     totalUsd,
-    url: env.FALKORDB_URL?.trim() || undefined,
+    url: env.PACT_BUDGET_URL?.trim() || env.FALKORDB_URL?.trim() || undefined,
     graphName: env.PACT_BUDGET_GRAPH?.trim() || 'pact_budget',
   };
 }

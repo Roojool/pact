@@ -698,11 +698,14 @@ async function run() {
 
   // Confirm reset
   await Promise.all([
-    page.waitForResponse((r) => r.url().includes('/api/reset') && r.status() === 200),
-    page.click('.btn-editorial-clay:has-text("Start over")'),
+    page.waitForResponse((r) => r.url().includes('/api/new-workspace') && r.status() === 200),
+    page.getByRole('dialog').getByRole('button', { name: 'Start over', exact: true }).click(),
   ]);
   await page.waitForTimeout(600);
-  console.log('✓ Assertion passed: Reset modal confirmed and workspace restored to sample schedule.');
+  await page.getByTestId('business-setup').waitFor();
+  await page.getByRole('button', { name: 'Try the original sample workspace' }).click();
+  await page.getByTestId('dashboard-view').waitFor();
+  console.log('✓ Start over returns to setup; the original sample can be chosen explicitly.');
 
   // 9. Deliverables & Desk / Overview: Edit Sam Approval for Comet Coffee
   console.log('9. Navigating to Overview ("Your work") and editing Sam approval for Comet Coffee...');

@@ -117,6 +117,10 @@ export async function POST(request: NextRequest, context: Context) {
       if (body.draft.suggestions.length && body.assumptionsAccepted !== true) throw new HttpError(400, 'ASSUMPTIONS_REQUIRED', 'Review and accept the suggested defaults before creating your workspace.');
       return response({ workspace: await createBusinessWorkspace(id, body.draft, body.note, body.idempotencyKey) });
     }
+    if (action === 'new-workspace') {
+      z.object({}).strict().parse(raw);
+      return response({ workspace: null }, newSessionId());
+    }
     if (action === 'reset') {
       z.object({}).strict().parse(raw);
       rateLimit('create:global', 60, 60 * 60 * 1000);

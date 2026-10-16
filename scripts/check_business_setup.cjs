@@ -14,7 +14,7 @@ const out=path.resolve(__dirname,'../output/business-setup');fs.mkdirSync(out,{r
  });
  try{
   await page.goto(base,{waitUntil:'networkidle'});await page.getByTestId('business-setup').waitFor();
-  assert(await page.getByTestId('generate-setup').isDisabled(),'No key: clearly disabled live generation');
+  assert(await page.getByTestId('generate-setup').isDisabled(),'An empty prompt must disable generation');
   await page.getByTestId('business-note').fill('My draft must survive a reload.');
   await page.reload({waitUntil:'networkidle'});assert.equal(await page.getByTestId('business-note').inputValue(),'My draft must survive a reload.');
   await page.screenshot({path:path.join(out,'welcome-desktop.png'),fullPage:true});

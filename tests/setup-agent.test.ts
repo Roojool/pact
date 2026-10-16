@@ -1,7 +1,7 @@
 import test, { afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { __resetAgentDeps, __setAgentDeps, runAgentSetup } from '../src/lib/agents';
-import { createMemoryBudgetLedger } from '../src/lib/budget';
+import { createMemoryBudgetLedger, resolveBudgetConfig } from '../src/lib/budget';
 import { setupFixture } from './setup-fixture';
 import { burgerExample, missingSetupFields } from '../src/lib/business-setup';
 afterEach(__resetAgentDeps);
@@ -65,4 +65,11 @@ test('malformed output and invented source quotes never become a setup', async (
   await assert.rejects(runAgentSetup('ws-setup', 'real note'), /valid JSON/);
   __setAgentDeps({ fetchImpl: async () => new Response(JSON.stringify({ status: 'incomplete', output_text: JSON.stringify(setupFixture()) })) });
   await assert.rejects(runAgentSetup('ws-setup', 'real note'), /did not finish/);
+});
+
+test('setup budget uses the explicitly shared ledger, not the isolated business database', () => {
+  const config = resolveBudgetConfig({ FALKORDB_URL: 'redis://127.0.0.1:17379', PACT_BUDGET_URL: 'redis://127.0.0.1:18379', PACT_API_BUDGET_USD: '5' });
+  assert.equal(config.url, 'redis://127.0.0.1:18379');
+  assert.equal(config.graphName, 'pact_budget');
+  assert.equal(config.totalUsd, 5);
 });
