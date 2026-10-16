@@ -12,6 +12,8 @@ separately accepted before saving. Manual setup and two clearly labelled example
 requires a configured provider key and the existing shared budget store; its
 contract is tested with injected responses, not a fresh paid model run.
 
+Watch the [93-second BunStop burger-shop demo](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#burger-shop): actual local browser/API/FalkorDB work with labelled example inputs and zero provider calls. This fork is not deployed as the original live planner.
+
 **The documentation below describes the original PACT baseline. Its live URLs,
 published media and historical live-AI evidence belong to that original app, not
 this fork.**
