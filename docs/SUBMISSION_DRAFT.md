@@ -1,10 +1,9 @@
 # PACT — submission draft
 
 > Paste-ready text below. Verify every field against the finished build before
-> filing. The live app link and public repository are real and verified;
-> the demo video and pitch deck are **pending reviewed publication** to release
-> `v1.0.0`, so their intended asset URLs are **targets only** — do not claim they are
-> published until the root gate completes.
+> filing. The app, public source, playable demo, captions and editable deck are
+> published and independently reviewed. The participant walkthrough remains
+> uncompleted and must be done personally before submission.
 
 ## Project title
 
@@ -66,25 +65,21 @@ graph model, Cypher and tests).
   live with **0 provider calls** for the capture and the **$5 cap unchanged**.
 - **Demo watchpage (HTTPS):**
   <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> —
-  self-hosted video and captions (publication pending).
+  verified self-hosted video and captions.
 - **Golden Hour redesign:** **deployed** — it is the live UI.
 - **Local fallback:** complete local and Docker setup instructions are in
   [`README.md`](../README.md).
 
 ## Demo video and deck status
 
-**Pending reviewed publication.** The root will publish the accepted video and deck
-to GitHub release `v1.0.0` after review. Intended asset URLs (targets, **not yet
-published**): [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4),
-[PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt),
-[PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt),
-[PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md),
-[PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx),
-[PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf).
-The zero-new-paid-call recording plan is in [`docs/DEMO_SCRIPT.md`](./DEMO_SCRIPT.md):
-a fresh **deterministic** production walkthrough, plus (optionally) an **explicitly
-captioned earlier live-AI validation clip** from existing evidence. Never present the
-old interface as current.
+**Published and reviewed:** [watch the actual 2:40 demo](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo).
+[Release v1.0.0](https://github.com/Roojool/pact/releases/tag/v1.0.0) contains the
+MP4, SRT/VTT captions, narration transcript, editable PowerPoint and PDF.
+
+The video uses real current-interface rules-mode footage and a clearly labeled
+verified production recall screenshot. Narration is synthesized offline. Earlier
+live AI validation is disclosed as historical; no new paid model call was made.
+See [release verification](./RELEASE_VERIFICATION.md).
 
 ## Details
 
@@ -111,7 +106,7 @@ From the official rules (<https://www.wemakedevs.org/hackathons/falkordb/rules>)
 | Public source-code repository | ✅ **published** — <https://github.com/Roojool/pact> |
 | README with setup instructions and graph data model | ✅ [`README.md`](../README.md) |
 | Cypher queries / graph algorithms the product depends on | ✅ [`queries/`](../queries/) |
-| Demo video showing the working project | ⏳ **pending reviewed publication** to release `v1.0.0` (plan: [`docs/DEMO_SCRIPT.md`](./DEMO_SCRIPT.md)) |
+| Demo video showing the working project | ✅ [published playable demo](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo) |
 | Live deployment, or complete local setup instructions | ✅ **live** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com> (Golden Hour, verified; complete local + Docker setup also documented) |
 | AI coding-assistant use disclosed | ✅ [`docs/AI_ASSISTANCE.md`](./AI_ASSISTANCE.md) |
 | Participant understands and can explain the code | ⏳ participant to complete the walkthrough in `PARTICIPANT_WALKTHROUGH.md` / `AI_ASSISTANCE.md` (not yet completed) |
@@ -124,10 +119,7 @@ From the official rules (<https://www.wemakedevs.org/hackathons/falkordb/rules>)
 ## Fields to complete from actual artifacts
 
 - **Repository:** <https://github.com/Roojool/pact> (reviewed source published).
-- **Demo video:** upload the recording of the working project (not a storyboard)
-  following `docs/DEMO_SCRIPT.md`. *Pending reviewed publication to release `v1.0.0`;
-  intended target <https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4>
-  (not yet published).*
+- **Demo video:** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (159.83 seconds; MP4 and captions also in release `v1.0.0`).
 - **Live deployment:** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>
   — the verified Golden Hour production release (commit `3985edf`), independently
   reviewed with zero paid calls for the capture. Watchpage:
@@ -151,12 +143,11 @@ From the official rules (<https://www.wemakedevs.org/hackathons/falkordb/rules>)
 
 ## Do not submit while…
 
-- Required links remain unverified — the **demo video and deck are still pending
-  reviewed publication** to release `v1.0.0`.
+- A required public link stops working; verify the published links before filing.
 - A live AI result is claimed beyond the single verified session above, a project-wide
   call total is stated, or the deterministic path is described as live.
-- The release asset URLs are presented as published before the root gate completes,
-  or the project is described as having spent nothing historically.
+- The project is described as having spent nothing historically, or a new paid
+  AI test is claimed for the final rules-mode video.
 - The AI-assistance disclosure is missing.
 - The participant cannot explain the graph model, the queries, the architecture
   and the technical decisions. Complete the walkthrough and answer the questions

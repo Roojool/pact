@@ -95,8 +95,9 @@ paid calls**.
 
 **Publication and remaining verification:**
 
-- The **demo video and deck are not published yet** — the intended release `v1.0.0`
-  asset URLs are targets only; the plan is in [`docs/DEMO_SCRIPT.md`](./DEMO_SCRIPT.md).
+- The **video, captions, transcript, editable deck and PDF are published** in
+  [release v1.0.0](https://github.com/Roojool/pact/releases/tag/v1.0.0). Actual browser
+  playback and all final slides were reviewed; see [verification](./RELEASE_VERIFICATION.md).
 - The **Golden Hour redesign is deployed** — it is the live UI on the verified India
   production release (Hyderabad / `indiasouthcentral`).
 - The **participant walkthrough is not yet completed** (see below).

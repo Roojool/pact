@@ -18,7 +18,7 @@ makes them fit?*
 > session has been verified** against an earlier deployment (both agent roles plus
 > live graph memory, executed in an independent verification run; see
 > [Verification evidence](#verification-evidence)). The **demo video and pitch deck
-> are prepared and pending reviewed publication** to the GitHub release below, and
+> are published** in the GitHub release below, and
 > the **participant walkthrough is not yet completed**. See [Live links](#live-links)
 > and [Publication status](#publication-status). Nothing here fabricates a link, a
 > live-model result, or a test result that was not actually executed.
@@ -33,11 +33,11 @@ makes them fit?*
   Central (`indiasouthcentral`)**. Independently reviewed live with **0 provider
   calls** for the capture; the **$5 application budget cap is unchanged**.
 - **Demo watchpage (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo>
-  — prepared self-hosted page, pending media publication, with video and captions
+  — verified self-hosted player with video and captions
   (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`).
 - **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
-- **Demo video & pitch deck:** *pending reviewed publication* to release
-  [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); intended asset
+- **Demo video & pitch deck:** **published** in release
+  [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); downloadable asset
   URLs are listed under [Publication status](#publication-status), and the recording
   plan is in [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md).
 
@@ -122,9 +122,9 @@ persists an internal reservation, owner tasks and an internal decision record.
   application cap. Executed in an independent verification run before this pass;
   see [Verification evidence](#verification-evidence).
 
-**Not verified / not claimed:**
+**Scope and remaining human checks:**
 
-- The **demo video and pitch deck are pending reviewed publication**. The **live
+- The **demo video and pitch deck are published**. The **live
   deployment and published source** are available (see [Live links](#live-links)).
 - The **participant walkthrough is not yet completed** (see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md)).
 - The live AI verification above is **not re-run in this documentation pass**:
@@ -613,6 +613,12 @@ path is now **end-to-end verified once** (see the live AI evidence above) in
 addition to being contract-verified against a loopback fake server and unit-tested
 against a fake model.
 
+**Final provenance correction (16 Oct 2026):** release `e8fbd44` follows approval
+source relationships in rules-mode recall. Focused deployed checks confirmed
+Comet citations `src-brief-c` / `src-policy`, editor citations including `src-cal`,
+working policy links and unchanged plan revisions. The full UI journey above was
+reviewed on the same Golden Hour interface at baseline `3985edf`.
+
 ## Synthetic data disclosure
 
 All agency data is **fictional and synthetic** (Morrow Studio, its creators,
@@ -636,14 +642,16 @@ decisions, and should personally validate the code before submission.
 | Artifact | Status |
 | --- | --- |
 | Live deployment (HTTPS) | ✅ **live** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com> (Golden Hour UI, commit `3985edf`, Hyderabad / `indiasouthcentral`; independently reviewed deterministic journey, **0 provider calls** for the capture, **$5 cap unchanged**; not re-run in this docs pass). |
-| Demo watchpage (HTTPS) | ⏳ **prepared; publication pending** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (self-hosted video + captions). |
+| Demo watchpage (HTTPS) | ✅ **verified playback and captions** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (self-hosted video + captions). |
 | Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (source, setup, graph model, Cypher and tests) |
-| Demo video & pitch deck | ⏳ **pending reviewed publication** — intended release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). Root publishes after review; **not yet published**. |
+| Demo video & pitch deck | ✅ **published and reviewed** — release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). |
 | Live AI session | ✅ **verified once (earlier deployment)** — real live production session (both roles + live memory) executed in an independent verification run; ledger estimate at that checkpoint $0.136371, durable ledger now estimates $0.855696 of the $5 cap ($0 reserved) after later recording attempts; not a provider bill; not re-run in this docs pass |
 | Participant walkthrough | ⏳ **not yet completed** — see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md) |
 
-The app and repository are verified public endpoints. The watchpage and release
-assets are prepared publication targets; final playback and link checks are pending.
+The app, watchpage and six release assets are public. The 159.83-second H264/AAC
+video passed actual browser playback, all 43 caption cues loaded, byte-range
+streaming worked, and the media page was checked at desktop and 390px mobile widths.
+See [final release verification](docs/RELEASE_VERIFICATION.md).
 Complete local and Docker setup instructions are provided above.
 
 Submission draft: [`docs/SUBMISSION_DRAFT.md`](./docs/SUBMISSION_DRAFT.md).

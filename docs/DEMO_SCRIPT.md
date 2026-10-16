@@ -1,7 +1,11 @@
-# PACT — 3-minute demo capture plan (zero new paid calls)
+# PACT — published demo and reusable capture outline
 
-A reusable shot list for recording the **working project** (the rules require a
-demo video, not a storyboard). Total target: **~3:00**. Rehearse once, then record.
+The [published demo](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo)
+is **159.83 seconds**. Its exact narration, scene labels and captions are in
+[release v1.0.0](https://github.com/Roojool/pact/releases/tag/v1.0.0). It uses actual
+rules-mode footage and a labeled verified production recall screenshot, with
+offline synthetic narration. The outline below is retained for a human walkthrough,
+not an instruction to launch more recording or paid AI attempts.
 
 > **Cost rule for this demo: ZERO new paid calls.** Record a fresh **deterministic**
 > production walkthrough (the "Rules check"). If you want to show the agent path,
@@ -23,7 +27,7 @@ demo video, not a storyboard). Total target: **~3:00**. Rehearse once, then reco
    - **Local:** `docker start pact-graph` (or the `docker run` from README.md),
      then `npm run dev` → `http://127.0.0.1:3000`.
 2. Keep the AI switch **off** and record the **deterministic "Rules check"**. It runs
-   instantly at $0 and exercises the exact same FalkorDB graph traversals, capacity
+   without provider spend and exercises the exact same FalkorDB graph traversals, capacity
    audit, conflict explanation, repair proposals, human approval and memory recall
    as the live path. Do **not** launch a new live AI request for this recording.
 3. If you want to show the two-agent handoff, insert a **short existing raw clip**
@@ -139,8 +143,8 @@ The main action button is **Check this plan**; the repair button is
   <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> ·
   <https://github.com/Roojool/pact> *(the live URL is the verified India release;
   the source repository is published)*
-- Note that the demo video and deck are pending reviewed publication to release
-  `v1.0.0`, and the participant walkthrough is not yet completed.
+- The demo and deck are published in release `v1.0.0`; the participant walkthrough
+  is not yet completed.
 - End on the graph model line: *the graph does the work; there is no fallback.*
 
 ## Optional B-roll (only if you have spare time)
@@ -163,8 +167,8 @@ The main action button is **Check this plan**; the repair button is
   receipts, or benchmark latency. Approval records an internal reservation and owner
   task checklist in the graph only.
 - Do not claim the participant walkthrough is complete — it is **not yet completed**.
-- Do not invent a demo-video URL or claim the release assets are published before
-  the root gate; the intended `v1.0.0` asset URLs are targets only.
+- Use the verified published watchpage and release links. Do not invent results
+  or describe the labeled recall screenshot as continuous motion footage.
 - Do not present an older interface as the current one: the Golden Hour redesign
   **is** the deployed live UI.
 - Do not show `.env` files, keys or private operations files on screen.
