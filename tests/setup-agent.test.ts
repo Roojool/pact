@@ -10,6 +10,7 @@ test('short burger prompt can return a complete proposed setup, with explicit as
   const draft = burgerExample();
   draft.companyName = 'Suggested burger shop';
   draft.ownerName = 'Shop manager';
+  draft.jobs[0].flexUntilDay = null;
   draft.editors[0].name = 'Kitchen lead'; draft.editors[1].name = 'Counter team member';
   for (const row of [...draft.editors, ...draft.jobs, ...draft.permissions]) row.evidence = '';
   draft.suggestions = ['Business name and team roles are placeholders.', 'Hours, task estimates and deadlines are proposed starting points.', 'Responsibility rules and flexible training are suggestions requiring your review.'];
@@ -22,6 +23,7 @@ test('short burger prompt can return a complete proposed setup, with explicit as
   const result = await runAgentSetup('ws-setup', 'I run a burger shop in Pune.');
   assert.equal(result.draft.businessType, 'food_shop');
   assert.deepEqual(missingSetupFields(result.draft), []);
+  assert.equal(result.draft.jobs[0].flexUntilDay, 1, 'Missing extension cannot permit a later deadline');
   assert.equal(result.draft.suggestions.length, 3);
   draft.suggestions = [];
   await assert.rejects(runAgentSetup('ws-setup', 'I run a burger shop in Pune.'), /did not label/);
