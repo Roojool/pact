@@ -43,7 +43,9 @@ makes them fit?*
   hand-authored inputs and zero provider calls. The original live app and agency
   video are unchanged. The fork supports food-shop, agency and other business
   profiles, short-prompt AI setup with reviewed assumptions, and manual setup.
-  Fresh live AI setup is not yet verified; see the fork's setup instructions.
+  One local live AI setup request was subsequently verified; see the fork's
+  setup instructions and dated verification evidence. The recorded demo remains
+  a hand-authored, zero-provider-call example.
 - **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
 - **Demo video & pitch deck:** **published** in release
   [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); downloadable asset
