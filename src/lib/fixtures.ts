@@ -16,6 +16,7 @@ export function createFixture(id: string): Workspace {
   return {
     id,
     agency: 'Morrow Studio',
+    kind: 'sample',
     revision: 1,
     creators: [
       { id: 'cr-mia', name: 'Mia Fabel', handle: '@miafabel', category: 'Skincare', initials: 'MF', color: '#b4634a' },

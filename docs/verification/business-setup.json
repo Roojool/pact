@@ -1,0 +1,37 @@
+{
+  "verifiedAt": "2026-10-16T08:42:37.634Z",
+  "scope": "Separate PACT business setup fork; original production deployment unchanged",
+  "productionBuild": true,
+  "unitTests": 83,
+  "baselineGraphIntegrationTests": 21,
+  "setupGraphIntegrationTests": 3,
+  "httpIntegrationTests": 1,
+  "browserChecks": [
+    "note/draft reload",
+    "manual validation",
+    "example review",
+    "unknown permissions recorded later",
+    "confirmation",
+    "save failure recovery",
+    "custom graph persistence",
+    "cookie isolation",
+    "check/repair/approve",
+    "edit invalidation",
+    "source drawer",
+    "390px overflow"
+  ],
+  "baselineBrowserJourney": true,
+  "desktopWidth": 1280,
+  "mobileWidth": 390,
+  "longNamesChecked": true,
+  "providerCalls": 0,
+  "liveExtractionVerified": false,
+  "aiContract": "Injected provider response tests: extraction schema, no mutation tools, unavailable key, budget rejection, invalid JSON, invented quote and incomplete response",
+  "screenshots": "Generated locally under ignored output/business-setup",
+  "preview": "http://127.0.0.1:3101",
+  "limitations": [
+    "Live provider extraction not run",
+    "Not deployed to a second public URL",
+    "Two-day editing model; one setup per browser workspace"
+  ]
+}

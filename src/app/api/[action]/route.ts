@@ -1,13 +1,15 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { analyzeWorkspace, approveProposal, createWorkspace, editWorkspace, graphHealth, readWorkspace, recallMemory, recordLiveActivities } from '@/lib/graph';
-import { runAgentAnalysis, runAgentMemory } from '@/lib/agents';
+import { analyzeWorkspace, approveProposal, createWorkspace, createBusinessWorkspace, editWorkspace, graphHealth, readWorkspace, recallMemory, recordLiveActivities } from '@/lib/graph';
+import { runAgentAnalysis, runAgentMemory, runAgentSetup } from '@/lib/agents';
+import { setupDraftSchema } from '@/lib/business-setup';
 import { checkOrigin, errorResponse, HttpError, jsonBody, newSessionId, rateLimit, requireSession, response, sessionId } from '@/lib/http';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const day = z.union([z.literal(1), z.literal(2)]);
 const edit = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('permission'), campaignId: z.string().min(1).max(100), editorId: z.string().min(1).max(100), approved: z.boolean() }).strict(),
   z.object({ kind: z.literal('commitment'), id: z.string().min(1).max(100), hours: z.number().int().min(1).max(8).nullable().optional(), deadlineDay: day.optional() }).strict(),
   z.object({ kind: z.literal('approval'), id: z.string().min(1).max(100), approved: z.boolean() }).strict(),
   z.object({ kind: z.literal('editor'), id: z.string().min(1).max(100), slots: z.array(z.number().int().min(0).max(15)).max(16) }).strict(),
@@ -20,7 +22,7 @@ async function checkLiveAiCapability(): Promise<{ available: boolean; amReachabl
   const apiKey = (process.env.OPENAI_API_KEY ?? '').trim();
   const transport = (process.env.PACT_AGENT_TRANSPORT ?? 'eve').trim().toLowerCase();
   if (transport === 'direct') {
-    return { available: Boolean(apiKey), amReachable: true, prodReachable: true };
+    return { available: Boolean(apiKey && process.env.PACT_BUDGET_URL), amReachable: true, prodReachable: true };
   }
   const amUrl = (process.env.AGENT_RUNTIME_URL ?? 'http://127.0.0.1:3010').replace(/\/+$/, '');
   const prodUrl = (process.env.AGENT_PRODUCER_URL ?? 'http://127.0.0.1:3011').replace(/\/+$/, '');
@@ -49,7 +51,7 @@ async function checkLiveAiCapability(): Promise<{ available: boolean; amReachabl
     prodReachable = false;
   }
 
-  const available = amReachable && prodReachable && Boolean(apiKey);
+  const available = amReachable && prodReachable && Boolean(apiKey && process.env.PACT_BUDGET_URL);
   return { available, amReachable, prodReachable };
 }
 
@@ -72,7 +74,8 @@ export async function GET(request: NextRequest, context: Context) {
         liveAiAvailable,
         liveAvailable: liveAiAvailable,
         transport,
-        synthetic: true,
+        setupFork: true,
+        setupAiAvailable: Boolean(process.env.OPENAI_API_KEY?.trim() && process.env.PACT_BUDGET_URL?.trim()),
       });
     }
     if (action !== 'workspace') throw new HttpError(404, 'NOT_FOUND', 'Unknown API route.');
@@ -81,7 +84,7 @@ export async function GET(request: NextRequest, context: Context) {
     if (workspace) return response({ workspace });
     rateLimit('create:global', 60, 60 * 60 * 1000);
     const id = newSessionId();
-    return response({ workspace: await createWorkspace(id) }, id);
+    return response({ workspace: null }, id);
   } catch (error) { return errorResponse(error); }
 }
 
@@ -102,7 +105,17 @@ export async function POST(request: NextRequest, context: Context) {
     const { action } = await context.params;
     const id = requireSession(request);
     rateLimit(`request:${id}`, 60, 60 * 60 * 1000);
-    const raw = await jsonBody(request);
+    const raw = await jsonBody(request, action === 'setup' ? 32768 : 8192);
+    if (action === 'setup-draft') {
+      rateLimit(`setup:${id}`, 3, 60 * 60 * 1000);
+      const body = z.object({ note: z.string().trim().min(1).max(4000) }).strict().parse(raw);
+      return response(await runAgentSetup(id, body.note));
+    }
+    if (action === 'setup') {
+      rateLimit('create:global', 60, 60 * 60 * 1000);
+      const body = z.object({ draft: setupDraftSchema, note: z.string().max(4000), confirmation: z.literal(true), idempotencyKey: z.string().min(8).max(100) }).strict().parse(raw);
+      return response({ workspace: await createBusinessWorkspace(id, body.draft, body.note, body.idempotencyKey) });
+    }
     if (action === 'reset') {
       z.object({}).strict().parse(raw);
       rateLimit('create:global', 60, 60 * 60 * 1000);

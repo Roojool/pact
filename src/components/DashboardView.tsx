@@ -66,7 +66,7 @@ export function DashboardView({ workspace, analysis, isChecking, onCheck, onNavi
             <g key={job.id} role="button" tabIndex={0} aria-pressed={selected?.id === job.id} aria-label={`${job.title}, ${job.hours === null ? 'hours unknown' : `${job.hours} hours`}, Day ${job.deadlineDay}${involved ? ', shares the bottleneck' : ''}`} onClick={() => setSelectedId(job.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedId(job.id); } }} className={`flow-job ${selected?.id === job.id ? 'is-selected' : ''}`} data-testid={`flow-job-${job.id}`}>
               <rect x={compact ? x - 53 : 20} y={y - 25} width={compact ? 106 : 290} height={compact ? 83 : 59} rx="15" className="flow-job-hit" />
               <circle cx={x} cy={y} r="10" fill={job.hours === null ? '#d79c21' : involved ? '#c44722' : good ? '#32523b' : '#a9956a'} stroke="#fffaf0" strokeWidth="4" />
-              <text x={compact ? x : x + 25} y={compact ? y + 30 : y - 3} textAnchor={compact ? 'middle' : 'start'} className="flow-job-name">{label.length > 30 ? label.slice(0, 29) + '…' : label}</text>
+              <text x={compact ? x : x + 25} y={compact ? y + 30 : y - 3} textAnchor={compact ? 'middle' : 'start'} className="flow-job-name">{label.length > (compact ? 12 : 30) ? label.slice(0, compact ? 11 : 29) + '…' : label}</text>
               <text x={compact ? x : x + 25} y={compact ? y + 47 : y + 17} textAnchor={compact ? 'middle' : 'start'} className="flow-job-meta">{job.hours === null ? 'Hours unknown' : `${job.hours}h`} · Day {job.deadlineDay}</text>
             </g>
           );
@@ -111,7 +111,7 @@ export function DashboardView({ workspace, analysis, isChecking, onCheck, onNavi
           { view: 'receipts', icon: Check, title: 'Saved plan', text: 'Find booked editing time and the next steps you approved.', meta: `${workspace.decisions.length} saved decisions` },
         ] as const).map(({ view, icon: Icon, title, text, meta }) => <button key={view} onClick={() => onNavigate(view)} className="dashboard-shortcut"><span className="shortcut-icon"><Icon size={19} /></span><span><strong>{title}</strong><small>{text}</small><em>{meta}</em></span><ArrowRight size={19} /></button>)}
       </div></section>
-      <p className="dashboard-sample-note" data-testid="page-intro">Morrow Studio sample workspace · Fictional data · Nothing is booked without your approval.</p>
+      <p className="dashboard-sample-note" data-testid="page-intro">{workspace.agency} · {workspace.kind === 'custom' ? 'Your confirmed business setup' : 'Fictional sample workspace'} · Nothing is booked without your approval.</p>
       {editing && <CommitmentModal key={editing.id} commitment={editing} onClose={() => setEditing(null)} onSave={onEditWorkspace} />}
     </div>
   );

@@ -10,6 +10,7 @@ import {
 import { Header } from '@/components/Header';
 import { Nav, NavView } from '@/components/Nav';
 import { DashboardView } from '@/components/DashboardView';
+import { BusinessSetup } from '@/components/BusinessSetup';
 import { OverviewView } from '@/components/OverviewView';
 import { ConflictEvidenceView } from '@/components/ConflictEvidenceView';
 import { RepairComparisonView } from '@/components/RepairComparisonView';
@@ -112,7 +113,7 @@ export default function PlanningDeskPage() {
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     }
-  }, [currentView]);
+  }, [currentView, workspace?.id]);
 
   // 3. Check Plan (Rules check or AI-assisted check)
   const handleAnalyze = async () => {
@@ -321,7 +322,8 @@ export default function PlanningDeskPage() {
 
   return (
     <div className="pact-app-layout">
-      <div className="pact-topbar">
+      <p className="setup-fork-note">PACT Lab · Business setup fork · <a href="https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com">Original app</a></p>
+      {workspace && <div className="pact-topbar">
       {/* Editorial Top Masthead */}
       <Header
         workspace={workspace}
@@ -342,7 +344,7 @@ export default function PlanningDeskPage() {
         analysis={analysis}
         onOpenSourceDrawer={() => handleOpenSourceDrawer()}
       />
-      </div>
+      </div>}
 
       {/* Main Planning Stage */}
       <main className="pact-content-container" data-testid="main-stage" data-view={currentView}>
@@ -358,6 +360,12 @@ export default function PlanningDeskPage() {
           {/* Loading Skeleton */}
           {isLoading ? (
             <SkeletonLoader />
+          ) : !workspace && !error ? (
+            <BusinessSetup
+              aiAvailable={Boolean(health?.setupAiAvailable)}
+              onSample={handleResetWorkspace}
+              onCreated={created => { setWorkspace(created); setAnalysis(null); setMemoryReplies([]); setCurrentView('dashboard'); }}
+            />
           ) : !workspace ? (
             /* STRICT REQUIREMENT 3: Error state 'The planning service is unavailable. Try again.'
                not discussion of missing route handlers. */

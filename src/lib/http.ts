@@ -2,7 +2,7 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
-const COOKIE = 'pact_workspace';
+const COOKIE = 'pact_setup_workspace';
 export class HttpError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
 }
@@ -38,7 +38,7 @@ export function checkOrigin(request: NextRequest) {
   try { originHost = new URL(origin).host; } catch { originHost = ''; }
   if (originHost !== request.headers.get('host')) throw new HttpError(403, 'ORIGIN', 'This request must come from the PACT app.');
 }
-export async function jsonBody(request: NextRequest): Promise<unknown> {
+export async function jsonBody(request: NextRequest, maxBytes = 8192): Promise<unknown> {
   const reader = request.body?.getReader();
   if (!reader) throw new HttpError(400, 'INVALID_INPUT', 'A JSON request body is required.');
   let length = 0;
@@ -48,7 +48,7 @@ export async function jsonBody(request: NextRequest): Promise<unknown> {
       const { done, value } = await reader.read();
       if (done) break;
       length += value.byteLength;
-      if (length > 8192) { await reader.cancel(); throw new HttpError(413, 'INPUT_LIMIT', 'This request is too large.'); }
+      if (length > maxBytes) { await reader.cancel(); throw new HttpError(413, 'INPUT_LIMIT', 'This request is too large.'); }
       chunks.push(value);
     }
     return JSON.parse(Buffer.concat(chunks).toString('utf8'));

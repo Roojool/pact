@@ -77,6 +77,7 @@ export interface CheckCopy {
 function inferCause(issues: string[]): 'approval' | 'calendar' | 'information' | 'capacity' | 'other' {
   const text = (issues ?? []).join(' ').toLowerCase();
   if (/cannot attend both|overlapping|overlap/.test(text)) return 'calendar';
+  if (/joint conflict|has \d+ of \d+h still free/.test(text)) return 'capacity';
   if (/not approved|no approval|eligibility is unknown|will not schedule them/.test(text)) return 'approval';
   if (/unknown|does not state a duration|no stated edit hours/.test(text)) return 'information';
   if (/joint conflict|capacity|unschedulable|editor-hours|cannot be placed/.test(text)) return 'capacity';
@@ -136,7 +137,7 @@ export function describeCheck(check: CheckResult): CheckCopy {
       : cause === 'information'
       ? 'Confirm the missing editing hours first.'
       : cause === 'capacity'
-      ? 'Move one job or add approved help.'
+      ? margin >= 0 ? 'The available hours do not fit every job’s deadline and approved editor. Review the working windows.' : 'Move a flexible job or add approved help.'
       : 'Something needs to change before this plan works.';
 
   return {

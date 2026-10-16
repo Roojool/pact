@@ -80,7 +80,7 @@ export function ConflictEvidenceView({
         </h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '480px', margin: '0 auto 24px auto', lineHeight: '1.5' }}>
           Check the plan to see what needs attention: the editing hours, working time, and client approvals across
-          Morrow Studio.
+          {workspace.agency}.
         </p>
         {onCheckPlan && (
           <button

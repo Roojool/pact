@@ -17,11 +17,12 @@ export interface Proposal { id: string; title: string; description: string; revi
 export interface OwnerTask { id: string; ownerId: string; title: string; status: 'todo' | 'done' }
 export interface Decision { id: string; proposalId: string; title: string; revision: number; createdAt: string; idempotencyKey: string; allocations: Allocation[]; tasks: OwnerTask[]; sourceVersions: Record<string, number>; note: string }
 export interface Activity { id: string; role: 'account_manager' | 'producer' | 'system'; text: string; createdAt: string; sourceIds: string[] }
-export interface Workspace { id: string; agency: string; revision: number; creators: Creator[]; people: Person[]; sources: Source[]; campaigns: Campaign[]; commitments: Commitment[]; editors: Editor[]; approvals: Approval[]; events: AgencyEvent[]; proposals: Proposal[]; decisions: Decision[]; activity: Activity[] }
+export interface Workspace { id: string; agency: string; kind?: 'sample' | 'custom'; revision: number; creators: Creator[]; people: Person[]; sources: Source[]; campaigns: Campaign[]; commitments: Commitment[]; editors: Editor[]; approvals: Approval[]; events: AgencyEvent[]; proposals: Proposal[]; decisions: Decision[]; activity: Activity[] }
 export interface Analysis { check: CheckResult; proposals: Proposal[]; activity: Activity[]; mode: 'deterministic' | 'live'; model?: string; usageUsd?: number; warning?: string }
 export interface AgentReply { text: string; activity: Activity[]; sourceIds: string[]; mode: 'deterministic' | 'live'; warning?: string; usageUsd?: number }
 export type WorkspaceEdit =
   | { kind: 'commitment'; id: string; hours?: number | null; deadlineDay?: Day }
   | { kind: 'approval'; id: string; approved: boolean }
+  | { kind: 'permission'; campaignId: string; editorId: string; approved: boolean }
   | { kind: 'editor'; id: string; slots: number[] }
   | { kind: 'event'; id: string; start: number; end: number };

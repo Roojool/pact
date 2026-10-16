@@ -65,6 +65,9 @@ async function run() {
   // 1. Initial Overview & 390px Viewport Mobile Validation
   console.log(`1. Navigating to ${baseUrl}...`);
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  if (await page.getByTestId('business-setup').isVisible()) {
+    await page.getByRole('button', { name: 'Try the original sample workspace' }).click();
+  }
 
   // Dashboard is the default, with no invented verdict before checking.
   await page.waitForSelector('[data-testid="dashboard-view"]');

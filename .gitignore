@@ -15,4 +15,5 @@ playwright-report/
 ROOT_DEPENDENCIES.md
 .playwright-cli/
 output/playwright/
+output/business-setup/
 media/

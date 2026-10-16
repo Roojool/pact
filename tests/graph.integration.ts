@@ -83,7 +83,7 @@ test('seeded graph survives an independent fresh connection (real persistence)',
   await createWorkspace(id);
   const client = await rawClient();
   try {
-    const g = client.selectGraph(`pact-ws-${id}`);
+    const g = client.selectGraph(`pact-setup-ws-${id}`);
     const rows = await g.roQuery<{ n: number }>(
       `MATCH (w:Workspace)-[:HAS_COMMITMENT]->(m:Commitment)-[:FOR_CAMPAIGN]->(c:Campaign)-[:FOR_CREATOR]->(cr:Creator)
        RETURN count(m) AS n`,
@@ -194,7 +194,7 @@ test('hero journey: analyze, approve the move, reservations and owner tasks pers
   // reservations visible via a fresh raw connection through real traversals
   const client = await rawClient();
   try {
-    const g = client.selectGraph(`pact-ws-${id}`);
+    const g = client.selectGraph(`pact-setup-ws-${id}`);
     const reserved = await g.roQuery<{ slots: number[] }>(
       `MATCH (w:Workspace)-[:HAS_DECISION]->(d:Decision)-[r:RESERVES]->(e:Editor {key:'ed-alex'})
        RETURN r.slots AS slots`,
@@ -249,7 +249,7 @@ test('version-checked approval: a mutated source revision blocks approval', asyn
   // Simulate an out-of-band policy revision directly in the graph.
   const client = await rawClient();
   try {
-    const g = client.selectGraph(`pact-ws-${id}`);
+    const g = client.selectGraph(`pact-setup-ws-${id}`);
     await g.query(`MATCH (s:Source {key:'src-policy'}) SET s.revision = 99`);
   } finally {
     await client.close();
@@ -277,14 +277,14 @@ test('reservation integrity: double-booking reserved editor slots conflicts', as
   // graph, then try to approve it through the public API.
   const client = await rawClient();
   try {
-    const g = client.selectGraph(`pact-ws-${id}`);
+    const g = client.selectGraph(`pact-setup-ws-${id}`);
     await g.query(
       `MATCH (w:Workspace {key:$wk})
        CREATE (p2:Proposal {key:'pr-test-overlap', title:'Tighten Comet back to Day 1', description:'test overlap proposal',
          revision:4, status:'proposed', createdAt:'2026-10-15T00:00:00.000Z',
          changes:'[{"commitmentId":"cm-c","deadlineDay":1}]', sourceVersions:'{}'})
        CREATE (w)-[:HAS_PROPOSAL]->(p2)`,
-      { params: { wk: `pact-ws-${id}` } },
+      { params: { wk: `pact-setup-ws-${id}` } },
     );
   } finally {
     await client.close();
@@ -365,7 +365,7 @@ test('recallMemory: graph-grounded reply, memory persisted, chained and revision
   // memory chain persisted: NEXT edge + two Memory nodes through a fresh client
   const client = await rawClient();
   try {
-    const g = client.selectGraph(`pact-ws-${id}`);
+    const g = client.selectGraph(`pact-setup-ws-${id}`);
     const chain = await g.roQuery<{ n: number }>(
       `MATCH (w:Workspace)-[:HAS_MEMORY]->(m1:Memory)-[:NEXT]->(m2:Memory) RETURN count(*) AS n`,
     );
@@ -412,7 +412,7 @@ test('edits never erase graph memory', async () => {
   assert.match(recalled.text, /Comet launch film for me/);
   const client = await rawClient();
   try {
-    const g = client.selectGraph(`pact-ws-${id}`);
+    const g = client.selectGraph(`pact-setup-ws-${id}`);
     const nodes = await g.roQuery<{ n: number }>(`MATCH (:Workspace)-[:HAS_MEMORY]->(m:Memory) RETURN count(m) AS n`);
     assert.equal(nodes.data?.[0]?.n, 2, 'the first note survived the edit');
   } finally {

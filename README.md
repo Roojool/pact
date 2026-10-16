@@ -1,3 +1,20 @@
+# PACT Lab — AI business setup fork
+
+This separate version adds **describe your business → review an editable setup →
+create a real company workspace → check/repair/approve**. The original app and its
+deployment remain unchanged. Start with [Business setup](docs/BUSINESS_SETUP.md)
+for the feature, local run instructions, demo sequence and verification limits.
+
+Manual setup and a clearly labelled example work without paid AI. Live extraction
+requires a configured provider key and the existing shared budget store; its
+contract is tested with injected responses, not a fresh paid model run.
+
+**The documentation below describes the original PACT baseline. Its live URLs,
+published media and historical live-AI evidence belong to that original app, not
+this fork.**
+
+---
+
 # PACT — Check the promise before you make it
 
 PACT is an influencer-agency planning desk that checks whether the work an agency

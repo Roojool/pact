@@ -214,7 +214,7 @@ export function OverviewView({
                       letterSpacing: '0.08em',
                     }}
                   >
-                    {creator?.category || 'Creator'}
+                    {creator?.category || camp.category}
                   </span>
                 </div>
 
@@ -236,14 +236,14 @@ export function OverviewView({
                         fontSize: '0.82rem',
                       }}
                     >
-                      {creator?.initials || 'CR'}
+                      {creator?.initials || camp.brand.slice(0, 2).toUpperCase()}
                     </div>
                     <div>
                       <h3 style={{ fontSize: '0.98rem', fontWeight: 600, color: 'var(--ink-primary)' }}>
                         {creator?.name || camp.name}
                       </h3>
                       <div style={{ fontSize: '0.74rem', color: 'var(--ink-tertiary)' }}>
-                        {creator?.handle} • {creator?.category}
+                        {creator ? `${creator.handle} · ${creator.category}` : 'Client project'}
                       </div>
                     </div>
                   </div>
@@ -593,6 +593,9 @@ export function OverviewView({
                       return (
                         <td key={camp.id} style={{ padding: '14px 18px', textAlign: 'center', color: 'var(--ink-muted)' }}>
                           No approval on file
+                          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 8 }}>
+                            {[true, false].map(approved => <button key={String(approved)} className="btn-editorial-secondary" style={{ fontSize: 11, padding: '6px 8px' }} onClick={async () => { try { await onEditWorkspace({ kind: 'permission', editorId: editor.id, campaignId: camp.id, approved }); } catch { /* Parent displays the failed edit. */ } }}>{approved ? 'Record approval' : 'Record denial'}</button>)}
+                          </div>
                         </td>
                       );
                     }

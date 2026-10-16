@@ -9,7 +9,9 @@ async function workspace() {
   assert.equal(res.status, 200, await res.clone().text());
   const cookie = res.headers.get('set-cookie')?.split(';')[0];
   assert.ok(cookie);
-  return { cookie, state: (await res.json()).workspace as Workspace };
+  const sample = await fetch(`${base}/api/reset`, { method: 'POST', headers: { cookie, 'content-type': 'application/json' }, body: '{}' });
+  assert.equal(sample.status, 200);
+  return { cookie: sample.headers.get('set-cookie')!.split(';')[0], state: (await sample.json()).workspace as Workspace };
 }
 async function send(cookie: string, path: string, body: unknown, method = 'POST') {
   const res = await fetch(`${base}/api/${path}`, { method, headers: { cookie, 'content-type': 'application/json' }, body: JSON.stringify(body) });
@@ -48,6 +50,6 @@ test('browser API: isolated workspaces, checked approval, stale rejection and fr
   assert.equal(handoff.data.workspace.decisions.length, 1);
   const other = await fetch(`${base}/api/workspace`, { headers: { cookie: b.cookie } }).then(r => r.json());
   assert.equal(other.workspace.decisions.length, 0);
-  const badCookie = a.cookie.replace('pact_workspace=', 'pact_workspace=changed');
+  const badCookie = a.cookie.replace('pact_setup_workspace=', 'pact_setup_workspace=changed');
   assert.equal((await send(badCookie, 'analyze', { revision: 1 })).status, 401);
 });

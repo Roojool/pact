@@ -74,16 +74,16 @@ export function Header({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <svg className="masthead-flower" width="38" height="38" viewBox="0 0 100 100" aria-hidden="true"><use href="#sf" /></svg>
           <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', lineHeight: 1 }}>
+            <div className="masthead-brand-line" style={{ display: 'flex', alignItems: 'baseline', gap: '8px', lineHeight: 1 }}>
               <span className="d" style={{ fontSize: '1.9rem', color: 'var(--ink)' }}>
                 PACT
               </span>
-              <span className="mono" style={{ fontSize: '0.68rem', color: 'var(--muted)', letterSpacing: '0.12em' }}>
-                Morrow Studio
+              <span className="mono masthead-company" title={workspace?.agency} style={{ fontSize: '0.68rem', color: 'var(--muted)', letterSpacing: '0.12em' }}>
+                {workspace?.agency ?? 'Your business'}
               </span>
             </div>
             <h1 className="editorial-headline" style={{ fontSize: '0.88rem', marginTop: '1px', color: 'var(--ink-secondary)', fontWeight: 500 }}>
-              Your studio plan
+              Your work plan
             </h1>
           </div>
         </div>

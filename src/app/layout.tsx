@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './dashboard.css';
+import './setup.css';
 
 export const metadata: Metadata = {
-  title: 'PACT — Influencer Agency Planning Desk',
+  title: 'PACT Lab — Business Setup',
   description: 'Studio planning desk that checks creator briefs, editing hours, and client approvals before you commit.',
 };
 

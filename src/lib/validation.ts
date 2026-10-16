@@ -94,6 +94,12 @@ export function validateWorkspaceEdit(edit: unknown): WorkspaceEdit {
   }
   const e = edit as Record<string, unknown>;
   switch (e.kind) {
+    case 'permission': {
+      const campaignId = validateEntityId(e.campaignId as string, 'campaign');
+      const editorId = validateEntityId(e.editorId as string, 'editor');
+      if (typeof e.approved !== 'boolean') throw new PactError('Client permission needs an explicit approved boolean.', 'invalid_request', 400);
+      return { kind: 'permission', campaignId, editorId, approved: e.approved };
+    }
     case 'commitment': {
       const id = validateEntityId(e.id as string, 'commitment');
       const hasHours = Object.prototype.hasOwnProperty.call(e, 'hours');

@@ -1,7 +1,7 @@
 /**
  * PACT core — FalkorDB graph storage.
  *
- * Every workspace is one graph ("pact-ws-<opaque server id>"). Domain entities
+ * Every workspace is one graph ("pact-setup-ws-<opaque server id>"). Domain entities
  * are nodes; relationships carry the structure (Campaign-[:FOR_CREATOR]->Creator,
  * Approval-[:ABOUT_CAMPAIGN]->Campaign, Decision-[:RESERVES]->Editor,
  * Memory-[:NEXT]->Memory ...). Snapshots are rebuilt EXCLUSIVELY through
@@ -19,7 +19,9 @@
  * unreachable, operations fail with 503 graph_unavailable.
  */
 import { FalkorDB, type Graph } from 'falkordb';
+import { createHash, randomUUID } from 'node:crypto';
 import { createFixture } from './fixtures';
+import { setupToWorkspace } from './business-setup';
 import { checkPlan, proposeRepairs } from './domain';
 import {
   PactError, validateEntityId, validateIdempotencyKey, validateMessage,
@@ -64,7 +66,7 @@ async function getClient(): Promise<FalkorDB> {
 }
 
 function graphKey(workspaceId: string): string {
-  return `pact-ws-${validateWorkspaceId(workspaceId)}`;
+  return `pact-setup-ws-${validateWorkspaceId(workspaceId)}`;
 }
 
 async function graphFor(workspaceId: string): Promise<{ g: Graph; wk: string }> {
@@ -121,6 +123,10 @@ function parseJson<T>(v: unknown, fallback: T): T {
 /* ------------------------------- snapshot loading ------------------------------ */
 
 interface Meta {
+  agency: string;
+  kind: 'sample' | 'custom';
+  setupKey: string;
+  setupHash: string;
   revision: number;
   createdAt: string;
   activitySeq: number;
@@ -129,7 +135,8 @@ interface Meta {
 }
 
 const META_QUERY = `MATCH (w:Workspace {key:$wk})
-RETURN w.revision AS revision, w.createdAt AS createdAt,
+RETURN w.agency AS agency, w.kind AS kind, w.setupKey AS setupKey, w.setupHash AS setupHash,
+       w.revision AS revision, w.createdAt AS createdAt,
        w.activitySeq AS activitySeq, w.memorySeq AS memorySeq, w.decisionSeq AS decisionSeq`;
 
 async function readMeta(g: Graph, wk: string): Promise<Meta | null> {
@@ -144,6 +151,10 @@ async function readMeta(g: Graph, wk: string): Promise<Meta | null> {
   const row = rows[0];
   if (!row) return null;
   return {
+    agency: str(row.agency),
+    kind: row.kind === 'custom' ? 'custom' : 'sample',
+    setupKey: str(row.setupKey),
+    setupHash: str(row.setupHash),
     revision: num(row.revision),
     createdAt: str(row.createdAt),
     activitySeq: num(row.activitySeq),
@@ -176,8 +187,9 @@ async function loadWorkspace(g: Graph, wk: string, meta: Meta, workspaceId: stri
   }));
 
   const campaigns: Campaign[] = (await run(g,
-    `MATCH (w:Workspace {key:$wk})-[:HAS_CAMPAIGN]->(c:Campaign)-[:FOR_CREATOR]->(cr:Creator),
+    `MATCH (w:Workspace {key:$wk})-[:HAS_CAMPAIGN]->(c:Campaign),
           (c)-[:OWNED_BY]->(p:Person), (c)-[:FROM_SOURCE]->(s:Source)
+     OPTIONAL MATCH (c)-[:FOR_CREATOR]->(cr:Creator)
      RETURN c.key AS id, c.name AS name, c.brand AS brand, c.category AS category, c.color AS color,
             cr.key AS creatorId, p.key AS ownerId, s.key AS sourceId
      ORDER BY id`, { wk }, true)).map((r) => ({
@@ -290,7 +302,8 @@ async function loadWorkspace(g: Graph, wk: string, meta: Meta, workspaceId: stri
 
   return {
     id: workspaceId,
-    agency: 'Morrow Studio',
+    agency: meta.agency,
+    kind: meta.kind,
     revision: meta.revision,
     creators, people, sources, campaigns, commitments, editors, approvals, events,
     proposals, decisions, activity,
@@ -487,6 +500,54 @@ export async function createWorkspace(id: string): Promise<Workspace> {
 
 /* ----------------------------------- reading ------------------------------------ */
 
+/** A confirmed setup is created atomically; it can never replace an existing company. */
+export async function createBusinessWorkspace(id: string, draft: unknown, source: string, setupKey: string): Promise<Workspace> {
+  validateIdempotencyKey(setupKey);
+  const ws = setupToWorkspace(validateWorkspaceId(id), draft, source);
+  const hash = createHash('sha256').update(JSON.stringify({ draft, source })).digest('hex');
+  const { g, wk } = await graphFor(id);
+  const existing = await readMeta(g, wk);
+  if (existing) {
+    if (existing.setupKey !== setupKey || existing.setupHash !== hash) throw new PactError('This workspace already exists. Reload to open it.', 'setup_conflict', 409);
+    return (await requireSnapshot(g, wk, id)).ws;
+  }
+  const createdAt = new Date().toISOString();
+  const nonce = randomUUID();
+  const result = await run(g, `
+    MERGE (w:Workspace {key:$wk})
+    ON CREATE SET w.createdAt=$createdAt, w.setupKey=$setupKey, w.setupHash=$hash, w.setupNonce=$nonce
+    WITH w WHERE w.setupNonce=$nonce
+    SET w.agency=$agency, w.kind='custom', w.revision=1, w.activitySeq=1, w.memorySeq=0, w.decisionSeq=0
+    FOREACH (r IN $people |
+      CREATE (p:Person {key:r.id, name:r.name, role:r.role}) CREATE (w)-[:HAS_PERSON]->(p))
+    FOREACH (r IN $sources |
+      CREATE (s:Source {key:r.id, title:r.title, kind:r.kind, revision:r.revision, excerpt:r.excerpt, updatedAt:r.updatedAt}) CREATE (w)-[:HAS_SOURCE]->(s))
+    FOREACH (r IN $campaigns |
+      CREATE (c:Campaign {key:r.id, name:r.name, brand:r.brand, category:r.category, color:r.color})
+      CREATE (w)-[:HAS_CAMPAIGN]->(c)
+      MERGE (p:Person {key:r.ownerId}) MERGE (s:Source {key:r.sourceId})
+      CREATE (c)-[:OWNED_BY]->(p) CREATE (c)-[:FROM_SOURCE]->(s))
+    FOREACH (r IN $commitments |
+      CREATE (m:Commitment {key:r.id, title:r.title, hours:r.hours, releaseDay:r.releaseDay, deadlineDay:r.deadlineDay, flexUntilDay:r.flexUntilDay, status:r.status})
+      CREATE (w)-[:HAS_COMMITMENT]->(m) MERGE (c:Campaign {key:r.campaignId}) CREATE (m)-[:FOR_CAMPAIGN]->(c))
+    FOREACH (r IN $editors |
+      CREATE (e:Editor {key:r.id, name:r.name, initials:r.initials, slots:r.slots})
+      CREATE (w)-[:HAS_EDITOR]->(e) MERGE (s:Source {key:r.sourceId}) CREATE (e)-[:FROM_SOURCE]->(s))
+    FOREACH (r IN $approvals |
+      CREATE (a:Approval {key:r.id, approved:r.approved}) CREATE (w)-[:HAS_APPROVAL]->(a)
+      MERGE (c:Campaign {key:r.campaignId}) MERGE (e:Editor {key:r.editorId}) MERGE (s:Source {key:r.sourceId})
+      CREATE (a)-[:ABOUT_CAMPAIGN]->(c) CREATE (a)-[:FOR_EDITOR]->(e) CREATE (a)-[:FROM_SOURCE]->(s))
+    CREATE (act:Activity {key:'act-1', role:'system', text:$activity, createdAt:$createdAt, seq:1})
+    CREATE (w)-[:HAS_ACTIVITY]->(act)
+    WITH w, act MATCH (s:Source {key:'src-setup'}) CREATE (act)-[:MENTIONS_SOURCE]->(s)
+    RETURN 1 AS ok`, { wk, createdAt, nonce, setupKey, hash, agency: ws.agency, people: ws.people, sources: ws.sources, campaigns: ws.campaigns, commitments: ws.commitments, editors: ws.editors, approvals: ws.approvals, activity: ws.activity[0].text });
+  if (!result.length) {
+    const winner = await requireMeta(g, wk);
+    if (winner.setupKey !== setupKey || winner.setupHash !== hash) throw new PactError('Another setup was saved. Reload to open it.', 'setup_conflict', 409);
+  }
+  return (await requireSnapshot(g, wk, id)).ws;
+}
+
 export async function readWorkspace(id: string): Promise<Workspace | null> {
   const { g, wk } = await graphFor(id);
   const snapshot = await loadConsistent(g, wk, validateWorkspaceId(id));
@@ -602,6 +663,29 @@ export async function editWorkspace(id: string, revision: number, edit: Workspac
   const params: Record<string, unknown> = { wk, rev: revision, createdAt: meta.createdAt, ts };
 
   switch (validated.kind) {
+    case 'permission': {
+      const editor = ws.editors.find(e => e.id === validated.editorId);
+      const campaign = ws.campaigns.find(c => c.id === validated.campaignId);
+      if (!editor || !campaign) throw new PactError('Editor or job not found in this workspace.', 'permission_not_found', 400);
+      const existing = ws.approvals.find(a => a.editorId === editor.id && a.campaignId === campaign.id);
+      if (existing) return editWorkspace(id, revision, { kind: 'approval', id: existing.id, approved: validated.approved });
+      const key = createHash('sha256').update(`${editor.id}:${campaign.id}`).digest('hex').slice(0, 16);
+      query = `
+        MATCH (w:Workspace {key:$wk})-[:HAS_EDITOR]->(e:Editor {key:$editor}),
+              (w)-[:HAS_CAMPAIGN]->(c:Campaign {key:$campaign})
+        WHERE w.revision=$rev AND w.createdAt=$createdAt
+        CREATE (s:Source {key:$srcId, title:$sourceTitle, kind:'policy', revision:1, excerpt:$actText, updatedAt:$ts})
+        CREATE (w)-[:HAS_SOURCE]->(s)
+        CREATE (a:Approval {key:$approval, approved:$approved})
+        CREATE (w)-[:HAS_APPROVAL]->(a) CREATE (a)-[:FOR_EDITOR]->(e)
+        CREATE (a)-[:ABOUT_CAMPAIGN]->(c) CREATE (a)-[:FROM_SOURCE]->(s)
+        SET w.revision=w.revision+1, w.activitySeq=w.activitySeq+1
+        WITH w, w.activitySeq AS seq
+        CREATE (act:Activity {key:'act-'+toString(seq), role:'account_manager', text:$actText, createdAt:$ts, seq:seq})
+        CREATE (w)-[:HAS_ACTIVITY]->(act)${ACTIVITY_TAIL}`;
+      Object.assign(params, { editor: editor.id, campaign: campaign.id, approval: `ap-${key}`, srcId: `src-policy-${key}`, sourceTitle: `${editor.name} × ${campaign.brand} — recorded permission`, approved: validated.approved, actText: `User recorded ${editor.name} as ${validated.approved ? 'APPROVED' : 'NOT approved'} for ${campaign.name}.` });
+      break;
+    }
     case 'commitment': {
       const cm = ws.commitments.find((c) => c.id === validated.id);
       if (!cm) throw new PactError(`Commitment "${validated.id}" not found.`, 'commitment_not_found', 400);
