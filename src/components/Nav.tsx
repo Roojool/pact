@@ -8,11 +8,12 @@ import {
   CheckCircle2,
   MessageSquare,
   FileText,
+  LayoutDashboard,
 } from 'lucide-react';
 import { Workspace, Analysis } from '@/lib/types';
 import { VIEW_LABELS } from './ui-copy';
 
-export type NavView = 'overview' | 'conflicts' | 'repairs' | 'receipts' | 'memory';
+export type NavView = 'dashboard' | 'overview' | 'conflicts' | 'repairs' | 'receipts' | 'memory';
 
 interface NavProps {
   currentView: NavView;
@@ -75,6 +76,7 @@ export function Nav({
   const sourceCount = workspace?.sources?.length ?? 0;
 
   const navItems: { id: NavView; label: string; icon: React.ReactNode; badge?: number; badgeColor?: string }[] = [
+    { id: 'dashboard', label: VIEW_LABELS.dashboard, icon: <LayoutDashboard size={15} /> },
     {
       id: 'overview',
       label: VIEW_LABELS.overview,
@@ -177,7 +179,7 @@ export function Nav({
             >
               <span
                 style={{
-                  color: isActive ? 'var(--paper)' : 'var(--ink-tertiary)',
+                  color: isActive ? 'var(--ink)' : 'var(--ink-secondary)',
                   display: 'inline-flex',
                 }}
               >
@@ -188,8 +190,8 @@ export function Nav({
                 <b
                   className="nav-count-badge"
                   style={{
-                    backgroundColor: item.badgeColor ? 'var(--red)' : isActive ? 'var(--paper)' : 'var(--ink)',
-                    color: isActive && !item.badgeColor ? 'var(--ink)' : '#FFFFFF',
+                    backgroundColor: item.badgeColor ?? 'var(--ink)',
+                    color: '#FFFFFF',
                   }}
                 >
                   {item.badge}

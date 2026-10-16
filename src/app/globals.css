@@ -694,7 +694,7 @@ input:checked + .toggle-slider:before {
 }
 
 .nav-item-btn.active span {
-  color: var(--paper) !important;
+  color: inherit;
 }
 
 .nav-count-badge {

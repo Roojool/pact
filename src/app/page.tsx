@@ -9,7 +9,7 @@ import {
 } from '@/lib/types';
 import { Header } from '@/components/Header';
 import { Nav, NavView } from '@/components/Nav';
-import { HeroBottleneckCard } from '@/components/HeroBottleneckCard';
+import { DashboardView } from '@/components/DashboardView';
 import { OverviewView } from '@/components/OverviewView';
 import { ConflictEvidenceView } from '@/components/ConflictEvidenceView';
 import { RepairComparisonView } from '@/components/RepairComparisonView';
@@ -38,7 +38,7 @@ export default function PlanningDeskPage() {
   const [isSendingMemory, setIsSendingMemory] = useState<boolean>(false);
   const [error, setError] = useState<{ message: string; code?: string } | null>(null);
 
-  const [currentView, setCurrentView] = useState<NavView>('overview');
+  const [currentView, setCurrentView] = useState<NavView>('dashboard');
   const [isLiveAiEnabled, setIsLiveAiEnabled] = useState<boolean>(false);
 
   // Source drawer state
@@ -321,6 +321,7 @@ export default function PlanningDeskPage() {
 
   return (
     <div className="pact-app-layout">
+      <div className="pact-topbar">
       {/* Editorial Top Masthead */}
       <Header
         workspace={workspace}
@@ -341,6 +342,7 @@ export default function PlanningDeskPage() {
         analysis={analysis}
         onOpenSourceDrawer={() => handleOpenSourceDrawer()}
       />
+      </div>
 
       {/* Main Planning Stage */}
       <main className="pact-content-container" data-testid="main-stage" data-view={currentView}>
@@ -399,34 +401,16 @@ export default function PlanningDeskPage() {
             </div>
           ) : (
             <>
-              {/* Hero Stage: Always visible on Overview */}
-              {currentView === 'overview' && (
-                <HeroBottleneckCard
+              {currentView === 'dashboard' && (
+                <DashboardView
                   workspace={workspace}
                   analysis={analysis}
-                  onNavigateToConflicts={() => setCurrentView('conflicts')}
-                  onNavigateToRepairs={() => setCurrentView('repairs')}
-                  onOpenSourceDrawer={handleOpenSourceDrawer}
-                  onCheckPlan={handleAnalyze}
+                  onNavigate={setCurrentView}
+                  onOpenSource={handleOpenSourceDrawer}
+                  onEditWorkspace={handleEditWorkspace}
+                  onCheck={handleAnalyze}
                   isChecking={isAnalyzing}
                 />
-              )}
-
-              {/* Concise Studio Notice */}
-              {currentView === 'overview' && (
-                <div
-                  className="mono wrap text-center"
-                  data-testid="page-intro"
-                  style={{
-                    fontSize: '0.72rem',
-                    color: 'var(--muted)',
-                    textAlign: 'center',
-                    padding: '12px 0 0',
-                    letterSpacing: '0.12em',
-                  }}
-                >
-                  Morrow Studio synthetic benchmark plan · Human approval required before booking
-                </div>
               )}
 
               {/* View Router */}

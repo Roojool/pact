@@ -55,16 +55,42 @@ async function run() {
     viewport: { width: 1280, height: 860 },
   });
   const page = await context.newPage();
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  await page.route('**/api/{analyze,memory}', async route => {
+    assert.strictEqual(route.request().postDataJSON().live, false, 'Browser smoke must never request paid AI');
+    await route.continue();
+  });
 
   // 1. Initial Overview & 390px Viewport Mobile Validation
   console.log(`1. Navigating to ${baseUrl}...`);
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
 
-  // Verify stable main stage and plain-language headings
+  // Dashboard is the default, with no invented verdict before checking.
+  await page.waitForSelector('[data-testid="dashboard-view"]');
+  await page.waitForSelector('[data-testid="page-intro"]');
+  assert.strictEqual(await page.getByTestId('dashboard-status').innerText(), 'Not checked');
+  const cometDot = page.locator('.flow-desktop [data-testid="flow-job-cm-c"]');
+  await cometDot.focus();
+  await page.keyboard.press('Enter');
+  assert.ok((await page.getByTestId('dashboard-job-detail').innerText()).includes('Comet launch film edit'));
+  await page.getByRole('button', { name: 'Read the brief' }).click();
+  await page.getByTestId('source-drawer').waitFor();
+  await page.keyboard.press('Escape');
+  await page.screenshot({ path: path.join(outDir, '00_dashboard_desktop.png'), fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: path.join(outDir, '00_dashboard_mobile.png'), fullPage: true });
+  assert.strictEqual(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  for (const view of ['dashboard', 'overview', 'conflicts', 'repairs', 'receipts', 'memory']) {
+    await page.getByTestId(`nav-${view}`).click();
+    await page.locator(`[data-testid="main-stage"][data-view="${view}"]`).waitFor();
+    assert.strictEqual(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `No mobile overflow in ${view}`);
+  }
+  await page.setViewportSize({ width: 1280, height: 860 });
+  await page.getByTestId('nav-overview').click();
   await page.waitForSelector('[data-testid="main-stage"][data-view="overview"]');
   await page.waitForSelector('text=Jobs in the plan');
   await page.waitForSelector('text=Who is available to edit');
-  await page.waitForSelector('[data-testid="page-intro"]');
 
   // Verify technical disclosures are initially collapsed
   const overviewDetails = page.locator('[data-testid="overview-technical-details"]');
@@ -187,7 +213,7 @@ async function run() {
     }
 
     // Verify all five navigation buttons fit visibly, auto-width, not oversized, touch targets >= 36px
-    const navViews = ['overview', 'conflicts', 'repairs', 'receipts', 'memory'];
+    const navViews = ['dashboard', 'overview', 'conflicts', 'repairs', 'receipts', 'memory'];
     const navInfo = [];
     for (const v of navViews) {
       const btn = document.querySelector(`[data-testid="nav-${v}"]`);
@@ -235,7 +261,7 @@ async function run() {
     mobileLayoutCheck.ok,
     `390px mobile layout validation failed: ${mobileLayoutCheck.error}`
   );
-  console.log('✓ Assertion passed: 390px mobile layout verified (all 5 nav choices fit visibly with auto width, masthead title does not overlap controls, and the real Sources launcher stays visible and contained).');
+  console.log('✓ Assertion passed: 390px mobile layout verified (all 6 nav choices fit visibly, masthead title does not overlap controls, and Sources stays contained).');
 
   await page.screenshot({ path: path.join(outDir, 'mobile_390_overview.png') });
   console.log('Saved: mobile_390_overview.png');
@@ -336,6 +362,13 @@ async function run() {
   console.log('✓ Assertion passed: Initial 12h/8h conflict verified (infeasible, 12h required vs 8h available, deterministic mode).');
 
   await page.waitForTimeout(600);
+  await page.getByTestId('nav-dashboard').click();
+  assert.strictEqual(await page.getByTestId('dashboard-status').innerText(), 'Needs a change');
+  assert.strictEqual(await page.locator('.flow-desktop .flow-break').count(), 1);
+  await page.screenshot({ path: path.join(outDir, 'dashboard_checked_desktop.png'), fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: path.join(outDir, 'dashboard_checked_mobile.png'), fullPage: true });
+  await page.setViewportSize({ width: 1280, height: 860 });
   await page.screenshot({ path: path.join(outDir, '02_checked_bottleneck.png') });
   console.log('Saved: 02_checked_bottleneck.png');
 
@@ -596,6 +629,20 @@ async function run() {
   await page.waitForTimeout(400);
   await page.screenshot({ path: path.join(outDir, '05_saved_receipts.png') });
   console.log('Saved: 05_saved_receipts.png');
+  await page.getByTestId('nav-dashboard').click();
+  assert.strictEqual(await page.getByTestId('dashboard-status').innerText(), 'Booked');
+  await page.getByTestId('dashboard-edit-job').click();
+  await page.fill('#commitment-hours-input', '5');
+  await Promise.all([
+    page.waitForResponse(r => r.url().includes('/api/workspace') && r.request().method() === 'PATCH' && r.status() === 200),
+    page.getByRole('button', { name: 'Save job' }).click(),
+  ]);
+  await page.getByRole('dialog').waitFor({ state: 'detached' });
+  assert.strictEqual(await page.getByTestId('dashboard-status').innerText(), 'Not checked');
+  assert.ok((await page.getByTestId('dashboard-job-detail').innerText()).includes('5 hours'));
+  assert.ok((await page.getByTestId('dashboard-view').innerText()).includes('saved bookings are still on file'));
+  assert.strictEqual(await page.locator('.flow-desktop .flow-break').count(), 0);
+  console.log('✓ Dashboard quick edit saves and invalidates the previous booked verdict.');
 
   // 6. Studio Memory Navigation ("Ask PACT")
   console.log('6. Navigating to Ask PACT ("Studio Memory")...');
@@ -693,6 +740,9 @@ async function run() {
   await page.waitForTimeout(600);
   await page.screenshot({ path: path.join(outDir, '09_sam_approved_feasible.png') });
   console.log('Saved: 09_sam_approved_feasible.png');
+  await page.getByTestId('nav-dashboard').click();
+  assert.strictEqual(await page.getByTestId('dashboard-status').innerText(), 'Fits, not booked');
+  await page.getByTestId('nav-overview').click();
 
   // 11. Unknown Duration Edit on Aurora Skincare (needs_information)
   console.log('11. Testing Unknown Duration edit on Aurora Skincare...');
@@ -729,6 +779,9 @@ async function run() {
     'Check summary or issues must indicate unknown deliverable duration'
   );
   console.log('✓ Assertion passed: Unknown duration correctly produces needs_information status.');
+  await page.getByTestId('nav-dashboard').click();
+  assert.strictEqual(await page.getByTestId('dashboard-status').innerText(), 'Not confirmed');
+  assert.ok((await page.getByTestId('dashboard-view').innerText()).includes('Known editing hours'));
 
   await page.waitForTimeout(600);
   await page.screenshot({ path: path.join(outDir, '11_unknown_duration_checked.png') });
@@ -854,6 +907,12 @@ async function run() {
   await page.screenshot({ path: path.join(outDir, '16_error_alert.png') });
   console.log('Saved: 16_error_alert.png');
 
+  assert.deepStrictEqual(pageErrors, [], 'No uncaught browser errors');
+  fs.writeFileSync(path.join(outDir, 'dashboard-result.json'), JSON.stringify({
+    passed: true, baseUrl, checkedAt: new Date().toISOString(), providerCalls: 0,
+    dashboard: ['default', 'keyboard graph selection', 'source brief', 'shortage break', 'booked', 'quick edit invalidation', 'feasible not booked', 'unknown'],
+    mobileViews: 6, pageErrors,
+  }, null, 2));
   await browser.close();
   console.log('\n======================================================');
   console.log('All 16 visual inspection screenshots + 3 mobile screenshots captured successfully!');
@@ -862,7 +921,7 @@ async function run() {
   console.log('  2. Truthful affected-work titles resolved from workspace commitments (none omitted, zero raw IDs)');
   console.log('  3. Technical disclosures initially collapsed & keyboard openable via Enter');
   console.log('  4. 390px mobile viewport zero page overflow across overview, conflict, and options views');
-  console.log('  4b. 390px mobile layout: title does not overlap controls, all 5 navigation choices fit visibly, and the Sources launcher stays visible/contained');
+  console.log('  4b. 390px mobile layout: title does not overlap controls, all 6 navigation choices fit visibly, and the Sources launcher stays visible/contained');
   console.log('  5. 390px timeline 16th cell reachable within genuine scroll wrapper after horizontal scrolling');
   console.log('  6. Feasible repair candidate synthesis & Sam policy denial enforcement');
   console.log('  7. Real source titles link to grounded drawer records');

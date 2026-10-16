@@ -34,7 +34,7 @@ export function Header({
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const summaryRef = useRef<HTMLElement>(null);
 
-  const isLiveCapable = Boolean(health?.liveAvailable);
+  const isLiveCapable = Boolean(health?.liveAvailable || health?.liveAiAvailable);
 
   // Do not infer healthy on an unknown state.
   const isHealthKnown = health !== null && typeof health === 'object';
@@ -72,16 +72,7 @@ export function Header({
       {/* Masthead Left: Golden Hour brand identity + studio label */}
       <div className="masthead-identity">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <i
-            style={{
-              width: '16px',
-              height: '16px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--red)',
-              display: 'inline-block',
-              flexShrink: 0,
-            }}
-          />
+          <svg className="masthead-flower" width="38" height="38" viewBox="0 0 100 100" aria-hidden="true"><use href="#sf" /></svg>
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', lineHeight: 1 }}>
               <span className="d" style={{ fontSize: '1.9rem', color: 'var(--ink)' }}>

@@ -8,6 +8,7 @@
 import type { CheckResult, Workspace } from '@/lib/types';
 
 export const VIEW_LABELS = {
+  dashboard: 'Dashboard',
   overview: 'Your work',
   conflicts: 'Needs attention',
   repairs: 'Plan options',

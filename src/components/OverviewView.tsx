@@ -141,7 +141,7 @@ export function OverviewView({
           </span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '16px' }}>
           {workspace.campaigns.map((camp) => {
             const creator = workspace.creators.find((c) => c.id === camp.creatorId);
             const owner = workspace.people.find((p) => p.id === camp.ownerId);

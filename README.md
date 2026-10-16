@@ -28,13 +28,14 @@ makes them fit?*
 ## Live links
 
 - **Live app (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>
-  — the verified production release (Golden Hour UI, commit `3985edf`, 2026-10-15),
+  — the production app, with a sunset dashboard and an interactive work-flow graph,
   served from a permitted **Azure for Students** region in **Hyderabad, India South
   Central (`indiasouthcentral`)**. Independently reviewed live with **0 provider
   calls** for the capture; the **$5 application budget cap is unchanged**.
 - **Demo watchpage (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo>
   — verified self-hosted player with video and captions
-  (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`).
+  (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`). The recording and deck show the
+  earlier interface; the live app now opens on Dashboard.
 - **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
 - **Demo video & pitch deck:** **published** in release
   [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); downloadable asset
@@ -153,16 +154,19 @@ persists an internal reservation, owner tasks and an internal decision record.
 
 ## Visual design (Golden Hour editorial)
 
-The local build's interface uses a **Golden Hour editorial** direction (warm sky
-and sunflower gold over forest green, with Anton display type, Instrument Serif,
-Inter and JetBrains Mono). It is adapted from a design reference the participant
+The interface uses a **Golden Hour editorial** direction: softly blurred sunset,
+sunflower and forest colours behind calm cream surfaces, with Anton display type,
+Instrument Serif, Inter and JetBrains Mono. It is adapted from design references the participant
 supplied and explicitly permitted, and it is a **presentation-layer change only**:
 it does not alter any check, evidence path, proposal or approval behaviour.
 
-The plan is organised into five plain-language views, using their actual on-screen
+The plan is organised into six plain-language views, using their actual on-screen
 labels:
 
-- **Your work** — the studio plan overview.
+- **Dashboard** — an interactive dot-and-line view of the actual jobs, shared editing
+  capacity and checked bottleneck, with job editing and brief links. Unchecked,
+  unknown, feasible and booked states stay distinct; editing clears the check.
+- **Your work** — work-by-work editing, team hours and client approvals.
 - **Needs attention** — the conflict and its graph-grounded evidence.
 - **Plan options** — checked repairs, including blocked candidates.
 - **Saved plan** — approved internal reservations and owner tasks.
