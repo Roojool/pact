@@ -36,6 +36,14 @@ makes them fit?*
   — verified self-hosted player with video and captions
   (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`). The recording and deck show the
   earlier interface; the live app now opens on Dashboard.
+- **Burger-shop demo:** the same watchpage includes a separate 93-second
+  [BunStop chapter](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#burger-shop).
+  It shows actual local staff/task planning in the
+  [business setup fork](https://github.com/Roojool/pact-business-setup), with
+  hand-authored inputs and zero provider calls. The original live app and agency
+  video are unchanged. The fork supports food-shop, agency and other business
+  profiles, short-prompt AI setup with reviewed assumptions, and manual setup.
+  Fresh live AI setup is not yet verified; see the fork's setup instructions.
 - **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
 - **Demo video & pitch deck:** **published** in release
   [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); downloadable asset
