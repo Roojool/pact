@@ -93,7 +93,7 @@ async function run() {
   await page.getByTestId('nav-overview').click();
   await page.waitForSelector('[data-testid="main-stage"][data-view="overview"]');
   await page.waitForSelector('text=Jobs in the plan');
-  await page.waitForSelector('text=Who is available to edit');
+  await page.waitForSelector('text=Who is available');
 
   // Verify technical disclosures are initially collapsed
   const overviewDetails = page.locator('[data-testid="overview-technical-details"]');
@@ -516,7 +516,7 @@ async function run() {
   await samOptionCard.waitFor();
   const samStatusText = await page.locator(`[data-testid="option-status-${samProposal.id}"]`).innerText();
   assert.ok(
-    samStatusText.includes('Blocked by client approval') || samStatusText.includes('Needs more time'),
+    samStatusText.includes('Blocked by task eligibility'),
     'Sam candidate must reflect client approval policy block'
   );
   assert.strictEqual(
@@ -784,13 +784,13 @@ async function run() {
   console.log('✓ Assertion passed: Unknown duration correctly produces needs_information status.');
   await page.getByTestId('nav-dashboard').click();
   assert.strictEqual(await page.getByTestId('dashboard-status').innerText(), 'Not confirmed');
-  assert.ok((await page.getByTestId('dashboard-view').innerText()).includes('Known editing hours'));
+  assert.ok((await page.getByTestId('dashboard-view').innerText()).includes('Known work hours'));
 
   await page.waitForTimeout(600);
   await page.screenshot({ path: path.join(outDir, '11_unknown_duration_checked.png') });
   console.log('Saved: 11_unknown_duration_checked.png');
 
-  // Navigate to Needs attention to assert real metrics read 'Known editing hours' and balance 'Unknown'
+  // Navigate to Needs attention to assert real metrics read 'Known work hours' and balance 'Unknown'
   console.log('   Navigating to Needs attention to assert truthful unknown metrics...');
   await page.click('[data-testid="nav-conflicts"]');
   await page.waitForSelector('[data-testid="conflict-view"]');
@@ -798,14 +798,14 @@ async function run() {
 
   const conflictMetricsText = await page.locator('[data-testid="conflict-metrics"]').innerText();
   assert.ok(
-    conflictMetricsText.toLowerCase().includes('known editing hours'),
-    `Conflict metrics must read 'Known editing hours' under unknown duration. Got: "${conflictMetricsText}"`
+    conflictMetricsText.toLowerCase().includes('known work hours'),
+    `Conflict metrics must read 'Known work hours' under unknown duration. Got: "${conflictMetricsText}"`
   );
   assert.ok(
     conflictMetricsText.toLowerCase().includes('unknown'),
     `Conflict metrics balance must read 'Unknown' under unknown duration. Got: "${conflictMetricsText}"`
   );
-  console.log('✓ Assertion passed: Truthful unknown metrics verified ("Known editing hours" and balance "Unknown").');
+  console.log('✓ Assertion passed: Truthful unknown metrics verified ("Known work hours" and balance "Unknown").');
 
   // Return to Overview for later edits
   console.log('   Returning to Overview for later edits...');
@@ -932,7 +932,7 @@ async function run() {
   console.log('  9. Grounded Studio Memory with $0 billable AI usage');
   console.log(' 10. Sam approval yielding feasible original Day 1 deadlines');
   console.log(' 11. Unknown duration deliverable correctly producing needs_information');
-  console.log(" 11b. Truthful unknown deliverable metrics verified ('Known editing hours' and balance 'Unknown')");
+  console.log(" 11b. Truthful unknown deliverable metrics verified ('Known work hours' and balance 'Unknown')");
   console.log(' 12. Keyboard accessibility: Escape cleanly dismisses Source Drawer and restores trigger focus');
   console.log(' 13. Real HTTP 409 optimistic locking state handling');
   console.log('======================================================\n');

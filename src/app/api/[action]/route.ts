@@ -113,7 +113,8 @@ export async function POST(request: NextRequest, context: Context) {
     }
     if (action === 'setup') {
       rateLimit('create:global', 60, 60 * 60 * 1000);
-      const body = z.object({ draft: setupDraftSchema, note: z.string().max(4000), confirmation: z.literal(true), idempotencyKey: z.string().min(8).max(100) }).strict().parse(raw);
+      const body = z.object({ draft: setupDraftSchema, note: z.string().max(4000), confirmation: z.literal(true), assumptionsAccepted: z.boolean().optional(), idempotencyKey: z.string().min(8).max(100) }).strict().parse(raw);
+      if (body.draft.suggestions.length && body.assumptionsAccepted !== true) throw new HttpError(400, 'ASSUMPTIONS_REQUIRED', 'Review and accept the suggested defaults before creating your workspace.');
       return response({ workspace: await createBusinessWorkspace(id, body.draft, body.note, body.idempotencyKey) });
     }
     if (action === 'reset') {

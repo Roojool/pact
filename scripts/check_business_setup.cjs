@@ -56,7 +56,7 @@ const out=path.resolve(__dirname,'../output/business-setup');fs.mkdirSync(out,{r
   const response=await other.request.get(base+'/api/workspace');assert.equal((await response.json()).workspace,null,'A second visitor must not see this company');
   const noConfirmation=await other.request.post(base+'/api/setup',{data:{confirmation:false}});assert.equal(noConfirmation.status(),400);
   const longPage=await other.newPage();await longPage.goto(base,{waitUntil:'networkidle'});await longPage.getByTestId('example-setup').click();
-  await longPage.getByTestId('setup-company').fill('S'.repeat(100));await longPage.getByTestId('setup-job-0').fill('J'.repeat(100));await longPage.getByLabel('Client',{exact:true}).first().fill('C'.repeat(100));
+  await longPage.getByTestId('setup-company').fill('S'.repeat(100));await longPage.getByTestId('setup-job-0').fill('J'.repeat(100));await longPage.getByLabel('Client, department or work area',{exact:true}).first().fill('C'.repeat(100));
   await longPage.getByTestId('confirm-setup').check();await longPage.getByTestId('create-business').click();await longPage.getByTestId('dashboard-view').waitFor();
   for(const width of [1280,390]){await longPage.setViewportSize({width,height:900});assert(await longPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Long names must not cause page overflow');}
   await other.close();

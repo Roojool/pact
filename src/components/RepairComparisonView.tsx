@@ -36,21 +36,21 @@ function describeChange(change: PlanChange, workspace: Workspace): string {
   if (change.deadlineDay !== undefined) return `Move ${title} to Day ${change.deadlineDay}`;
   if (change.editorId !== undefined) {
     const editor = workspace.editors.find((e) => e.id === change.editorId);
-    return `Assign ${editor?.name ?? 'this editor'} to ${title}`;
+    return `Assign ${editor?.name ?? 'this team member'} to ${title}`;
   }
   return title;
 }
 
 function whyItHelps(proposal: Proposal): string {
   if (proposal.status === 'rejected') {
-    return 'Considered and rejected: the client has not approved this editor for this job, so PACT will not schedule them.';
+    return 'Considered and rejected: this team member is not allowed to handle this task, so PACT will not schedule them.';
   }
   const result = proposal.result;
   if (result?.status === 'feasible') {
-    return `This makes the whole plan fit: ${result.requiredHours}h of editing within ${result.availableHours}h available before these deadlines.`;
+    return `This makes the whole plan fit: ${result.requiredHours}h of work within ${result.availableHours}h available before these deadlines.`;
   }
   if (result?.status === 'needs_information') {
-    return 'This confirms the missing editing hours so the job can be scheduled.';
+    return 'This confirms the missing work hours so the job can be scheduled.';
   }
   return 'This option does not resolve the plan on its own yet.';
 }
@@ -65,7 +65,7 @@ function tradeOff(proposal: Proposal, workspace: Workspace): string | null {
   const editorChange = proposal.changes.find((c) => c.editorId !== undefined);
   if (editorChange) {
     const editor = workspace.editors.find((e) => e.id === editorChange.editorId);
-    return `Trade-off: this uses ${editor?.name ?? 'this editor'}'s remaining working time.`;
+    return `Trade-off: this uses ${editor?.name ?? 'this team member'}'s remaining working time.`;
   }
   return null;
 }
@@ -191,7 +191,7 @@ export function RepairComparisonView({
               proposal.description;
             const isPolicy =
               proposal.status === 'rejected' || /policy|not approved|unapproved|eligibility|blocked/i.test(issues);
-            statusLabel = isPolicy ? 'Blocked by client approval' : 'Needs more time';
+            statusLabel = isPolicy ? 'Blocked by task eligibility' : 'Needs more time';
             badgeClass = 'infeasible';
           } else if (proposal.result?.status === 'feasible') {
             statusLabel = 'Ready to approve';

@@ -43,7 +43,7 @@ export function SavedReceiptsView({
           Nothing saved yet
         </h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '440px', margin: '0 auto 24px auto', lineHeight: '1.5' }}>
-          When you approve a plan option, the booked editing time and the follow-up tasks are saved here.
+          When you approve a plan option, the booked work time and the follow-up tasks are saved here.
         </p>
         <button
           type="button"
@@ -79,7 +79,7 @@ export function SavedReceiptsView({
       </div>
 
       <p style={{ fontSize: '0.92rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '-12px' }}>
-        Each entry below is an internal booking for the studio. Approving never publishes or contacts anyone.
+        Each entry below is an internal booking for your business. Approving never publishes or contacts anyone.
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -130,11 +130,11 @@ export function SavedReceiptsView({
               </div>
             )}
 
-            {/* Booked editing time */}
+            {/* Booked work time */}
             {decision.allocations && decision.allocations.length > 0 && (
               <div>
                 <span className="editorial-label" style={{ fontSize: '0.72rem', display: 'block', marginBottom: '10px' }}>
-                  Booked editing time
+                  Booked work time
                 </span>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
@@ -161,7 +161,7 @@ export function SavedReceiptsView({
                             {commitment?.title || 'This job'}
                           </span>
                           <span className="badge-status neutral" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
-                            {editor?.name || 'Editor'}
+                            {editor?.name || 'Team member'}
                           </span>
                         </div>
 

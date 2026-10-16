@@ -1,4 +1,5 @@
 export type Day = 1 | 2;
+export type BusinessType = 'creative_agency' | 'food_shop' | 'other';
 export interface Creator { id: string; name: string; handle: string; category: string; initials: string; color: string }
 export interface Person { id: string; name: string; role: string }
 export interface Source { id: string; title: string; kind: 'brief' | 'policy' | 'calendar' | 'handoff'; revision: number; excerpt: string; updatedAt: string }
@@ -17,7 +18,7 @@ export interface Proposal { id: string; title: string; description: string; revi
 export interface OwnerTask { id: string; ownerId: string; title: string; status: 'todo' | 'done' }
 export interface Decision { id: string; proposalId: string; title: string; revision: number; createdAt: string; idempotencyKey: string; allocations: Allocation[]; tasks: OwnerTask[]; sourceVersions: Record<string, number>; note: string }
 export interface Activity { id: string; role: 'account_manager' | 'producer' | 'system'; text: string; createdAt: string; sourceIds: string[] }
-export interface Workspace { id: string; agency: string; kind?: 'sample' | 'custom'; revision: number; creators: Creator[]; people: Person[]; sources: Source[]; campaigns: Campaign[]; commitments: Commitment[]; editors: Editor[]; approvals: Approval[]; events: AgencyEvent[]; proposals: Proposal[]; decisions: Decision[]; activity: Activity[] }
+export interface Workspace { id: string; agency: string; kind?: 'sample' | 'custom'; businessType?: BusinessType; revision: number; creators: Creator[]; people: Person[]; sources: Source[]; campaigns: Campaign[]; commitments: Commitment[]; editors: Editor[]; approvals: Approval[]; events: AgencyEvent[]; proposals: Proposal[]; decisions: Decision[]; activity: Activity[] }
 export interface Analysis { check: CheckResult; proposals: Proposal[]; activity: Activity[]; mode: 'deterministic' | 'live'; model?: string; usageUsd?: number; warning?: string }
 export interface AgentReply { text: string; activity: Activity[]; sourceIds: string[]; mode: 'deterministic' | 'live'; warning?: string; usageUsd?: number }
 export type WorkspaceEdit =

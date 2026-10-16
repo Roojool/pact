@@ -1,0 +1,81 @@
+const { chromium } = require('playwright-core');
+const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path');
+const base = process.env.PACT_BASE_URL || 'http://127.0.0.1:3101';
+const out = path.resolve(__dirname, '../output/business-setup/burger');
+fs.mkdirSync(out, { recursive: true });
+(async () => {
+  const browser = await chromium.launch({ channel: 'chrome', headless: true });
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  let setupBody, providerRequests = 0; const errors = [];
+  await context.route('**/api/{setup-draft,analyze,memory}', async route => {
+    assert(!route.request().url().endsWith('/setup-draft'), 'No AI call permitted');
+    assert.equal(route.request().postDataJSON().live, false); await route.continue();
+  });
+  const page = await context.newPage(); page.on('pageerror', e => errors.push(e.message));
+  page.on('request', r => { if (r.url().endsWith('/api/setup')) setupBody = r.postDataJSON(); if(r.url().endsWith('/api/setup-draft'))providerRequests++; });
+  try {
+    await page.goto(base, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: 'Use a burger-shop prompt' }).click();
+    assert.match(await page.getByTestId('business-note').inputValue(), /burger shop/);
+    await page.getByTestId('burger-example').click();
+    assert.equal(await page.getByTestId('setup-business-type').inputValue(), 'food_shop');
+    await page.getByTestId('confirm-setup').check();
+    await page.getByTestId('create-business').click(); await page.getByTestId('dashboard-view').waitFor();
+    assert.equal(await page.locator('.masthead-company').textContent(), 'BunStop');
+    assert.equal(await page.locator('[data-business-type]').getAttribute('data-business-type'), 'food_shop');
+    const analysisResponse = page.waitForResponse(r => r.url().endsWith('/api/analyze') && r.status() === 200);
+    await page.getByTestId('check-plan').click();
+    await page.getByTestId('dashboard-status').getByText('Needs a change', { exact: true }).waitFor();
+    const response = await context.request.get(base + '/api/workspace');
+    assert.equal((await response.json()).workspace.businessType, 'food_shop');
+    const checked = (await (await analysisResponse).json()).analysis.check;
+    assert.equal(checked.requiredHours, 6); assert.equal(checked.availableHours, 4);
+    await page.screenshot({ path: path.join(out, 'dashboard-desktop.png'), fullPage: true });
+    await page.getByTestId('nav-conflicts').click();
+    assert.doesNotMatch(await page.getByTestId('main-stage').innerText(), /editing|Morrow|Comet|Aurora/);
+    await page.screenshot({ path: path.join(out, 'attention-desktop.png'), fullPage: true });
+    await page.getByTestId('nav-repairs').click();
+    assert.match(await page.getByTestId('main-stage').innerText(), /Team training/);
+    await page.screenshot({ path: path.join(out, 'options-desktop.png'), fullPage: true });
+    await page.getByRole('button', { name: 'Approve this option' }).click(); await page.getByTestId('receipts-view').waitFor();
+    const booked = (await (await context.request.get(base + '/api/workspace')).json()).workspace;
+    assert.deepEqual(booked.commitments.map(c => c.deadlineDay), [1, 1, 2]);
+    assert(booked.decisions[0].allocations.every(a => a.editorId === 'ed-1'));
+    await page.getByTestId('nav-memory').click(); await page.locator('#memory-query-input').fill('Who handles Team training and what was approved?');
+    const memoryResponse = page.waitForResponse(r => r.url().endsWith('/api/memory') && r.status() === 200);
+    await page.getByRole('button', { name: 'Ask', exact: true }).click();
+    const memory = (await (await memoryResponse).json()).reply; assert(memory.sourceIds.length > 0); assert(memory.sourceIds.every(id => booked.sources.some(s => s.id === id)));
+    await page.getByText('Rules-based answer', { exact: true }).first().waitFor();
+    await page.screenshot({ path: path.join(out, 'memory-desktop.png'), fullPage: true });
+    await page.getByTestId('open-sources').click(); await page.getByTestId('source-drawer').waitFor();
+    assert.match(await page.getByTestId('source-drawer').innerText(), /task responsibility/); await page.keyboard.press('Escape');
+    await page.getByTestId('nav-dashboard').click();
+    await page.setViewportSize({ width: 390, height: 844 });
+    for(const view of ['dashboard','overview','conflicts','repairs','receipts','memory']) {
+      await page.getByTestId('nav-'+view).click(); assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), view);
+    }
+    await page.getByTestId('nav-dashboard').click(); await page.screenshot({ path: path.join(out, 'dashboard-mobile.png'), fullPage: true });
+    await page.getByTestId('dashboard-edit-job').click(); await page.fill('#commitment-hours-input', '3');
+    await page.getByRole('button', { name: 'Save job' }).click(); await page.getByRole('dialog').waitFor({ state: 'detached' });
+    assert.equal(await page.getByTestId('dashboard-status').innerText(), 'Not checked');
+    // The server must enforce acceptance even when the client is bypassed.
+    const other = await browser.newContext(); await other.request.get(base + '/api/workspace');
+    const proposed = { ...setupBody, idempotencyKey: crypto.randomUUID(), assumptionsAccepted: false, draft: { ...setupBody.draft, suggestions: ['Working hours and task estimates are proposed defaults.'] } };
+    const rejected = await other.request.post(base + '/api/setup', { data: proposed }); assert.equal(rejected.status(), 400);
+    assert.equal((await rejected.json()).code, 'ASSUMPTIONS_REQUIRED');
+    assert.equal((await (await other.request.get(base+'/api/workspace')).json()).workspace, null);
+    const accepted = await other.request.post(base + '/api/setup', { data: { ...proposed, assumptionsAccepted: true } }); assert.equal(accepted.status(), 200);
+    const userConfirmed = (await accepted.json()).workspace; assert.match(userConfirmed.sources.find(s => s.id === 'src-setup').excerpt, /proposed defaults/);
+    await other.close();
+    const review = await browser.newContext();
+    await review.addInitScript(data => localStorage.setItem('pact-business-setup-draft-v1', JSON.stringify({ note: data.note, draft: data.draft, mode: 'manual' })), proposed);
+    const form = await review.newPage(); await form.goto(base, { waitUntil: 'networkidle' });
+    await form.getByTestId('setup-assumptions').waitFor(); await form.getByTestId('confirm-setup').check();
+    assert(await form.getByTestId('create-business').isDisabled());
+    await form.getByTestId('accept-suggestions').check(); assert(await form.getByTestId('create-business').isEnabled());
+    await form.getByTestId('setup-company').fill('Edited name'); assert(!(await form.getByTestId('accept-suggestions').isChecked()));
+    await review.close(); assert.deepEqual(errors, []); assert.equal(providerRequests, 0);
+    fs.writeFileSync(path.join(out,'result.json'), JSON.stringify({ passed:true, checkedAt:new Date().toISOString(), providerCalls:0, realGraph:true, example:'Hand-authored, not AI generated', required:6, eligibleDay1:4, trainingMovedOnly:true, assumptionsEnforced:true, mobileViews:6, pageErrors:errors }, null, 2));
+    console.log('Burger shop: real setup/check/repair/approval/memory/edit, six mobile views and assumption gate passed.');
+  } finally { await browser.close(); }
+})().catch(e => { console.error(e); process.exitCode = 1; });

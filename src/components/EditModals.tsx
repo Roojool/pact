@@ -114,7 +114,7 @@ export function CommitmentModal({ commitment, onClose, onSave }: CommitmentModal
     if (isSubmitting) return;
 
     if (!isUnknownHours && (hours < 1 || hours > 8)) {
-      setFormError('Commitment duration must be between 1 and 8 editor-hours.');
+      setFormError('Commitment duration must be between 1 and 8 work hours.');
       return;
     }
 
@@ -366,7 +366,7 @@ export function EventModal({ event, onClose, onSave }: EventModalProps) {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div>
-            <span className="editorial-label">Studio calendar</span>
+            <span className="editorial-label">Team calendar</span>
             <h3 id="event-modal-title" className="editorial-headline" style={{ fontSize: '1.2rem', marginTop: '2px' }}>
               Edit this event
             </h3>

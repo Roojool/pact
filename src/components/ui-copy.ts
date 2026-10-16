@@ -17,8 +17,8 @@ export const VIEW_LABELS = {
 } as const;
 
 export const SOURCE_KIND_LABELS: Record<string, string> = {
-  brief: 'Campaign brief',
-  policy: 'Client approvals',
+  brief: 'Work brief',
+  policy: 'Task responsibilities',
   calendar: 'Working hours',
   handoff: 'Handoff notes',
 };
@@ -80,7 +80,7 @@ function inferCause(issues: string[]): 'approval' | 'calendar' | 'information' |
   if (/joint conflict|has \d+ of \d+h still free/.test(text)) return 'capacity';
   if (/not approved|no approval|eligibility is unknown|will not schedule them/.test(text)) return 'approval';
   if (/unknown|does not state a duration|no stated edit hours/.test(text)) return 'information';
-  if (/joint conflict|capacity|unschedulable|editor-hours|cannot be placed/.test(text)) return 'capacity';
+  if (/joint conflict|capacity|unschedulable|(?:editor|team)-hours|cannot be placed/.test(text)) return 'capacity';
   return 'other';
 }
 
@@ -98,7 +98,7 @@ export function describeCheck(check: CheckResult): CheckCopy {
       tone: 'good',
       headline: 'This plan fits',
       diagnosis:
-        `Everything fits: ${formatHours(requiredHours)} of editing within ` +
+        `Everything fits: ${formatHours(requiredHours)} of work within ` +
         `${formatHours(availableHours)} available before these deadlines.`,
     };
   }
@@ -108,8 +108,8 @@ export function describeCheck(check: CheckResult): CheckCopy {
       tone: 'unknown',
       headline: 'A few details are missing',
       diagnosis:
-        'Some jobs do not have editing hours yet, so PACT cannot schedule them. ' +
-        'Confirm the missing hours with the account manager first.',
+        'Some jobs do not have work hours yet, so PACT cannot schedule them. ' +
+        'Confirm the missing hours with the owner or manager first.',
     };
   }
 
@@ -127,17 +127,17 @@ export function describeCheck(check: CheckResult): CheckCopy {
   const cause = inferCause(issues);
   const lead =
     margin < 0
-      ? `There are ${formatHours(requiredHours)} of editing and only ${formatHours(availableHours)} available before these deadlines.`
+      ? `There are ${formatHours(requiredHours)} of work and only ${formatHours(availableHours)} available before these deadlines.`
       : 'This plan cannot be scheduled as written yet.';
   const causeSentence =
     cause === 'calendar'
-      ? 'Studio events overlap for the same creator, so move one event.'
+      ? 'Team events overlap for the same person, so move one event.'
       : cause === 'approval'
-      ? 'One job still needs an editor the client has approved.'
+      ? 'One job still needs an eligible team member.'
       : cause === 'information'
-      ? 'Confirm the missing editing hours first.'
+      ? 'Confirm the missing work hours first.'
       : cause === 'capacity'
-      ? margin >= 0 ? 'The available hours do not fit every job’s deadline and approved editor. Review the working windows.' : 'Move a flexible job or add approved help.'
+      ? margin >= 0 ? 'The available hours do not fit every job’s deadline and eligible team member. Review the working windows.' : 'Move a flexible job or add eligible help.'
       : 'Something needs to change before this plan works.';
 
   return {

@@ -53,3 +53,11 @@
   .setup-permission select { max-width: none; }
   .setup-actions > button { width: 100%; }
 }
+
+.setup-prompt-examples { display: flex; flex-wrap: wrap; gap: 10px; }
+.setup-prompt-examples button { background: #f7edcf; border: 1px solid #cbb58b; border-radius: 20px; padding: 8px 12px; color: #38422b; font-size: 12px; cursor: pointer; }
+.setup-assumptions { border: 2px solid #c08a18; }
+.setup-assumptions ul { padding-left: 20px; margin: 14px 0; line-height: 1.7; }
+.pact-app-layout[data-business-type=food_shop] { --forest: #87251e; --forest-base: #87251e; --forest-dark: #6e211b; --sage-700: #87251e; --sage-600: #a12d20; --forest-light: #fff0d9; --forest-border: #dfac70; }
+.pact-app-layout[data-business-type=food_shop] .masthead-identity .d { color: #87251e !important; }
+.pact-app-layout[data-business-type=food_shop] .dashboard-welcome { background: linear-gradient(115deg, #ffe5a0, #fff8e8 65%); }

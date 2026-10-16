@@ -124,6 +124,7 @@ function parseJson<T>(v: unknown, fallback: T): T {
 
 interface Meta {
   agency: string;
+  businessType: Workspace['businessType'];
   kind: 'sample' | 'custom';
   setupKey: string;
   setupHash: string;
@@ -135,7 +136,7 @@ interface Meta {
 }
 
 const META_QUERY = `MATCH (w:Workspace {key:$wk})
-RETURN w.agency AS agency, w.kind AS kind, w.setupKey AS setupKey, w.setupHash AS setupHash,
+RETURN w.agency AS agency, w.businessType AS businessType, w.kind AS kind, w.setupKey AS setupKey, w.setupHash AS setupHash,
        w.revision AS revision, w.createdAt AS createdAt,
        w.activitySeq AS activitySeq, w.memorySeq AS memorySeq, w.decisionSeq AS decisionSeq`;
 
@@ -152,6 +153,7 @@ async function readMeta(g: Graph, wk: string): Promise<Meta | null> {
   if (!row) return null;
   return {
     agency: str(row.agency),
+    businessType: row.businessType === 'food_shop' || row.businessType === 'other' ? row.businessType : 'creative_agency',
     kind: row.kind === 'custom' ? 'custom' : 'sample',
     setupKey: str(row.setupKey),
     setupHash: str(row.setupHash),
@@ -303,6 +305,7 @@ async function loadWorkspace(g: Graph, wk: string, meta: Meta, workspaceId: stri
   return {
     id: workspaceId,
     agency: meta.agency,
+    businessType: meta.businessType,
     kind: meta.kind,
     revision: meta.revision,
     creators, people, sources, campaigns, commitments, editors, approvals, events,
@@ -517,7 +520,7 @@ export async function createBusinessWorkspace(id: string, draft: unknown, source
     MERGE (w:Workspace {key:$wk})
     ON CREATE SET w.createdAt=$createdAt, w.setupKey=$setupKey, w.setupHash=$hash, w.setupNonce=$nonce
     WITH w WHERE w.setupNonce=$nonce
-    SET w.agency=$agency, w.kind='custom', w.revision=1, w.activitySeq=1, w.memorySeq=0, w.decisionSeq=0
+    SET w.agency=$agency, w.businessType=$businessType, w.kind='custom', w.revision=1, w.activitySeq=1, w.memorySeq=0, w.decisionSeq=0
     FOREACH (r IN $people |
       CREATE (p:Person {key:r.id, name:r.name, role:r.role}) CREATE (w)-[:HAS_PERSON]->(p))
     FOREACH (r IN $sources |
@@ -540,7 +543,7 @@ export async function createBusinessWorkspace(id: string, draft: unknown, source
     CREATE (act:Activity {key:'act-1', role:'system', text:$activity, createdAt:$createdAt, seq:1})
     CREATE (w)-[:HAS_ACTIVITY]->(act)
     WITH w, act MATCH (s:Source {key:'src-setup'}) CREATE (act)-[:MENTIONS_SOURCE]->(s)
-    RETURN 1 AS ok`, { wk, createdAt, nonce, setupKey, hash, agency: ws.agency, people: ws.people, sources: ws.sources, campaigns: ws.campaigns, commitments: ws.commitments, editors: ws.editors, approvals: ws.approvals, activity: ws.activity[0].text });
+    RETURN 1 AS ok`, { wk, createdAt, nonce, setupKey, hash, agency: ws.agency, businessType: ws.businessType, people: ws.people, sources: ws.sources, campaigns: ws.campaigns, commitments: ws.commitments, editors: ws.editors, approvals: ws.approvals, activity: ws.activity[0].text });
   if (!result.length) {
     const winner = await requireMeta(g, wk);
     if (winner.setupKey !== setupKey || winner.setupHash !== hash) throw new PactError('Another setup was saved. Reload to open it.', 'setup_conflict', 409);
@@ -894,7 +897,7 @@ export async function approveProposal(
       ownerId: campaign.ownerId,
       title:
         `Internal reservation: hold ${commitment.hours ?? '?'}h with ${editor.name} for ${campaign.name} ` +
-        `(slots ${allocation.slots.join(',')}). This reserves editing time; it is not delivery.`,
+        `(slots ${allocation.slots.join(',')}). This reserves work time; it is not delivery.`,
       status: 'todo',
     };
   });
@@ -1098,9 +1101,9 @@ export async function recallMemory(id: string, message: string): Promise<AgentRe
 
   if (matchedCampaigns.length === 0 && matchedEditors.length === 0) {
     lines.push(
-      `No specific campaign or editor matched your note. The plan currently needs ${check.requiredHours}h ` +
-      `with ${check.availableHours}h of approved editor capacity by the tightest deadline. ` +
-      `Mention a campaign (e.g. "Comet Coffee Launch Film") or an editor for their graph trail.`,
+      `No specific task or team member matched your note. The plan currently needs ${check.requiredHours}h ` +
+      `with ${check.availableHours}h of eligible team capacity by the tightest deadline. ` +
+      `Mention a task (e.g. "${ws.campaigns[0]?.name ?? 'your task'}") or a team member for their graph trail.`,
     );
   }
   for (const issue of check.issues.slice(0, 3)) lines.push(`Open issue: ${issue}`);

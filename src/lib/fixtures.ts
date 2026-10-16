@@ -16,6 +16,7 @@ export function createFixture(id: string): Workspace {
   return {
     id,
     agency: 'Morrow Studio',
+    businessType: 'creative_agency',
     kind: 'sample',
     revision: 1,
     creators: [

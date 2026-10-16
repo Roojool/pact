@@ -72,7 +72,7 @@ export function Header({
       {/* Masthead Left: Golden Hour brand identity + studio label */}
       <div className="masthead-identity">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <svg className="masthead-flower" width="38" height="38" viewBox="0 0 100 100" aria-hidden="true"><use href="#sf" /></svg>
+          <svg className="masthead-flower" width="38" height="38" viewBox="0 0 100 100" aria-hidden="true">{workspace?.businessType === 'food_shop' ? <><path d="M12 43C15 12 85 12 88 43Z" fill="#efae24" stroke="#8b251a" strokeWidth="4"/><path d="M10 52H90M12 67H88" stroke="#8b251a" strokeWidth="12" strokeLinecap="round"/><path d="M14 57L36 64 53 56 73 64 88 57" fill="none" stroke="#567638" strokeWidth="5"/><path d="M12 76H88Q85 91 72 91H28Q15 91 12 76Z" fill="#efae24" stroke="#8b251a" strokeWidth="4"/></> : <use href="#sf" />}</svg>
           <div>
             <div className="masthead-brand-line" style={{ display: 'flex', alignItems: 'baseline', gap: '8px', lineHeight: 1 }}>
               <span className="d" style={{ fontSize: '1.9rem', color: 'var(--ink)' }}>

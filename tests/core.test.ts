@@ -146,7 +146,7 @@ test('unknown durations remain unknown: needs_information, never guessed', () =>
   assert.deepEqual(result.conflictIds, ['cm-b']);
   assert.equal(result.requiredHours, 8); // only the known hours are counted
   assert.deepEqual(result.allocations, []);
-  assert.ok(result.issues.some((i) => i.includes('cm-b') && /unknown edit hours/i.test(i)));
+  assert.ok(result.issues.some((i) => i.includes('cm-b') && /unknown work hours/i.test(i)));
   assert.ok(result.evidence.some((e) => e.id === 'ev-cm-b' && e.explanation.includes('will not guess')));
 });
 

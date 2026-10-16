@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { emptySetup, missingSetupFields, setupToWorkspace, validateSetupDraft } from '../src/lib/business-setup';
+import { burgerExample, BURGER_DEMO_NOTE, emptySetup, missingSetupFields, setupToWorkspace, validateSetupDraft } from '../src/lib/business-setup';
 import { checkPlan, proposeRepairs } from '../src/lib/domain';
 import { setupFixture } from './setup-fixture';
 import { describeCheck } from '../src/components/ui-copy';
@@ -47,4 +47,20 @@ test('invalid references, duplicate hours, unsupported ranges and fabricated quo
   raw.jobs[0].hours = 9;
   assert.throws(() => setupToWorkspace('setup-invalid', raw, ''));
   assert(missingSetupFields(emptySetup()).length >= 4);
+});
+
+test('burger shop uses real staff constraints and moves only flexible training', () => {
+  const ws = setupToWorkspace('burger-test', burgerExample(), BURGER_DEMO_NOTE);
+  assert.equal(ws.businessType, 'food_shop');
+  assert.deepEqual(missingSetupFields(burgerExample()), []);
+  const check = checkPlan(ws);
+  assert.equal(check.status, 'infeasible');
+  assert.equal(check.requiredHours, 6);
+  assert.equal(check.availableHours, 4);
+  const repairs = proposeRepairs(ws).filter(p => p.result.status === 'feasible');
+  assert.equal(repairs.length, 1);
+  assert.deepEqual(repairs[0].changes, [{ commitmentId: 'cm-3', deadlineDay: 2 }]);
+  assert(repairs[0].result.allocations.every(a => a.editorId === 'ed-1'));
+  assert.throws(() => checkPlan(ws, [{ commitmentId: 'cm-1', deadlineDay: 2 }]), /exceeds the flexibility/);
+  assert.doesNotMatch(JSON.stringify(ws), /Morrow|Aurora|Comet|editing/);
 });

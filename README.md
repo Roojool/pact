@@ -5,7 +5,10 @@ create a real company workspace → check/repair/approve**. The original app and
 deployment remain unchanged. Start with [Business setup](docs/BUSINESS_SETUP.md)
 for the feature, local run instructions, demo sequence and verification limits.
 
-Manual setup and a clearly labelled example work without paid AI. Live extraction
+Food shops, creative agencies and other small businesses share the same task/time
+planner. A short AI prompt proposes a complete starting setup, with assumptions
+separately accepted before saving. Manual setup and two clearly labelled examples
+(agency and BunStop burger shop) work without paid AI. Live generation
 requires a configured provider key and the existing shared budget store; its
 contract is tested with injected responses, not a fresh paid model run.
 

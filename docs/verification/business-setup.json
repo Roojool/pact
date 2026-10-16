@@ -1,10 +1,10 @@
 {
-  "verifiedAt": "2026-10-16T08:42:37.634Z",
+  "verifiedAt": "2026-10-16T10:07:00.405862+00:00",
   "scope": "Separate PACT business setup fork; original production deployment unchanged",
   "productionBuild": true,
-  "unitTests": 83,
+  "unitTests": 85,
   "baselineGraphIntegrationTests": 21,
-  "setupGraphIntegrationTests": 3,
+  "setupGraphIntegrationTests": 4,
   "httpIntegrationTests": 1,
   "browserChecks": [
     "note/draft reload",
@@ -18,7 +18,10 @@
     "check/repair/approve",
     "edit invalidation",
     "source drawer",
-    "390px overflow"
+    "390px overflow",
+    "burger shop real check/repair/approve/memory/edit",
+    "six burger mobile views",
+    "client/server assumption acceptance"
   ],
   "baselineBrowserJourney": true,
   "desktopWidth": 1280,
@@ -30,8 +33,21 @@
   "screenshots": "Generated locally under ignored output/business-setup",
   "preview": "http://127.0.0.1:3101",
   "limitations": [
-    "Live provider extraction not run",
-    "Not deployed to a second public URL",
-    "Two-day editing model; one setup per browser workspace"
-  ]
+    "Fresh live provider generation not run; current local preview has no key/shared budget connection",
+    "Fork is local, not deployed to a second public URL",
+    "Two-day staff/task model; no POS, inventory quantities, live orders or task-dependency sequencing"
+  ],
+  "shortPromptSetup": "Structured-output contract verified with injected responses; defaults require explicit acceptance",
+  "businessTypes": [
+    "creative_agency",
+    "food_shop",
+    "other"
+  ],
+  "burgerBrowser": true,
+  "burgerShortage": {
+    "requiredHours": 6,
+    "eligibleDay1Hours": 4,
+    "repair": "Only team training moves to Day 2"
+  },
+  "assumptionGates": "Client and actual HTTP server acceptance checks passed"
 }

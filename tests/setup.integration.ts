@@ -3,7 +3,24 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createBusinessWorkspace, readWorkspace, analyzeWorkspace, approveProposal, editWorkspace, closeGraphConnection } from '../src/lib/graph';
 import { setupFixture } from './setup-fixture';
+import { burgerExample, BURGER_DEMO_NOTE } from '../src/lib/business-setup';
 after(closeGraphConnection);
+
+test('burger identity, allowed team and fixed opening tasks survive persistence and booking', async () => {
+  const id = `setup-${randomUUID()}`;
+  await createBusinessWorkspace(id, burgerExample(), BURGER_DEMO_NOTE, randomUUID());
+  const loaded = await readWorkspace(id);
+  assert.equal(loaded!.businessType, 'food_shop');
+  assert.equal(loaded!.agency, 'BunStop');
+  const result = await analyzeWorkspace(id, 1);
+  assert.equal(result.analysis.check.availableHours, 4);
+  const proposal = result.analysis.proposals.find(p => p.result.status === 'feasible')!;
+  const booked = await approveProposal(id, result.workspace.revision, proposal.id, randomUUID());
+  assert.equal(booked.workspace.commitments[0].deadlineDay, 1);
+  assert.equal(booked.workspace.commitments[1].deadlineDay, 1);
+  assert.equal(booked.workspace.commitments[2].deadlineDay, 2);
+  assert(booked.decision.allocations.every(a => a.editorId === 'ed-1'));
+});
 
 test('atomic setup survives reload, concurrent retries, approval and editing without replacing another company', async () => {
   const id = `setup-${randomUUID()}`;

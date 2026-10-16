@@ -137,7 +137,7 @@ export function OverviewView({
             </h2>
           </div>
           <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--ink-tertiary)' }}>
-            {workspace.campaigns.length} campaigns · {workspace.commitments.length} jobs
+            {workspace.campaigns.length} work areas · {workspace.commitments.length} jobs
           </span>
         </div>
 
@@ -243,7 +243,7 @@ export function OverviewView({
                         {creator?.name || camp.name}
                       </h3>
                       <div style={{ fontSize: '0.74rem', color: 'var(--ink-tertiary)' }}>
-                        {creator ? `${creator.handle} · ${creator.category}` : 'Client project'}
+                        {creator ? `${creator.handle} · ${creator.category}` : 'Work item'}
                       </div>
                     </div>
                   </div>
@@ -270,15 +270,15 @@ export function OverviewView({
                 >
                   <div>
                     <span style={{ color: 'var(--ink-tertiary)', display: 'block', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      Campaign Title
+                      Task
                     </span>
                     <span style={{ fontWeight: 600 }}>{camp.name}</span>
                   </div>
                   <div>
                     <span style={{ color: 'var(--ink-tertiary)', display: 'block', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      Lead Producer
+                      Responsible person
                     </span>
-                    <span style={{ fontWeight: 600 }}>{owner?.name || 'Producer'}</span>
+                    <span style={{ fontWeight: 600 }}>{owner?.name || 'Unassigned'}</span>
                   </div>
                 </div>
 
@@ -325,7 +325,7 @@ export function OverviewView({
                           </span>
                         ) : (
                           <span>
-                            <strong>{commitment.hours}</strong> editor-hours
+                            <strong>{commitment.hours}</strong> work hours
                           </span>
                         )}
                       </div>
@@ -398,7 +398,7 @@ export function OverviewView({
             <span className="editorial-section-number">02</span>
             <span className="editorial-label">Working hours</span>
             <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
-              Who is available to edit
+              Who is available
             </h2>
           </div>
           <span style={{ fontSize: '0.78rem', color: 'var(--ink-tertiary)' }}>
@@ -493,7 +493,7 @@ export function OverviewView({
                     className="timeline-scroll-wrapper"
                     tabIndex={0}
                     role="region"
-                    aria-label={`Editing hours for ${editor.name}`}
+                    aria-label={`Work hours for ${editor.name}`}
                   >
                     <div className="timeline-grid">
                       {Array.from({ length: 16 }).map((_, slotIdx) => {
@@ -535,13 +535,13 @@ export function OverviewView({
         <div className="editorial-section-header">
           <div>
             <span className="editorial-section-number">03</span>
-            <span className="editorial-label">Client approvals</span>
+            <span className="editorial-label">Task responsibilities</span>
             <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
               Who can work on what
             </h2>
           </div>
           <span style={{ fontSize: '0.78rem', color: 'var(--ink-tertiary)' }}>
-            Client policy decides which editors may take each campaign
+            Record who is allowed to handle each task; unknown responsibilities stay unassigned
           </span>
         </div>
 
@@ -550,7 +550,7 @@ export function OverviewView({
             <thead>
               <tr style={{ backgroundColor: 'var(--paper-subtle)', borderBottom: '1px solid var(--paper-border-strong)' }}>
                 <th style={{ padding: '12px 18px', textAlign: 'left', fontWeight: 600, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Editor
+                  Team member
                 </th>
                 {workspace.campaigns.map((camp) => (
                   <th key={camp.id} style={{ padding: '12px 18px', textAlign: 'center', fontWeight: 600, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -639,7 +639,7 @@ export function OverviewView({
           <div className="editorial-section-header">
             <div>
               <span className="editorial-section-number">04</span>
-              <span className="editorial-label">Studio calendar</span>
+              <span className="editorial-label">Team calendar</span>
               <h2 className="editorial-headline" style={{ fontSize: '1.4rem', marginTop: '2px' }}>
                 Studio events
               </h2>
@@ -718,7 +718,7 @@ export function OverviewView({
           >
             <Info size={15} style={{ color: 'var(--ink-tertiary)', flexShrink: 0 }} />
             <span>
-              PACT checks a 2-day studio horizon (48 hours), editor jobs up to 8 hours, and 16 one-hour working windows
+              PACT checks a 2-day planning horizon, tasks up to 8 hours, and 16 one-hour working windows
               (Day 1 &amp; Day 2, 09:00–17:00). It never guesses a duration or an approval.
             </span>
           </div>

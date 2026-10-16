@@ -1,79 +1,83 @@
 # PACT Lab — business setup fork
 
-This is a separate version of PACT. It does not update the original repository's
-main branch or its deployed app. It keeps the sunset dashboard and adds a real
-business setup flow before the dashboard.
+The original live planner stays unchanged. This separate version creates a planning
+workspace for a food shop, creative agency or another small business. It is a staff
+and task planner, not a till, stock system or live customer-order manager.
 
-## Try it
+## Two ways to set up
 
-1. Open the fork locally and choose **Explore an example draft (no AI call)**.
-2. Rename the company, review Neha/Rohan's hours and the three jobs, and record
-   whether Rohan is approved for each job. The example initially leaves these
-   permissions unknown.
-3. Confirm the facts and choose **Create my workspace**. No work is booked by setup.
-4. Choose **Check this plan**, review the Comet deadline repair and approve it.
-5. Edit Aurora from four to five hours and check again. The earlier approval is
-   preserved, but the changed plan needs another repair.
+- **AI:** write a short prompt such as “I run a small burger shop in Pune. Set up
+  my team and next two days.” AI proposes a business profile, team roles, tasks,
+  time estimates, working hours and responsibility rules. Real details in the note
+  take priority. Missing names use role placeholders; proposed defaults are listed
+  as assumptions. Review/edit everything and explicitly accept the assumptions
+  before creating the workspace. Setup itself never books work.
+- **Manual:** choose **Fill it in myself** and enter the same fields. Unknown time
+  estimates and responsibilities remain unknown. Both paths feed the same real
+  checker, source records and human approval flow.
 
-The example draft is hand-authored and labelled. It exercises real HTTP routes,
-FalkorDB persistence, checking, approval and editing. It is not an AI demonstration.
+Short-prompt generation uses one strict structured-output Responses request,
+with no tools or database writes. It uses the existing durable shared budget gate.
+The old Eve members have fixed analysis prompts, so setup uses the budgeted direct
+transport; plan explanations may still use Eve. Incomplete output, invalid quotes,
+unlabelled defaults, unavailable credentials or exhausted budget fail closed.
+There is no automatic provider retry or fake generated fallback.
 
-**Draft my setup with AI** sends your note to the configured provider only after
-you click it. It uses one structured extraction call through the existing durable
-budget gate. The old Eve members have fixed analysis prompts, so setup uses the
-existing budgeted direct Responses transport; plan analysis can still use Eve.
-The request uses strict structured output and rejects incomplete responses; see
-the [official OpenAI documentation](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
-AI cannot create a workspace, approve work or invent missing permissions.
-Failed extraction leaves the note intact and manual completion available.
+## Try both businesses without an AI call
+
+**Agency example:** Sunroom Studio, Neha and Rohan, three client jobs. Check the
+plan, move the flexible Comet job, approve it and edit a duration to invalidate
+that check. Unconfirmed responsibilities can be recorded later with sources.
+
+**Burger-shop example:** BunStop is a fictional independent burger shop. Its
+original red/gold burger mark does not use a real chain’s logo. Sana has four
+eligible hours on Day 1, but ingredient prep, opening checks and team training need
+six. Only training may move to Day 2. PACT offers that repair and refuses to assign
+the counter worker to tasks they are recorded as not allowed to handle. Approval
+saves actual staff-hour reservations and next steps. Prep and opening checks stay
+on Day 1. This example does not model stock quantities, food-safety certification,
+task sequencing or restaurant service times.
+
+Both examples are explicitly hand-authored, not AI results. Custom workspace data
+persists in FalkorDB and stays isolated between browser sessions. Existing work
+cannot be overwritten by setup. Creation and approval have idempotent retries and
+revision/source guards. Drafts survive browser reloads through local storage;
+creation clears that draft. Clear inputs on shared machines.
 
 ## Run locally
-
-Use the same locked Node dependencies as the original project:
 
 ```powershell
 npm ci
 docker run -d --name pact-setup-graph -p 127.0.0.1:17379:6379 falkordb/falkordb:latest
 ```
 
-Create an ignored `.env.local` with `FALKORDB_URL=redis://127.0.0.1:17379`, a
-random `SESSION_SECRET` of at least 32 characters, and `OPENAI_API_KEY=`. Then run
-`npm run dev -- --port 3101`. The example/manual flows need no model key.
+Create an ignored `.env.local` with `FALKORDB_URL=redis://127.0.0.1:17379`, a random
+`SESSION_SECRET` of at least 32 characters and `OPENAI_API_KEY=`. Run
+`npm run dev -- --port 3101`. Manual setup/examples need no provider key.
 
-To enable live extraction, configure a server-side `OPENAI_API_KEY` and explicitly
-set `PACT_BUDGET_URL` to the **existing shared persistent budget store**. Retain its
-`PACT_BUDGET_GRAPH` and the existing cap/reserve; do not initialise another spending
-allowance for the fork. AI fails closed without that configuration. Do not expose
-the original production graph or budget port publicly to enable local access.
+AI setup additionally needs a server-side key and `PACT_BUDGET_URL` pointing to
+**the existing shared persistent budget store**. Retain its graph, cap and reserve;
+never initialise a fresh allowance for this fork or expose production DB/budget
+ports. Without this configuration the AI button is disabled. No credentials are
+copied from the original app.
 
-The fork uses cookie `pact_setup_workspace` and graph prefix `pact-setup-ws-`.
-Setup cannot replace a pre-existing company. Initial creation is atomic and
-idempotent, including concurrent retries. All unknown values remain unconfirmed;
-unknown hours can be filled later and missing client permissions can be recorded
-under **Your work** with source records and revision checks.
+## Bounds and verification
 
-## Bounds and evidence
+1–6 tasks, 1–4 team members, whole task durations 1–8 hours or unknown, two planning
+days with one-hour slots from 09:00 to 17:00. Every task is handled by one eligible
+team member. This is a bounded planning prototype, not unrestricted business
+automation. Suggested qualifications are never treated as verified credentials.
+Exact source excerpts are validated; interpretation still requires user review.
 
-- 1–6 editing jobs, 1–4 editors, whole job hours 1–8 or unknown, two planning days
-  with one-hour availability slots between 09:00 and 17:00. This is not a general
-  business workflow generator or an unlimited calendar.
-- An AI citation must be an exact excerpt from the input note. Excerpt validation
-  does not prove interpretation is correct: the user must review each field.
-- Imported and corrected facts are saved with their original excerpts and
-  user-confirmed values. Custom jobs do not receive fictional creators.
-- Drafts are stored in this browser's local storage for recovery. Clear the note
-  when finished on a shared machine; the draft is removed after successful creation.
-- The browser and real-FalkorDB journey are verified without provider calls. The
-  extraction contract, malformed output, unavailable credentials and budget
-  rejection are tested using injected provider responses. A fresh live extraction
-  has **not** been run; no new paid test or recording is part of this fork.
+`npm test` checks domain/provider contracts with injected responses. Run graph and
+setup integration tests against local FalkorDB. With the local app running,
+`node scripts/check_business_setup.cjs` checks agency setup/recovery/isolation,
+and `node scripts/check_burger_business.cjs` checks food-shop setup, real checking,
+repair/approval/memory/edit, six mobile views and server/client assumption gates.
+Private screenshots/results are under `output/business-setup/`.
 
-Run `npm test`, then set `FALKORDB_URL` and run the graph/setup integration tests.
-With the local app running, `node scripts/check_business_setup.cjs` checks the
-onboarding-to-edit journey at desktop and 390px, saving actual screenshots and
-`output/business-setup/result.json`. Existing deterministic inspection tooling can
-still enter the original sample explicitly.
-
-The published video/deck inherited from PACT show the original app. They do not
-demonstrate this new onboarding. The three-minute storyboard above is ready for
-a later bounded recording after any permitted live extraction is verified.
+No fresh live model request was run for this change. The short-prompt generation
+contract uses injected responses; manual and labelled examples use the actual
+browser, API and FalkorDB. The burger demo is recorded from that local example,
+not a deployed multi-business feature or an AI-generated result. The original
+production app and its original video remain available unchanged.

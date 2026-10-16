@@ -347,7 +347,7 @@ function windowCapacityLine(workspace: Workspace, w: Working, editors: Editor[],
       return `${e.name} ${inWindow}h in Day ${w.releaseDay}..${w.deadline}`;
     })
     .sort();
-  return capacity.length > 0 ? capacity.join(', ') : 'no approved editors';
+  return capacity.length > 0 ? capacity.join(', ') : 'no eligible team members';
 }
 
 function failureEvidence(workspace: Workspace, w: Working, editors: Editor[], elig: EligibilityIndex): EvidencePath {
@@ -385,7 +385,7 @@ function failureEvidence(workspace: Workspace, w: Working, editors: Editor[], el
     explanation:
       `"${w.commitment.title}" (${w.commitment.id}) for ${w.campaign.name} needs ${w.hours}h inside its ` +
       `Day ${w.releaseDay}..${w.deadline} window ("${sourceTitle(workspace, w.campaign.sourceId)}"). ` +
-      `Approved editor capacity in that window: ${windowCapacityLine(workspace, w, editors, elig)}.`,
+      `Eligible team capacity in that window: ${windowCapacityLine(workspace, w, editors, elig)}.`,
   };
 }
 
@@ -417,7 +417,7 @@ function needsInformationEvidence(workspace: Workspace, w: Working): EvidencePat
 }
 
 const MODELING_ASSUMPTION =
-  'Editing time is counted in whole one-hour slots; one editor completes an entire commitment; editing happens ' +
+  'Work time is counted in whole one-hour slots; one team member completes an entire commitment; work happens ' +
   'only between a commitment\'s release day and its deadline; agency events occupy creator time and the same ' +
   'creator cannot attend overlapping events (attendance windows are end-exclusive).';
 
@@ -443,7 +443,7 @@ export function checkPlan(workspace: Workspace, changes: PlanChange[] = [], comm
     const issues = unknown
       .sort((a, b) => a.commitment.id.localeCompare(b.commitment.id))
       .map((w) =>
-        `Unknown edit hours for "${w.commitment.title}" (${w.commitment.id}) on ${w.campaign.name}: ` +
+        `Unknown work hours for "${w.commitment.title}" (${w.commitment.id}) on ${w.campaign.name}: ` +
         `the brief does not state a duration; ask the account manager before scheduling.`,
       );
     const summary =
@@ -555,11 +555,11 @@ export function checkPlan(workspace: Workspace, changes: PlanChange[] = [], comm
         .sort((a, b) => a.commitment.id.localeCompare(b.commitment.id))
         .map((w) =>
           `"${w.commitment.title}" (${w.commitment.id}) needs ${w.hours}h in its Day ${w.releaseDay}..${w.deadline} ` +
-          `window; approved editor capacity in that window: ${windowCapacityLine(workspace, w, editors, elig)}.`,
+          `window; eligible team capacity in that window: ${windowCapacityLine(workspace, w, editors, elig)}.`,
         ),
     ];
     const summary =
-      `Infeasible: ${requiredHours}h of editing is due but the union of approved editor-hours in the relevant ` +
+      `Infeasible: ${requiredHours}h of work is due but the union of approved team-hours in the relevant ` +
       `windows is ${availableHours}h; ${titles.length === working.length && working.length > 0 ? titles.join(', ') : 'the plan'} ` +
       `conflict jointly — any ${working.length - 1} of them fit, all ${working.length} do not.`;
     return {
@@ -598,7 +598,7 @@ export function checkPlan(workspace: Workspace, changes: PlanChange[] = [], comm
       if (!elig.approved.get(w.campaign.id)?.has(w.pinnedEditorId)) {
         issues.push(
           `"${w.commitment.title}" (${w.commitment.id}) cannot be pinned to ${w.pinnedEditorId}: ` +
-          `no approval fact exists for that editor on ${w.campaign.name}; PACT treats this as unknown ` +
+          `no approval fact exists for that team member on ${w.campaign.name}; PACT treats this as unknown ` +
           `and will not schedule them.`,
         );
         continue;
@@ -622,14 +622,14 @@ export function checkPlan(workspace: Workspace, changes: PlanChange[] = [], comm
       .sort();
     issues.push(
       `"${w.commitment.title}" (${w.commitment.id}) needs ${w.hours}h inside Day ${w.releaseDay}..${w.deadline} ` +
-      `and cannot be placed: ${freeLines.length ? freeLines.join('; ') : 'no approved editors'}. ` +
+      `and cannot be placed: ${freeLines.length ? freeLines.join('; ') : 'no eligible team members'}. ` +
       blockedCandidateLines(workspace, [w], elig).join(' '),
     );
   }
   const unplacedTitles = unplaced.map((w) => `"${w.commitment.title}"`).sort();
   const summary =
     `Infeasible: ${unplacedTitles.length > 0 ? unplacedTitles.join(', ') : 'the plan'} cannot be placed ` +
-    `(${requiredHours}h due; union of approved editor-hours in the relevant windows is ${availableHours}h).`;
+    `(${requiredHours}h due; union of approved team-hours in the relevant windows is ${availableHours}h).`;
   return {
     status: 'infeasible',
     summary,
@@ -691,9 +691,9 @@ export function proposeRepairs(workspace: Workspace): Proposal[] {
       const campaign = campaigns.get(commitment.campaignId);
       proposals.push({
         id: `pr-${stableId('info', commitmentId)}`,
-        title: `Confirm edit hours for ${campaign?.name ?? commitment.campaignId}`,
+        title: `Confirm work hours for ${campaign?.name ?? commitment.campaignId}`,
         description:
-          `The brief does not state how many editor-hours "${commitment.title}" needs. ` +
+          `The brief does not state how many team-hours "${commitment.title}" needs. ` +
           `Ask the account manager to confirm the duration before scheduling; PACT will not guess.`,
         revision: workspace.revision,
         changes: [],

@@ -83,7 +83,7 @@ export function StudioMemoryView({
       </div>
 
       <p style={{ fontSize: '0.92rem', color: 'var(--ink-secondary)', maxWidth: '780px', marginTop: '-12px' }}>
-        Ask in plain language. Answers are grounded in the studio&rsquo;s own records, and PACT says when it is unsure.
+        Ask in plain language. Answers are grounded in your business&rsquo;s own records, and PACT says when it is unsure.
       </p>
 
       {/* SECTION 2: INTERACTIVE QUERY BOX & SUGGESTED PROMPTS */}

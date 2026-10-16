@@ -79,7 +79,7 @@ export function ConflictEvidenceView({
           Nothing to review yet
         </h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--ink-secondary)', maxWidth: '480px', margin: '0 auto 24px auto', lineHeight: '1.5' }}>
-          Check the plan to see what needs attention: the editing hours, working time, and client approvals across
+          Check the plan to see what needs attention: work hours, available time, and task responsibilities across
           {workspace.agency}.
         </p>
         {onCheckPlan && (
@@ -184,7 +184,7 @@ export function ConflictEvidenceView({
           >
             <div className="stat-card">
               <span className="stat-label">
-                {isUnknown ? 'Known editing hours' : 'Editing needed'}
+                {isUnknown ? 'Known work hours' : 'Work needed'}
               </span>
               <div className="font-serif stat-value" style={{ color: 'var(--ink-primary)' }}>
                 {checkResult.requiredHours}h
@@ -217,7 +217,7 @@ export function ConflictEvidenceView({
 
           {checkResult.status === 'needs_information' && (
             <p className="pact-inline-note" data-testid="conflict-unknown-note" style={{ fontSize: '0.78rem', color: 'var(--ink-tertiary)', marginTop: '14px' }}>
-              Some jobs have unknown hours, so the known editing hours are only a partial total and the balance
+              Some jobs have unknown hours, so the known work hours are only a partial total and the balance
               cannot be confirmed yet. PACT will not guess a duration.
             </p>
           )}

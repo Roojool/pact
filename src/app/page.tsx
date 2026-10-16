@@ -321,7 +321,7 @@ export default function PlanningDeskPage() {
   };
 
   return (
-    <div className="pact-app-layout">
+    <div className="pact-app-layout" data-business-type={workspace?.businessType ?? 'other'}>
       <p className="setup-fork-note">PACT Lab · Business setup fork · <a href="https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com">Original app</a></p>
       {workspace && <div className="pact-topbar">
       {/* Editorial Top Masthead */}
