@@ -1,0 +1,48 @@
+{
+  "reviewedAt": "2026-10-16T10:07:46.654246+00:00",
+  "duration": 92.742969,
+  "providerCalls": 0,
+  "release": "v1.1.0-burger-demo",
+  "assets": [
+    {
+      "name": "PACT_burger_shop_demo.mp4",
+      "size": 3489654,
+      "sha256": "73ad766a640fe7442592e76a5d893ac05dc5e07b1a9ab3a4ff07fc52b52a9b98"
+    },
+    {
+      "name": "PACT_burger_shop_demo.srt",
+      "size": 2392,
+      "sha256": "f7143e830273bed7a9f552a2061e9d47d45de38b8227be77b3daf8756dcbe1ff"
+    },
+    {
+      "name": "PACT_burger_shop_demo.vtt",
+      "size": 2322,
+      "sha256": "cbe3b0f975caf9722773dc3dd4ba37e5764b3edec0886515632e0139e82eebf3"
+    },
+    {
+      "name": "PACT_burger_shop_transcript.md",
+      "size": 2226,
+      "sha256": "32cdb6d4da227032aa2e74974ec764a2261399304e8ac8e42e33da7480fd3f8f"
+    },
+    {
+      "name": "PACT_burger_shop_poster.png",
+      "size": 394286,
+      "sha256": "d183d5351ceb12895411a55f1b2ae72ca47235e11f2858356419ced01cc312bb"
+    }
+  ],
+  "watchpageSha256": "dd5645018e07166a2a81435fb7c9b458fc130822138ba8871d3fab28a93cb2d4",
+  "scope": "Additional local-fork demo only; original live app and agency media unchanged",
+  "visualReview": "All seven decoded scene frames reviewed; check and recall are labelled actual local screenshots",
+  "audio": "H264/AAC 1280x800; audio stream present, mean -23.6dB/max -3.2dB; offline synthetic narration",
+  "setupForkCommit": "6272a3b",
+  "unitTests": 85,
+  "graphIntegrationTests": 25,
+  "httpIntegrationTests": 1,
+  "browserJourneys": [
+    "Agency onboarding/recovery/isolation",
+    "Burger actual setup/check/repair/approve/memory/edit; six mobile views",
+    "16-scene baseline including denial, unknowns, stale 409, sources and keyboard"
+  ],
+  "freshLiveAiSetupVerified": false,
+  "publication": "Release assets and separate /demo chapter; original planner UI/backend not redeployed"
+}

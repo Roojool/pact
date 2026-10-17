@@ -20,6 +20,9 @@
                color:var(--forest); text-decoration:none; font-weight:bold; font-size:0.95rem; }
   ul.links a:hover, ul.links a:focus { background:var(--forest); color:var(--cream); }
   footer { margin-top:28px; font-size:0.85rem; color:#4a4a3f; }
+  section { margin-top:48px; padding-top:24px; border-top:2px solid var(--forest); }
+  h2 { font-size:1.65rem; line-height:1.2; color:var(--forest); }
+  .eyebrow { font:700 0.75rem/1.5 Arial,sans-serif; letter-spacing:0.08em; text-transform:uppercase; color:#8b251a; }
   @media (max-width:390px) { main { padding:24px 14px 48px; } }
 </style>
 </head>
@@ -27,6 +30,7 @@
 <main>
   <h1>PACT: check the promises before you make them</h1>
   <div class="rule" aria-hidden="true"></div>
+  <h2>01 / Creative agency</h2>
 
   <video controls playsinline preload="metadata" aria-label="PACT working-project demo">
     <source src="/media/PACT_demo.mp4" type="video/mp4">
@@ -55,7 +59,37 @@
     <li><a href="https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md">Transcript</a></li>
   </ul>
 
-  <footer>PACT — check the promises before you make them. All fixtures synthetic.</footer>
+  <section id="burger-shop" aria-labelledby="burger-title">
+    <p class="eyebrow">Additional demo · PACT Lab local preview · 1 min 33 sec</p>
+    <h2 id="burger-title">02 / BunStop: a small burger shop</h2>
+    <p>Three tasks, one busy kitchen lead. See the same planner check a staffing
+      bottleneck, keep ingredient prep and opening checks on Day 1, and move only
+      flexible team training before the manager approves the plan.</p>
+    <video controls playsinline preload="metadata" poster="/media/PACT_burger_shop_poster.png" aria-label="BunStop burger-shop local preview demo">
+      <source src="/media/PACT_burger_shop_demo.mp4" type="video/mp4">
+      <track kind="captions" src="/media/PACT_burger_shop_demo.vtt" srclang="en" label="English" default>
+      Your browser does not support video. Download the burger-shop demo below.
+    </video>
+    <p class="note">This is a <strong>separate local setup fork</strong>; the original
+      live planner above stays unchanged. BunStop is a fictional independent shop
+      with an original burger mark. The setup example is hand-authored,
+      <strong>not AI-generated</strong>. Real browser, API and FalkorDB operations
+      run in rules mode with zero provider calls. Check and recall results include
+      clearly labelled actual local screenshots; narration is offline synthetic speech.
+      The fork implements short-prompt AI drafting with editable review and explicit
+      acceptance of suggestions, plus manual setup. <strong>At the time of this recording, a fresh live AI setup
+      run had not been verified</strong>; it needs server-side credentials and the
+      existing shared budget gate. This is staff/task planning, not a till, stock
+      system or live ordering service.</p>
+    <ul class="links">
+      <li><a href="/media/PACT_burger_shop_demo.mp4" download>Download burger-shop demo</a></li>
+      <li><a href="https://github.com/Roojool/pact-business-setup">Setup fork source &amp; local instructions</a></li>
+      <li><a href="/media/PACT_burger_shop_demo.vtt">Burger-shop captions</a></li>
+      <li><a href="/media/PACT_burger_shop_transcript.md">Burger-shop transcript</a></li>
+    </ul>
+  </section>
+
+  <footer>PACT — check the promises before you make them. Both demo businesses are fictional.</footer>
 </main>
 </body>
 </html>
