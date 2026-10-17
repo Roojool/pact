@@ -69,6 +69,28 @@ test('malformed output and invented source quotes never become a setup', async (
   await assert.rejects(runAgentSetup('ws-setup', 'real note'), /did not finish/);
 });
 
+test('whitespace-only evidence is not a citation and still requires labeled assumptions', async () => {
+  // Regression: a whitespace-only "quote" trivially satisfied the substring
+  // citation check (every note contains a space), letting a suggested input
+  // masquerade as a quoted fact without any disclosed assumption.
+  const note = 'Maya runs the studio. Raj edits 9-5 on Day 1. The Aurora edit needs four hours due Day 1.';
+  const draft = setupFixture();
+  draft.editors = [draft.editors[0]];
+  draft.jobs = [draft.jobs[0]];
+  draft.permissions = [];
+  draft.editors[0].evidence = '  Raj edits 9-5 on Day 1.  ';
+  draft.jobs[0].evidence = '   ';
+  __setAgentDeps({ env: { OPENAI_API_KEY: 'test-only' }, ledger: createMemoryBudgetLedger(5), fetchImpl: async () => new Response(JSON.stringify({ output_text: JSON.stringify(draft) })) });
+  await assert.rejects(runAgentSetup('ws-setup', note), /did not label/);
+  // Once the assumption is disclosed, the same draft is reviewable, with the
+  // padded quote normalized to its verbatim form.
+  draft.suggestions = ['Task hours for the Aurora edit are suggested; review before accepting.'];
+  __setAgentDeps({ fetchImpl: async () => new Response(JSON.stringify({ output_text: JSON.stringify(draft) })) });
+  const result = await runAgentSetup('ws-setup', note);
+  assert.equal(result.draft.editors[0].evidence, 'Raj edits 9-5 on Day 1.');
+  assert.equal(result.draft.jobs[0].evidence, '');
+});
+
 test('setup budget uses the explicitly shared ledger, not the isolated business database', () => {
   const config = resolveBudgetConfig({ FALKORDB_URL: 'redis://127.0.0.1:17379', PACT_BUDGET_URL: 'redis://127.0.0.1:18379', PACT_API_BUDGET_USD: '5' });
   assert.equal(config.url, 'redis://127.0.0.1:18379');

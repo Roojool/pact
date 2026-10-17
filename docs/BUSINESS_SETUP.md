@@ -1,7 +1,12 @@
-# PACT Lab — business setup fork
+# PACT — AI business setup
 
-The original live planner stays unchanged. This separate version creates a planning
-workspace for a food shop, creative agency or another small business. It is a staff
+Business setup is the first screen of this PACT release: describe your business →
+review an editable setup → create a real company workspace → check/repair/approve.
+The **Morrow Studio sample workspace stays reachable** from setup at any time. The
+merge into the public repository and the redeploy to the existing production
+domain (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>) are
+**planned and handled by the maintainer**, and are not verified by this
+documentation pass. It is a staff
 and task planner, not a till, stock system or live customer-order manager.
 
 ## Two ways to set up
@@ -57,7 +62,7 @@ Create an ignored `.env.local` with `FALKORDB_URL=redis://127.0.0.1:17379`, a ra
 
 AI setup additionally needs a server-side key and `PACT_BUDGET_URL` pointing to
 **the existing shared persistent budget store**. Retain its graph, cap and reserve;
-never initialise a fresh allowance for this fork or expose production DB/budget
+never initialise a fresh allowance for this app or expose production DB/budget
 ports. Without this configuration the AI button is disabled. No credentials are
 copied from the original app.
 
@@ -72,9 +77,13 @@ Exact source excerpts are validated; interpretation still requires user review.
 `npm test` checks domain/provider contracts with injected responses. Run graph and
 setup integration tests against local FalkorDB. With the local app running,
 `node scripts/check_business_setup.cjs` checks agency setup/recovery/isolation,
-and `node scripts/check_burger_business.cjs` checks food-shop setup, real checking,
-repair/approval/memory/edit, six mobile views and server/client assumption gates.
-Private screenshots/results are under `output/business-setup/`.
+`node scripts/check_burger_business.cjs` checks food-shop setup, real checking,
+repair/approval/memory/edit, six mobile views and server/client assumption gates,
+and `node scripts/check_reset_dialog.cjs` checks the start-over dialog at desktop
+and mobile widths (set `PACT_BASE_URL` to point any of them at another running
+instance, e.g. the production URL; they default to `http://127.0.0.1:3101`).
+Private screenshots/results are under `output/business-setup/` and
+`output/reset-dialog/`.
 
 One real short-prompt setup request was verified on 2026-10-16: two team roles,
 three tasks and explicit reviewable assumptions. Its ledger estimate was $0.024456;
@@ -86,9 +95,10 @@ tunnel or VM is unavailable, generation must fail closed.
 
 The contract also uses injected responses; manual and labelled examples use the
 actual browser, API and FalkorDB. The burger demo is recorded from that local example,
-not a deployed multi-business feature or an AI-generated result. The original
-production app and its original video remain available unchanged.
+not a deployed multi-business feature or an AI-generated result. The earlier
+production release and its historical video remain published unchanged; the
+redeploy of this release to the same domain is planned, not verified.
 
-**Start over** in this fork returns to new business setup, instead of implicitly
+**Start over** returns to new business setup, instead of implicitly
 loading the original sample. The dialog is centered, traps focus, restores focus
 on cancel and stays open if the reset fails.

@@ -1,68 +1,101 @@
-# PACT Lab — AI business setup fork
-
-This separate version adds **describe your business → review an editable setup →
-create a real company workspace → check/repair/approve**. The original app and its
-deployment remain unchanged. Start with [Business setup](docs/BUSINESS_SETUP.md)
-for the feature, local run instructions, demo sequence and verification limits.
-
-Food shops, creative agencies and other small businesses share the same task/time
-planner. A short AI prompt proposes a complete starting setup, with assumptions
-separately accepted before saving. Manual setup and two clearly labelled examples
-(agency and BunStop burger shop) work without paid AI. Live generation
-requires a configured provider key and the existing shared budget store; its
-contract is tested with injected responses. One real short-prompt setup generation
-was also verified on 2026-10-16 against the existing shared cap; it returned two
-team roles, three tasks and explicit assumptions. The recorded burger demo predates
-that verification and still makes zero AI calls.
-
-Watch the [93-second BunStop burger-shop demo](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#burger-shop): actual local browser/API/FalkorDB work with labelled example inputs and zero provider calls. This fork is not deployed as the original live planner.
-
-**The documentation below describes the original PACT baseline. Its live URLs,
-published media and historical live-AI evidence belong to that original app, not
-this fork.**
-
----
-
 # PACT — Check the promise before you make it
 
-PACT is an influencer-agency planning desk that checks whether the work an agency
-has **promised** can actually be delivered by its production team, explains the
-conflict with graph-grounded evidence, proposes a checked repair, and records a
-human-approved internal plan in [FalkorDB](https://falkordb.com).
+PACT is a small-business planning desk that checks whether the work a team has
+**promised** can actually be delivered by its people, explains the conflict with
+graph-grounded evidence, proposes a checked repair, and records a human-approved
+internal plan in [FalkorDB](https://falkordb.com).
 
-An agency can have three available creators and still promise more editing work
-than its team can deliver. PACT connects campaigns, creators, editing capacity,
-brand approvals, source documents and decision owners in a graph, then answers:
-*do these promises fit together, and if not, what is the smallest change that
-makes them fit?*
+A business can have three available people and still promise more work than it can
+deliver. PACT connects work commitments, the people who may handle them, available
+hours, responsibility rules, source documents and decision owners in a graph, then
+answers: *do these promises fit together, and if not, what is the smallest change
+that makes them fit?*
 
-> **Submission status:** the app is **live over HTTPS** at the verified India
-> (Hyderabad, `indiasouthcentral`) production release linked below, with the
-> **Golden Hour visual redesign deployed and independently reviewed**, and the
-> **reviewed source is published in the public repository**. A **real live AI
-> session has been verified** against an earlier deployment (both agent roles plus
-> live graph memory, executed in an independent verification run; see
-> [Verification evidence](#verification-evidence)). The **demo video and pitch deck
-> are published** in the GitHub release below, and
-> the **participant walkthrough is not yet completed**. See [Live links](#live-links)
-> and [Publication status](#publication-status). Nothing here fabricates a link, a
-> live-model result, or a test result that was not actually executed.
+## What visitors see first: business setup
+
+New visitors describe their business in one short prompt — for example "I run a
+small burger shop in Pune. Set up my team and the work for the next two days." —
+then choose:
+
+- **Draft my setup with AI** — one structured provider request proposes a business
+  profile, team roles, tasks, time estimates, working hours and responsibility
+  rules. Real details in the note take priority; proposed defaults are listed as
+  assumptions and are accepted separately before anything is saved. With no
+  provider key or an exhausted budget the AI button is disabled with the reason
+  stated — nothing pretends a model was called.
+- **Fill it in myself** — the same fields entered manually. Unknown hours and
+  unknown responsibilities stay unknown.
+- **Two clearly labelled, hand-authored examples** — the Sunroom Studio agency and
+  the BunStop burger shop — running the real browser/API/FalkorDB flow with zero
+  provider calls.
+- **Try the original sample workspace** — the Morrow Studio influencer-agency
+  scenario described below stays reachable from setup at any time.
+
+Both paths feed the same bounded checker, source records and human approval flow.
+Setup itself never books work. Feature details, bounds and the demo sequence are
+in [`docs/BUSINESS_SETUP.md`](./docs/BUSINESS_SETUP.md).
+
+## Release status (18 Oct 2026)
+
+This is the AI business-setup release of PACT by **Rujul Talekar (solo)**, entered
+in all three tracks of *Graph Hacks: Context for AI Agents* (WeMakeDevs ×
+FalkorDB). Every claim below is separated by who verified it and when:
+
+- **Planned, not yet executed (handled by the maintainer after this pass):**
+  merging this branch into the public repository
+  (<https://github.com/Roojool/pact>) and redeploying the **same production
+  domain** (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>)
+  so it opens with business setup, with at most **one** real paid
+  setup-generation call as the final live check. Until that redeploy, the live
+  domain serves the **earlier, independently reviewed production release**
+  described in [Verification evidence](#verification-evidence).
+- **Verified earlier, not re-run in this pass (dated historical evidence):** the
+  desktop/mobile deterministic journey on the India production release with 0
+  provider calls; one real live AI session (both agent roles plus live graph
+  memory) on 2026-10-15; and one real short-prompt setup generation on 2026-10-16
+  (two team roles, three tasks, explicit reviewable assumptions; $0.024456 ledger
+  estimate against the unchanged $5 cap).
+- **Verified in this UI/docs pass (18 Oct 2026):** restored the README, removed
+  an abandoned `/lab` basePath experiment (config, client fetch prefixes and font
+  rewrites) and the fork banner that linked the app to its own production domain,
+  kept the business-setup flow and the warm editorial visual identity unchanged,
+  and ran one clean typecheck (`npx tsc --noEmit`). **No provider call was made
+  by this pass.**
+- **Media status:** the published demo video and deck (release `v1.0.0`, the
+  <https://youtu.be/PKR43OuwzXg> upload, and the self-hosted watchpage) are
+  **historical recordings of the earlier interface**; a replacement recording of
+  this release is **pending**. The LinkedIn post
+  (<https://lnkd.in/p/dnpZSBgW>) and profile are unchanged. Old media is kept as
+  drafts/history, not presented as footage of this release.
+- **Still open:** the **participant walkthrough is not yet completed**
+  ([`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md)).
+- **Scope:** a bounded **two-day staff/task planner** (people, tasks, hours,
+  responsibility rules). It is **not** a point-of-sale, inventory, live-order or
+  delivery system, and an approved plan is an internal reservation, not a
+  guarantee of real-world delivery.
+
+Nothing here fabricates a link, a live-model result, or a test result that was
+not actually executed.
 
 ---
 
 ## Live links
 
 - **Live app (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>
-  — the production app, with a sunset dashboard and an interactive work-flow graph,
-  served from a permitted **Azure for Students** region in **Hyderabad, India South
-  Central (`indiasouthcentral`)**. Independently reviewed live with **0 provider
-  calls** for the capture; the **$5 application budget cap is unchanged**.
+  — the production domain, served from a permitted **Azure for Students** region in
+  **Hyderabad, India South Central (`indiasouthcentral`)**. The **business-setup
+  release described here is planned for this same domain** (merge + redeploy
+  handled by the maintainer); until then the domain serves the earlier production
+  release, which was independently reviewed live with **0 provider calls** for the
+  capture and the **$5 application budget cap unchanged**.
 - **Demo watchpage (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo>
-  — verified self-hosted player with video and captions
-  (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`). The recording and deck show the
-  earlier interface; the live app now opens on Dashboard.
+  — self-hosted player with video and captions
+  (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`). **Historical:** the recording
+  and deck show the earlier interface; a replacement recording of this release is
+  pending. The earlier YouTube upload <https://youtu.be/PKR43OuwzXg> is likewise
+  historical.
 - **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
-- **Demo video & pitch deck:** **published** in release
+- **Demo video & pitch deck:** **published** (historical, earlier interface) in release
   [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); downloadable asset
   URLs are listed under [Publication status](#publication-status), and the recording
   plan is in [`docs/DEMO_SCRIPT.md`](./docs/DEMO_SCRIPT.md).
@@ -78,6 +111,8 @@ live path. This documentation pass did not re-run either check.
 
 ## Table of contents
 
+- [What visitors see first: business setup](#what-visitors-see-first-business-setup)
+- [Release status (18 Oct 2026)](#release-status-18-oct-2026)
 - [Live links](#live-links)
 - [The use case](#the-use-case)
 - [Honest product status](#honest-product-status)
@@ -226,10 +261,13 @@ close at the end of the window).
 
 ## How it works
 
-1. A visitor opens the app and gets an isolated anonymous workspace (an opaque
-   server-generated id in an HMAC-signed cookie; the client never supplies it).
-   The workspace is seeded into its **own** FalkorDB graph as the synthetic
-   Morrow Studio fixture.
+1. A visitor opens the app and either describes their business (business setup)
+   or opens the original sample workspace. Either way they get an isolated
+   anonymous workspace (an opaque server-generated id in an HMAC-signed cookie;
+   the client never supplies it) seeded into its **own** FalkorDB graph — from
+   the synthetic Morrow Studio fixture, or from the reviewed business-setup
+   inputs, whose original note and accepted assumptions become real `Source`
+   records.
 2. **Check this plan** calls `analyzeWorkspace`, which reads a consistent
    snapshot, runs the pure bounded checker and repair proposer, and atomically
    persists the check activity and proposals (bumping the revision).
@@ -255,6 +293,13 @@ One graph per workspace: `pact-ws-<opaque id>`. Nodes carry facts; relationships
 carry the structure. Snapshots are rebuilt **only** through traversals — there
 are no denormalized foreign keys on nodes. Full diagram and the exact Cypher are
 in [`queries/`](./queries/):
+
+> Setup-created business workspaces use exactly this model: the reviewed note and
+> accepted assumptions are persisted as `Source` nodes (`src-setup` plus one
+> source per confirmed fact), team members become `Editor` nodes, tasks become
+> `Campaign` + `Commitment` nodes, and responsibility rules become `Approval`
+> facts. The Cypher in [`queries/`](./queries/) is unchanged for custom
+> workspaces.
 
 - [`queries/README.md`](./queries/README.md) — graph model + concurrency model
 - [`queries/reads.cypher`](./queries/reads.cypher) — read-only traversals
@@ -332,7 +377,8 @@ the UI and to the agents):
 - **One-hour granularity.** Edits are whole one-hour slots; a commitment is
   completed by a single editor.
 - **Bounded inputs.** At most 6 commitments per workspace and 1–8 hours per
-  commitment; larger inputs are rejected with `invalid_request`.
+  commitment; larger inputs are rejected with `invalid_request`. The business
+  setup form accepts at most 6 tasks and 4 team members within the same bounds.
 - **Unknowns stay unknown.** A commitment with no stated duration yields
   `needs_information`; an editor with no approval record is treated as unknown
   eligibility and is reported as an assumption, never scheduled.
@@ -407,10 +453,13 @@ Copy-Item .env.example .env.local
 npm run dev        # http://127.0.0.1:3000
 ```
 
-The deterministic "rules check" works with **no** API key. The optional
+The deterministic "rules check" works with **no** API key. Manual business setup
+and the two labelled examples also work with no key. The optional
 "AI-assisted check" additionally needs `OPENAI_API_KEY`, a
 `PACT_RUNTIME_TOKEN`, and the two Eve runtimes running (see
-[Agent roles](#agent-roles-eve)).
+[Agent roles](#agent-roles-eve)). AI setup drafting needs `OPENAI_API_KEY` plus a
+durable shared budget store (`PACT_BUDGET_URL`, defaulting to `FALKORDB_URL`)
+and fails closed without them.
 
 ### Tests
 
@@ -477,6 +526,7 @@ All values below are **names with placeholders only**; never commit real secrets
 | --- | --- | --- | --- |
 | `SESSION_SECRET` | web | `<32+ byte random string>` | HMAC-signs the anonymous workspace cookie |
 | `FALKORDB_URL` | web + runtimes | `redis://127.0.0.1:16379` | FalkorDB connection |
+| `PACT_BUDGET_URL` | web (AI setup drafting + budget) | `<blank>` ⇒ `FALKORDB_URL` | Durable shared paid-call budget ledger location |
 | `OPENAI_API_KEY` | runtimes + direct transport | `<blank>` | Live model calls (blank ⇒ deterministic) |
 | `OPENAI_MODEL` | web + runtimes | `gpt-6.1-sol` | Model id |
 | `PACT_AGENT_TRANSPORT` | web | `eve` (`direct` for the Responses fallback) | Agent transport |
@@ -581,10 +631,20 @@ Every billable call is gated by a **durable, atomic, global** ledger in FalkorDB
 ## Verification evidence
 
 The results below were **executed before this documentation pass** (15 Oct 2026)
-and are **not re-run here** — this pass only edits docs. The unit and integration
+and are **not re-run here**. The unit and integration
 suites ran against the local build (FalkorDB reachable at `127.0.0.1:16379`); the
 desktop/mobile deterministic journey and one live AI session ran against the
-**live HTTPS deployment**. No paid model call was made by this documentation pass.
+**live HTTPS deployment**. No paid model call was made by that documentation pass.
+
+**This UI/docs pass (18 Oct 2026):** restored the README, removed the abandoned
+`/lab` basePath experiment (config, client fetch prefixes, font rewrites) and the
+fork banner, and ran one clean typecheck (`npx tsc --noEmit`, exit 0). **No
+provider call was made, no live site was tested, and no test suite was re-run by
+this pass**; the shared final build/integration runs once all workers finish. For
+completeness, one real short-prompt setup generation had been verified on
+**2026-10-16** against the existing shared budget store (two team roles, three
+tasks, explicit reviewable assumptions; **$0.024456** cumulative ledger estimate
+at that checkpoint, **$5 cap unchanged**) — historical evidence, not re-run here.
 
 | Check | Command | Result |
 | --- | --- | --- |
@@ -670,20 +730,24 @@ decisions, and should personally validate the code before submission.
 
 | Artifact | Status |
 | --- | --- |
-| Live deployment (HTTPS) | ✅ **live** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com> (Golden Hour UI, commit `3985edf`, Hyderabad / `indiasouthcentral`; independently reviewed deterministic journey, **0 provider calls** for the capture, **$5 cap unchanged**; not re-run in this docs pass). |
-| Demo watchpage (HTTPS) | ✅ **verified playback and captions** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (self-hosted video + captions). |
-| Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (source, setup, graph model, Cypher and tests) |
-| Demo video & pitch deck | ✅ **published and reviewed** — release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). |
-| Live AI session | ✅ **verified once (earlier deployment)** — real live production session (both roles + live memory) executed in an independent verification run; ledger estimate at that checkpoint $0.136371, durable ledger now estimates $0.855696 of the $5 cap ($0 reserved) after later recording attempts; not a provider bill; not re-run in this docs pass |
+| Live deployment (HTTPS) | ⚠️ **earlier release still live; business-setup redeploy planned** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com> currently serves the verified Golden Hour release (commit `3985edf`, Hyderabad / `indiasouthcentral`; independently reviewed deterministic journey, **0 provider calls** for the capture, **$5 cap unchanged**; not re-run in this pass). Merging this branch and redeploying the same domain — so it opens with business setup — is **planned and not yet verified**. |
+| Demo watchpage (HTTPS) | ✅ **verified playback and captions (historical media)** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (self-hosted video + captions of the earlier interface; replacement recording pending; the <https://youtu.be/PKR43OuwzXg> upload is likewise historical). |
+| Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (source, setup, graph model, Cypher and tests); merge of this branch planned |
+| Demo video & pitch deck | ✅ **published and reviewed (historical, earlier interface)** — release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). Kept as drafts/history; a replacement recording of this release is pending. |
+| Live AI session | ✅ **verified once (earlier deployment)** — real live production session (both roles + live memory) executed in an independent verification run; ledger estimate at that checkpoint $0.136371, durable ledger now estimates $0.855696 of the $5 cap ($0 reserved) after later recording attempts; not a provider bill; not re-run in this pass |
+| AI business-setup generation | ✅ **verified once (2026-10-16, local against the shared budget store)** — two team roles, three tasks, explicit assumptions; $0.024456 ledger estimate at that checkpoint, $5 cap unchanged; not re-run in this pass |
 | Participant walkthrough | ⏳ **not yet completed** — see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md) |
+| LinkedIn post & profile | ✅ **unchanged** — <https://lnkd.in/p/dnpZSBgW> and the profile stay as published |
 
 The app, watchpage and six release assets are public. The 159.83-second H264/AAC
 video passed actual browser playback, all 43 caption cues loaded, byte-range
 streaming worked, and the media page was checked at desktop and 390px mobile widths.
-See [final release verification](docs/RELEASE_VERIFICATION.md).
+See [final release verification](docs/RELEASE_VERIFICATION.md). That verification
+describes the **historical** media, not this release.
 Complete local and Docker setup instructions are provided above.
 
-Submission draft: [`docs/SUBMISSION_DRAFT.md`](./docs/SUBMISSION_DRAFT.md).
+Submission text: paste-ready [`docs/SUBMISSION_FINAL.md`](./docs/SUBMISSION_FINAL.md);
+earlier draft kept as [`docs/SUBMISSION_DRAFT.md`](./docs/SUBMISSION_DRAFT.md).
 
 ## Repository layout
 
@@ -694,12 +758,12 @@ pact/
 ├─ Dockerfile                ← web app (Next.js standalone)
 ├─ Caddyfile                 ← reverse proxy
 ├─ queries/                  ← graph model + read-only/mutation Cypher
-├─ docs/                     ← submission draft, walkthrough, AI disclosure, demo script
+├─ docs/                     ← submission text, walkthrough, AI disclosure, demo script
 ├─ src/
 │  ├─ app/                   ← Next.js app router (UI + /api/[action] routes)
-│  ├─ components/            ← UI components
+│  ├─ components/            ← UI components (incl. BusinessSetup)
 │  └─ lib/                   ← domain.ts, graph.ts, fixtures.ts, validation.ts,
-│                              agents.ts, budget.ts, http.ts, types.ts
+│                              business-setup.ts, agents.ts, budget.ts, http.ts, types.ts
 ├─ agent-runtime/            ← Eve workspace (account-manager + producer members)
 ├─ scripts/                  ← MCP adapter + visual inspection helper
 └─ tests/                    ← unit + integration suites

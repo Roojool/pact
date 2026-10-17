@@ -63,6 +63,7 @@ services:
     environment:
       NODE_ENV: production
       FALKORDB_URL: redis://graph:6379
+      PACT_BUDGET_URL: redis://graph:6379
       PACT_AGENT_TRANSPORT: eve
       AGENT_RUNTIME_URL: http://agent-account-manager:3010
       AGENT_PRODUCER_URL: http://agent-producer:3011

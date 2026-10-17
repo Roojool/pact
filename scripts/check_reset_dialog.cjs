@@ -1,7 +1,9 @@
 const { chromium } = require('playwright-core');
 const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path');
-const base = process.env.PACT_BASE_URL || 'http://127.0.0.1:3102';
-const fork = process.env.PACT_SETUP_FORK === '1';
+const base = process.env.PACT_BASE_URL || 'http://127.0.0.1:3101';
+// This release opens with business setup; set PACT_SETUP_FORK=0 only to check an
+// app that starts directly on the original sample workspace.
+const fork = process.env.PACT_SETUP_FORK !== '0';
 const out = path.resolve(__dirname, '../output/reset-dialog'); fs.mkdirSync(out, { recursive: true });
 (async () => {
   const browser = await chromium.launch({ channel: 'chrome', headless: true });

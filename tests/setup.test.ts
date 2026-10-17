@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { burgerExample, BURGER_DEMO_NOTE, emptySetup, missingSetupFields, setupToWorkspace, validateSetupDraft } from '../src/lib/business-setup';
+import { burgerExample, BURGER_DEMO_NOTE, emptySetup, missingSetupFields, SETUP_DEMO_NOTE, setupToWorkspace, validateSetupDraft } from '../src/lib/business-setup';
 import { checkPlan, proposeRepairs } from '../src/lib/domain';
 import { setupFixture } from './setup-fixture';
 import { describeCheck } from '../src/components/ui-copy';
@@ -47,6 +47,15 @@ test('invalid references, duplicate hours, unsupported ranges and fabricated quo
   raw.jobs[0].hours = 9;
   assert.throws(() => setupToWorkspace('setup-invalid', raw, ''));
   assert(missingSetupFields(emptySetup()).length >= 4);
+});
+
+test('padded quotes normalize to their verbatim form and whitespace-only quotes are no citation', () => {
+  const raw = setupFixture();
+  raw.editors[0].evidence = `  ${'Neha edits 9–5 on Day 1 and Day 2.'}  `;
+  raw.jobs[0].evidence = '   ';
+  const draft = validateSetupDraft(raw, SETUP_DEMO_NOTE);
+  assert.equal(draft.editors[0].evidence, 'Neha edits 9–5 on Day 1 and Day 2.', 'padded real quote keeps its verbatim text');
+  assert.equal(draft.jobs[0].evidence, '', 'whitespace-only evidence is treated as absent, not as a quote');
 });
 
 test('burger shop uses real staff constraints and moves only flexible training', () => {

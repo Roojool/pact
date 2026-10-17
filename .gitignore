@@ -16,6 +16,7 @@ ROOT_DEPENDENCIES.md
 .playwright-cli/
 output/playwright/
 output/business-setup/
+output/
 media/
 
 /output/reset-dialog/

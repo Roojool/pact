@@ -73,6 +73,13 @@ on the prior release (commit `6e04796`, 2026-10-15) the deterministic journey ag
 the live HTTPS deployment passed with **19 captures / 13 numbered groups** and **0
 paid calls**.
 
+**18 Oct 2026 UI/docs pass (executed):** restored the README, removed an abandoned
+`/lab` basePath experiment (config, client fetch prefixes, font rewrites) and the
+fork banner that linked the app to its own production domain, updated the release
+documentation, and ran one clean typecheck (`npx tsc --noEmit`, exit 0). **No
+provider call, no live-site test and no test-suite re-run happened in this pass.**
+The participant walkthrough below remains **not completed**.
+
 **Verified before this pass, not re-run here (executed in an independent verification run):**
 
 - **Live AI verified in production.** One real live AI session (both agent roles —
@@ -138,7 +145,9 @@ The **reviewed source is published** at <https://github.com/Roojool/pact>.
   private Docker network and the session cookie signed server-side. The live URL is
   the verified Golden Hour production release
   (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>), served from a
-  permitted Azure for Students region in Hyderabad. Any live model usage remains a
+  permitted Azure for Students region in Hyderabad; redeploying that same domain
+  with the AI business-setup release is **planned and not yet verified**. Any live
+  model usage remains a
   paid dependency; the complete local/Docker setup instructions remain in the README.
 
 ## Participant walkthrough

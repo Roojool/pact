@@ -1,5 +1,3 @@
-.setup-fork-note { padding: 0 24px 12px; text-align: center; font-size: 12px; color: #283d28; }
-.setup-fork-note a { color: inherit; text-decoration: underline; }
 .masthead-company { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dashboard-job-detail h4, .dashboard-job-detail > p, .dashboard-sample-note, .setup-panel p, .setup-panel blockquote { overflow-wrap: anywhere; }
 .setup-shell { max-width: 960px; margin: 0 auto; display: grid; gap: 20px; }

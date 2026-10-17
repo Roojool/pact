@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
+import { readFileSync } from 'node:fs';
 import type { AddressInfo } from 'node:net';
 
 import type { Analysis, AgentReply, Workspace } from '../src/lib/types';
@@ -259,6 +260,16 @@ test('context: serializes bounded JSON with known source IDs', () => {
   assert.ok(built.knownSourceIds.includes('src_policy'));
   assert.ok(built.estimatedInputTokens > 0);
   assert.doesNotThrow(() => JSON.parse(built.text));
+});
+
+test('context: carries the business type for non-agency workspaces', () => {
+  const foodShop = { ...fixtureWorkspace(), businessType: 'food_shop' as const, kind: 'custom' as const };
+  const built = buildAgentContext(foodShop, undefined, {});
+  assert.equal((built.context as Record<string, unknown>).businessType, 'food_shop');
+  assert.equal((built.context as Record<string, unknown>).kind, 'custom');
+  assert.match(built.text, /"businessType":"food_shop"/);
+  const untyped = buildAgentContext(fixtureWorkspace(), undefined, {});
+  assert.equal((untyped.context as Record<string, unknown>).businessType, null, 'unset type stays explicit null');
 });
 
 test('tokens: ceiling is conservative (UTF8 bytes, never chars/4)', () => {
@@ -532,6 +543,79 @@ test('runAgentMemory: eve transport returns a live reply', async () => {
   assert.equal(result.mode, 'live');
   assert.deepEqual(result.sourceIds, ['src_policy']);
   __resetAgentDeps();
+});
+
+/* ------------------------------------------------------------------ *
+ * Business-neutral prompts: agencies, food shops, other small businesses
+ * ------------------------------------------------------------------ */
+
+test('prompts: direct analysis and memory prompts are business-neutral', async () => {
+  const systems: Record<string, string> = {};
+  const users: Record<string, string> = {};
+  const fetchImpl = (async (_input: unknown, init?: RequestInit) => {
+    const body = JSON.parse(String(init?.body)) as {
+      input: { content: { text: string }[] }[];
+      text?: { format?: { name?: string } };
+    };
+    const name = String(body.text?.format?.name ?? '');
+    systems[name] = body.input[0]?.content?.[0]?.text ?? '';
+    users[name] = body.input[1]?.content?.[0]?.text ?? '';
+    const payload =
+      name === 'pact_assessment' ? AM_PAYLOAD : name === 'pact_producer_analysis' ? PRODUCER_PAYLOAD : MEMORY_PAYLOAD;
+    return jsonResponse(responsesBody(payload));
+  }) as typeof fetch;
+  const ledger = createMemoryBudgetLedger(5);
+  __setAgentDeps({
+    env: { OPENAI_API_KEY: 'test-key', PACT_AGENT_TRANSPORT: 'direct', PACT_AGENT_MAX_CONTEXT_BYTES: '20000' },
+    ledger,
+    handoffMemory: new MemoryHandoffMemory(),
+    fetchImpl,
+  });
+
+  const analysis = await runAgentAnalysis(fixtureWorkspace(), fixtureAnalysis());
+  assert.equal(analysis.mode, 'live');
+  const reply = await runAgentMemory(fixtureWorkspace(), 'Why is Beta at risk?', fixtureFallback());
+  assert.equal(reply.mode, 'live');
+
+  for (const name of ['pact_assessment', 'pact_producer_analysis', 'pact_memory']) {
+    const system = systems[name];
+    assert.ok(system, `missing system prompt for ${name}`);
+    assert.match(system, /small-business capacity-planning studio/);
+    assert.match(system, /creative agency/);
+    assert.match(system, /food shop/);
+    assert.doesNotMatch(system, /agency capacity-planning studio/);
+    assert.match(system, /verified professional qualification/);
+    assert.match(system, /knownSourceIds/);
+    assert.match(system, /Explicit denials always override suggestions/);
+  }
+  assert.match(users['pact_producer_analysis'], /Workspace context \(JSON\):/);
+  assert.doesNotMatch(users['pact_producer_analysis'], /Agency context/);
+  assert.match(users['pact_memory'], /Workspace context \(JSON\):/);
+  assert.doesNotMatch(users['pact_memory'], /Agency context/);
+  assert.match(reply.activity.at(-1)?.text ?? '', /^Producer replied \(confidence: high\)\.$/);
+  __resetAgentDeps();
+});
+
+test('runtime instructions: business-neutral and keep the graph-backed handoff contract', () => {
+  const read = (role: string) =>
+    readFileSync(new URL(`../agent-runtime/agents/${role}/agent/instructions.md`, import.meta.url), 'utf8');
+  const am = read('account-manager');
+  const producer = read('producer');
+  for (const doc of [am, producer]) {
+    assert.match(doc, /small-business capacity-planning studio/);
+    assert.match(doc, /creative agency/);
+    assert.match(doc, /food shop/);
+    assert.doesNotMatch(doc, /agency capacity-planning studio/);
+    assert.match(doc, /verified professional qualification, certificate, or safety clearance/);
+    assert.match(doc, /knownSourceIds/);
+    assert.match(doc, /Explicit denials always override suggestions/);
+  }
+  // Stable role IDs and the real tool-backed handoff/source contracts remain.
+  assert.match(am, /Account Manager/);
+  assert.match(am, /record_handoff/);
+  assert.match(producer, /Producer/);
+  assert.match(producer, /read_handoffs/);
+  assert.match(producer, /validate_citations/);
 });
 
 /* ------------------------------------------------------------------ *

@@ -92,7 +92,7 @@ export function DashboardView({ workspace, analysis, isChecking, onCheck, onNavi
       <div className="dashboard-stats" aria-label="Plan at a glance">
         <div><span>Jobs in your plan</span><strong>{workspace.commitments.length.toString().padStart(2, '0')}</strong><small>{workspace.campaigns.length} task briefs</small></div>
         <div><span>{model.unknownHours ? 'Known work hours' : 'Work to plan'}</span><strong>{model.knownHours}<i>h</i>{model.unknownHours ? '+' : ''}</strong><small>{model.unknownHours ? 'Some hours still need confirming' : 'Across your current jobs'}</small></div>
-        <div><span>Plan options</span><strong>{model.readyOptions.toString().padStart(2, '0')}</strong><small>{checked ? 'Checked options ready to review' : 'Check your plan to find options'}</small></div>
+        <div><span>Plan options</span><strong>{model.readyOptions.toString().padStart(2, '0')}</strong><small>{saved ? 'No pending options' : checked ? 'Checked options ready to review' : 'Check your plan to find options'}</small></div>
         <div><span>Saved decisions</span><strong>{workspace.decisions.length.toString().padStart(2, '0')}</strong><small>{saved ? 'Work time booked' : workspace.decisions.length ? 'Previous bookings on file' : 'You have the final say'}</small></div>
       </div>
 
@@ -106,7 +106,7 @@ export function DashboardView({ workspace, analysis, isChecking, onCheck, onNavi
       <section aria-labelledby="dashboard-sections-heading" className="dashboard-sections"><div className="dashboard-section-top"><div><span className="editorial-label">02 / A place for everything</span><h3 id="dashboard-sections-heading">One step at a time</h3></div><span className="dashboard-small-note">Clear choices. You stay in charge.</span></div><div className="dashboard-shortcuts">
         {([
           { view: 'overview', icon: Pencil, title: 'Work by work', text: 'Adjust each job, working hours and task responsibilities.', meta: `${workspace.commitments.length} jobs` },
-          { view: 'conflicts', icon: Clock3, title: 'Needs attention', text: checked ? 'See the check and the reasons behind it.' : 'Check your plan to see what needs a closer look.', meta: checked ? flowLabel : 'Not checked yet' },
+          { view: saved ? 'receipts' : 'conflicts', icon: Clock3, title: 'Needs attention', text: saved ? 'Your approved plan is saved. See its bookings and next steps.' : checked ? 'See the check and the reasons behind it.' : 'Check your plan to see what needs a closer look.', meta: saved ? 'Approved plan saved' : model.status === 'changed' ? 'Changes need checking' : checked ? flowLabel : 'Not checked yet' },
           { view: 'repairs', icon: Sparkles, title: 'Plan options', text: 'Compare changes and choose what works for you.', meta: `${model.readyOptions} ready to review` },
           { view: 'receipts', icon: Check, title: 'Saved plan', text: 'Find booked work time and the next steps you approved.', meta: `${workspace.decisions.length} saved decisions` },
         ] as const).map(({ view, icon: Icon, title, text, meta }) => <button key={view} onClick={() => onNavigate(view)} className="dashboard-shortcut"><span className="shortcut-icon"><Icon size={19} /></span><span><strong>{title}</strong><small>{text}</small><em>{meta}</em></span><ArrowRight size={19} /></button>)}

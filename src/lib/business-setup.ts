@@ -22,7 +22,9 @@ export function emptySetup(): SetupDraft {
 
 export function validateSetupDraft(raw: unknown, source: string): SetupDraft {
   const draft = setupDraftSchema.parse(raw);
+  // Whitespace alone must not turn an assumption into a cited fact.
   for (const record of [...draft.editors, ...draft.jobs, ...draft.permissions]) {
+    record.evidence = record.evidence.trim();
     if (record.evidence && !source.includes(record.evidence)) throw new PactError('A draft citation is not in your original note. Review the fields manually.', 'invalid_setup_source', 400);
   }
   const pairs = new Set<string>();

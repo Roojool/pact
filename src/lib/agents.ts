@@ -303,6 +303,9 @@ export interface AgentContext {
   workspaceId: string;
   revision: number;
   agency: string;
+  /** Business classification, when the workspace states one (setup workspaces always do). */
+  businessType: Workspace['businessType'] | null;
+  kind: Workspace['kind'] | null;
   knownSourceIds: string[];
   context: Record<string, unknown>;
   text: string;
@@ -378,6 +381,8 @@ export function buildAgentContext(
     workspaceId: workspace.id,
     revision: workspace.revision,
     agency: workspace.agency,
+    businessType: workspace.businessType ?? null,
+    kind: workspace.kind ?? null,
     counts: {
       creators: workspace.creators?.length ?? 0,
       campaigns: workspace.campaigns?.length ?? 0,
@@ -519,6 +524,8 @@ export function buildAgentContext(
     workspaceId: workspace.id,
     revision: workspace.revision,
     agency: workspace.agency,
+    businessType: workspace.businessType ?? null,
+    kind: workspace.kind ?? null,
     knownSourceIds,
     context,
     text,
@@ -703,37 +710,46 @@ export function __resetAgentDeps(): void {
  * Prompts
  * ------------------------------------------------------------------ */
 
-const AM_SYSTEM = `You are the Account Manager agent inside PACT, an agency capacity-planning studio.
+// The stored field names remain compatible across business types.
+const TERMINOLOGY_NOTE = `The business may be a creative agency, a food shop, or another small business with bounded work. The JSON context uses generic field names: agency is the business name; campaigns are jobs or work items; commitments are planned tasks with hours and deadlines; editors are team members; approvals are recorded responsibility rules.`;
 
-You receive a JSON context derived from the agency graph and assess whether the planned work fits.
+const AM_SYSTEM = `You are the Account Manager agent inside PACT, a small-business capacity-planning studio.
+
+${TERMINOLOGY_NOTE} You receive a JSON context derived from the business's planning graph and assess whether the planned work fits.
 
 Rules:
 - Use ONLY the supplied JSON context. Never invent campaigns, commitments, editors, approvals, events, hours, dates, or source IDs.
 - Every source ID you return MUST appear in context.knownSourceIds. Omit anything you cannot cite.
-- Approval is an internal reservation/owner task, never real publishing, delivery, or client messaging.
+- Approval is an internal reservation/owner task, never real publishing, delivery, client messaging, or a completed external obligation.
+- Never describe planning eligibility as a verified professional qualification, certificate, or safety clearance; it only records what the owner stated.
+- Explicit denials always override suggestions.
 - Unknown eligibility, duration, or capacity must be reported as unknown. Never guess.
 - Write a concise assessment and a short list of concrete risks.
 - Respond with JSON matching the provided schema and nothing else.`;
 
-const PRODUCER_SYSTEM = `You are the Campaign Producer agent inside PACT, an agency capacity-planning studio.
+const PRODUCER_SYSTEM = `You are the Producer agent inside PACT, a small-business capacity-planning studio.
 
-You receive the Account Manager's handoff plus graph-derived memory and a JSON agency context. You turn the Account Manager's assessment into concrete producer activities and owner-facing notes.
+${TERMINOLOGY_NOTE} You receive the Account Manager's handoff plus graph-derived memory and a JSON planning context. You turn the Account Manager's assessment into concrete producer activities and owner-facing notes.
 
 Rules:
 - Use ONLY the supplied handoff, memory, and JSON context. Never invent facts.
 - Every source ID you return MUST appear in context.knownSourceIds. Omit anything you cannot cite.
 - If the handoff or context is insufficient, say so in warnings instead of guessing.
 - You may describe internal reservations and owner tasks, but never claim real publishing, delivery, or client messaging.
+- Never describe planning eligibility as a verified professional qualification, certificate, or safety clearance; it only records what the owner stated.
+- Explicit denials always override suggestions.
 - Respond with JSON matching the provided schema and nothing else.`;
 
-const MEMORY_SYSTEM = `You are the Campaign Producer agent inside PACT, an agency capacity-planning studio.
+const MEMORY_SYSTEM = `You are the Producer agent inside PACT, a small-business capacity-planning studio.
 
-You answer the user's question from graph-derived memory and a JSON agency context.
+${TERMINOLOGY_NOTE} You answer the user's question from graph-derived memory and a JSON planning context.
 
 Rules:
 - Use ONLY the supplied memory and JSON context. Never invent facts.
 - Every source ID you return MUST appear in context.knownSourceIds. Omit anything you cannot cite.
 - If the context does not contain the answer, say so plainly and name the missing fact instead of guessing.
+- Never present planning eligibility as a verified professional qualification, certificate, or safety clearance, and never claim real publishing, delivery, or client messaging.
+- Explicit denials always override suggestions.
 - Respond with JSON matching the provided schema and nothing else.`;
 
 /* ------------------------------------------------------------------ *
@@ -1376,7 +1392,7 @@ export async function runAgentAnalysis(workspace: Workspace, analysis: Analysis)
       'Recent handoff memory (JSON):',
       JSON.stringify(memory.map((m) => ({ from: m.from, to: m.to, summary: excerpt(m.summary, 400), sourceIds: m.sourceIds }))),
       '',
-      'Agency context (JSON):',
+      'Workspace context (JSON):',
       built.text,
     ].join('\n');
 
@@ -1472,7 +1488,7 @@ export async function runAgentMemory(
       'Handoff memory (JSON):',
       JSON.stringify(memory.map((m) => ({ from: m.from, to: m.to, summary: excerpt(m.summary, 400), sourceIds: m.sourceIds }))),
       '',
-      'Agency context (JSON):',
+      'Workspace context (JSON):',
       built.text,
     ].join('\n');
 
@@ -1490,7 +1506,7 @@ export async function runAgentMemory(
     );
     const output = validateMemoryOutput(call.json, new Set(built.knownSourceIds));
     const activity = makeActivity(
-      `Campaign Producer replied (confidence: ${output.confidence}).`,
+      `Producer replied (confidence: ${output.confidence}).`,
       'producer',
       output.sourceIds,
       deps.now(),
