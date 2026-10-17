@@ -125,7 +125,7 @@ The **reviewed source is published** at <https://github.com/Roojool/pact>.
 - **The $5 cap is an application guard, not a bill.** One real live AI session was
   run against the configured provider. The conservative application budget ledger
   recorded that session as a $0.136371 cumulative estimate against the $5 cap with $0 reserved; the
-  durable ledger now estimates $0.855696 used after later recording attempts. These
+  durable ledger then estimated $0.855696 used after later recording attempts. These
   are **historical application-ledger estimates, not OpenAI billing measurements, not
   current balances, and not guarantees of cash costs**. The project has **not** spent
   nothing historically. The Golden Hour UI release/capture made **0 provider calls**
@@ -145,10 +145,28 @@ The **reviewed source is published** at <https://github.com/Roojool/pact>.
   private Docker network and the session cookie signed server-side. The live URL is
   the verified Golden Hour production release
   (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>), served from a
-  permitted Azure for Students region in Hyderabad; redeploying that same domain
-  with the AI business-setup release is **planned and not yet verified**. Any live
+  permitted Azure for Students region in Hyderabad. The AI business-setup release
+  was deployed and production-verified on 18 Oct 2026 IST. Any live
   model usage remains a
   paid dependency; the complete local/Docker setup instructions remain in the README.
+
+## AI business-setup release verification — 18 Oct 2026 IST
+
+GLM 5.3 and GLM 5.3 Flash workers through OpenCode implemented/reviewed the
+business-neutral prompts, source-validation regression, UI cleanup and release
+documentation. Codex independently reviewed the changes, corrected integration
+types and a saved-dashboard label, and performed deployment and production checks.
+The full unit suite passed 91 tests; real graph integration passed 25 tests; the
+HTTP integration and agency/burger/reset browser journeys also passed.
+
+One actual production setup request returned an editable BunStop draft (two team
+members, three tasks, seven assumptions). The recording then performed one
+deterministic check and one deterministic recall; it did not run new live agent
+analysis or live memory. The setup request's application estimate was $0.021897.
+The subsequent ledger checkpoint was $5 cap, $0.926307 cumulative estimated spend,
+$0 reserved. These are application estimates, not provider billing measurements.
+Counts apply to this capture only; no project-wide request total is claimed.
+See [`verification/ai-release.json`](./verification/ai-release.json).
 
 ## Participant walkthrough
 

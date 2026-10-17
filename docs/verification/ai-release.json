@@ -1,0 +1,59 @@
+{
+  "releaseDateIst": "2026-10-18",
+  "applicationCommit": "27664aad02377c5c6a92baf5c1294b4b6a6daa08",
+  "url": "https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com",
+  "deployed": true,
+  "existingGraphsPreserved": true,
+  "graphAndProxyContainersPreserved": true,
+  "localVerification": {
+    "unitTestsPassed": 91,
+    "realGraphTestsPassed": 25,
+    "httpIntegrationTestsPassed": 1,
+    "typecheckPassed": true,
+    "productionBuildPassed": true,
+    "providerTestsUseInjectedResponses": true
+  },
+  "productionVerification": {
+    "agencySetupJourney": true,
+    "burgerSetupCheckRepairApproveRecallEdit": true,
+    "sourceLinksAndIsolation": true,
+    "assumptionsEnforcedClientAndServer": true,
+    "resetFocusCenteringAndFailureRecovery": true,
+    "savedDashboardLabelsAndEditInvalidation": true,
+    "desktopAnd390pxMobileReviewed": true,
+    "settingsContainmentWidths": [1024, 1280, 390],
+    "keyboardEscapeFocus": true,
+    "providerCallsInTheseChecks": 0
+  },
+  "recordedProductionSetup": {
+    "passed": true,
+    "verifiedAtUtc": "2026-10-17T19:51:44.302Z",
+    "providerRequestsInThisCapture": 1,
+    "mode": "live",
+    "businessType": "food_shop",
+    "teamMembers": 2,
+    "tasks": 3,
+    "reviewableAssumptions": 7,
+    "usageEstimateUsd": 0.021897,
+    "subsequentRulesChecks": 1,
+    "subsequentRulesRecalls": 1,
+    "requiredHours": 6,
+    "eligibleDay1Hours": 4,
+    "humanApprovedDecisions": 1,
+    "allRecallSourcesExistAndAreNonempty": true
+  },
+  "ledgerCheckpoint": {
+    "totalUsd": 5,
+    "spentEstimateUsd": 0.926307,
+    "reservedUsd": 0,
+    "providerBillingMeasurement": false
+  },
+  "limits": [
+    "Two days, one-hour staff slots, at most six tasks and four team members",
+    "AI output is an editable draft requiring human confirmation and assumption acceptance",
+    "Plan approval records internal reservations, not external execution",
+    "No fresh live two-role analysis or live memory request in this release recording",
+    "No project-wide provider request count is established",
+    "Participant walkthrough and replacement YouTube upload remain human actions"
+  ]
+}

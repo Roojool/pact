@@ -2,11 +2,11 @@
 
 Business setup is the first screen of this PACT release: describe your business →
 review an editable setup → create a real company workspace → check/repair/approve.
-The **Morrow Studio sample workspace stays reachable** from setup at any time. The
-merge into the public repository and the redeploy to the existing production
-domain (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>) are
-**planned and handled by the maintainer**, and are not verified by this
-documentation pass. It is a staff
+The **Morrow Studio sample workspace stays reachable** from setup. The release is
+published in the original public repository and deployed to the existing domain
+(<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>). Production
+desktop/mobile journeys and one real AI setup request passed on 18 Oct 2026 IST;
+see [`verification/ai-release.json`](./verification/ai-release.json). It is a staff
 and task planner, not a till, stock system or live customer-order manager.
 
 ## Two ways to set up
@@ -95,9 +95,9 @@ tunnel or VM is unavailable, generation must fail closed.
 
 The contract also uses injected responses; manual and labelled examples use the
 actual browser, API and FalkorDB. The burger demo is recorded from that local example,
-not a deployed multi-business feature or an AI-generated result. The earlier
-production release and its historical video remain published unchanged; the
-redeploy of this release to the same domain is planned, not verified.
+not an AI-generated result. That historical recording remains published. The
+current main site now offers business setup, verified separately with one real
+production AI setup request and deterministic planning/approval/recall.
 
 **Start over** returns to new business setup, instead of implicitly
 loading the original sample. The dialog is centered, traps focus, restores focus

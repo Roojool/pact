@@ -21,8 +21,8 @@ then choose:
   profile, team roles, tasks, time estimates, working hours and responsibility
   rules. Real details in the note take priority; proposed defaults are listed as
   assumptions and are accepted separately before anything is saved. With no
-  provider key or an exhausted budget the AI button is disabled with the reason
-  stated — nothing pretends a model was called.
+  configured AI service the button is disabled. An exhausted budget rejects the
+  request before provider dispatch — nothing pretends a model was called.
 - **Fill it in myself** — the same fields entered manually. Unknown hours and
   unknown responsibilities stay unknown.
 - **Two clearly labelled, hand-authored examples** — the Sunroom Studio agency and
@@ -41,14 +41,19 @@ This is the AI business-setup release of PACT by **Rujul Talekar (solo)**, enter
 in all three tracks of *Graph Hacks: Context for AI Agents* (WeMakeDevs ×
 FalkorDB). Every claim below is separated by who verified it and when:
 
-- **Planned, not yet executed (handled by the maintainer after this pass):**
-  merging this branch into the public repository
-  (<https://github.com/Roojool/pact>) and redeploying the **same production
-  domain** (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>)
-  so it opens with business setup, with at most **one** real paid
-  setup-generation call as the final live check. Until that redeploy, the live
-  domain serves the **earlier, independently reviewed production release**
-  described in [Verification evidence](#verification-evidence).
+- **Deployed and independently verified:** commit `27664aa` is published in
+  <https://github.com/Roojool/pact> and serves the **same production domain**
+  (<https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>). New
+  visitors start with AI/manual business setup; the original Morrow Studio
+  sample remains available. Desktop/mobile setup, checking, repair, approval,
+  recall, source links, reset recovery and settings containment passed against
+  production. Existing graphs and the shared $5 cap were retained.
+- **Fresh production AI setup:** one real request returned an editable BunStop
+  draft with two team members, three tasks and seven reviewable assumptions.
+  Its application-ledger estimate was **$0.021897**. The same captured journey
+  then checked a 6h/4h shortage, approved the flexible training move and recalled
+  real source IDs in deterministic mode. These call counts describe that capture
+  only, not total project usage. See [`docs/verification/ai-release.json`](./docs/verification/ai-release.json).
 - **Verified earlier, not re-run in this pass (dated historical evidence):** the
   desktop/mobile deterministic journey on the India production release with 0
   provider calls; one real live AI session (both agent roles plus live graph
@@ -82,12 +87,9 @@ not actually executed.
 ## Live links
 
 - **Live app (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>
-  — the production domain, served from a permitted **Azure for Students** region in
-  **Hyderabad, India South Central (`indiasouthcentral`)**. The **business-setup
-  release described here is planned for this same domain** (merge + redeploy
-  handled by the maintainer); until then the domain serves the earlier production
-  release, which was independently reviewed live with **0 provider calls** for the
-  capture and the **$5 application budget cap unchanged**.
+  — the verified **AI business-setup release**, served from **Hyderabad, India
+  South Central (`indiasouthcentral`)** on Azure for Students. The application
+  budget cap remains $5; manual setup and rules-mode planning need no model call.
 - **Demo watchpage (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo>
   — self-hosted player with video and captions
   (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`). **Historical:** the recording
@@ -730,12 +732,12 @@ decisions, and should personally validate the code before submission.
 
 | Artifact | Status |
 | --- | --- |
-| Live deployment (HTTPS) | ⚠️ **earlier release still live; business-setup redeploy planned** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com> currently serves the verified Golden Hour release (commit `3985edf`, Hyderabad / `indiasouthcentral`; independently reviewed deterministic journey, **0 provider calls** for the capture, **$5 cap unchanged**; not re-run in this pass). Merging this branch and redeploying the same domain — so it opens with business setup — is **planned and not yet verified**. |
+| Live deployment (HTTPS) | ✅ **AI business setup deployed and production-verified** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>, application commit `27664aa`, Hyderabad / `indiasouthcentral`. Original graphs and shared $5 cap retained. |
 | Demo watchpage (HTTPS) | ✅ **verified playback and captions (historical media)** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (self-hosted video + captions of the earlier interface; replacement recording pending; the <https://youtu.be/PKR43OuwzXg> upload is likewise historical). |
-| Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (source, setup, graph model, Cypher and tests); merge of this branch planned |
+| Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (integrated business setup, source, graph model, Cypher and tests) |
 | Demo video & pitch deck | ✅ **published and reviewed (historical, earlier interface)** — release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). Kept as drafts/history; a replacement recording of this release is pending. |
-| Live AI session | ✅ **verified once (earlier deployment)** — real live production session (both roles + live memory) executed in an independent verification run; ledger estimate at that checkpoint $0.136371, durable ledger now estimates $0.855696 of the $5 cap ($0 reserved) after later recording attempts; not a provider bill; not re-run in this pass |
-| AI business-setup generation | ✅ **verified once (2026-10-16, local against the shared budget store)** — two team roles, three tasks, explicit assumptions; $0.024456 ledger estimate at that checkpoint, $5 cap unchanged; not re-run in this pass |
+| Live AI session | ✅ **historical verification of both roles and live memory** — the 2026-10-15 session recorded a $0.136371 cumulative application estimate; a later historical checkpoint was $0.855696. These are not current balances or provider bills; no fresh two-role live call in this release recording. |
+| AI business-setup generation | ✅ **production verified on 18 Oct 2026 IST** — one request in the new capture returned two team members, three tasks and seven reviewable assumptions; request estimate $0.021897. The subsequent cumulative ledger checkpoint was $0.926307 of the unchanged $5 cap, $0 reserved. Earlier local verification is separately dated 2026-10-16. |
 | Participant walkthrough | ⏳ **not yet completed** — see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md) |
 | LinkedIn post & profile | ✅ **unchanged** — <https://lnkd.in/p/dnpZSBgW> and the profile stay as published |
 
