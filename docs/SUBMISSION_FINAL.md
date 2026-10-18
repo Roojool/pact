@@ -1,6 +1,6 @@
 # PACT — final submission copy
 
-Verified application: commit `27664aa`, deployed on 18 Oct 2026 IST at the existing URL. Public source and social links remain unchanged. Replacement video assembly is in progress; its new YouTube URL must be supplied by the participant after upload. The older submitted YouTube video remains available as historical evidence.
+Verified application: commit `27664aa`, deployed on 18 Oct 2026 IST at the existing URL. Public source and social links remain unchanged. The current narrated demo is published on the existing watchpage and as a downloadable MP4; its new YouTube URL must be supplied by the participant after upload. The older submitted YouTube video remains available as historical evidence.
 
 ## Team
 
@@ -35,6 +35,15 @@ https://github.com/Roojool/pact
 ## Demo video — required YouTube field
 
 Replacement YouTube URL: pending the participant's upload of the accepted new MP4.
+
+Current demo watchpage:
+https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#ai-setup
+
+Accepted MP4 download:
+https://github.com/Roojool/pact/releases/download/v1.2.0-ai-setup/PACT_ai_release.mp4
+
+Copy-paste upload title and description: [VIDEO_UPLOAD.md](./VIDEO_UPLOAD.md).
+The submission form requires a YouTube URL; the watchpage is supplementary.
 
 Existing submitted video: https://youtu.be/PKR43OuwzXg
 This is the historical original-app recording, not footage of AI business setup.

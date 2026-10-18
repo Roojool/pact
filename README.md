@@ -66,12 +66,13 @@ FalkorDB). Every claim below is separated by who verified it and when:
   kept the business-setup flow and the warm editorial visual identity unchanged,
   and ran one clean typecheck (`npx tsc --noEmit`). **No provider call was made
   by this pass.**
-- **Media status:** the published demo video and deck (release `v1.0.0`, the
-  <https://youtu.be/PKR43OuwzXg> upload, and the self-hosted watchpage) are
-  **historical recordings of the earlier interface**; a replacement recording of
-  this release is **pending**. The LinkedIn post
-  (<https://lnkd.in/p/dnpZSBgW>) and profile are unchanged. Old media is kept as
-  drafts/history, not presented as footage of this release.
+- **Current demo:** the AI setup video, captions and transcript are published in
+  [release v1.2.0-ai-setup](https://github.com/Roojool/pact/releases/tag/v1.2.0-ai-setup)
+  and on the [existing watchpage](https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#ai-setup).
+  It combines genuine production interactions with labelled explanatory graphics
+  and locally generated Kokoro neural narration. Earlier recordings and the deck
+  remain historical evidence. The LinkedIn post (<https://lnkd.in/p/dnpZSBgW>)
+  and profile stay unchanged. A replacement YouTube upload remains a human step.
 - **Still open:** the **participant walkthrough is not yet completed**
   ([`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md)).
 - **Scope:** a bounded **two-day staff/task planner** (people, tasks, hours,
@@ -90,12 +91,12 @@ not actually executed.
   — the verified **AI business-setup release**, served from **Hyderabad, India
   South Central (`indiasouthcentral`)** on Azure for Students. The application
   budget cap remains $5; manual setup and rules-mode planning need no model call.
-- **Demo watchpage (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo>
-  — self-hosted player with video and captions
-  (`/media/PACT_demo.mp4`, `/media/PACT_demo.vtt`). **Historical:** the recording
-  and deck show the earlier interface; a replacement recording of this release is
-  pending. The earlier YouTube upload <https://youtu.be/PKR43OuwzXg> is likewise
-  historical.
+- **Demo watchpage (HTTPS):** <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#ai-setup>
+  — current AI setup video with English captions and transcript; both older demos
+  are retained below it as history.
+- **Download current MP4:** <https://github.com/Roojool/pact/releases/download/v1.2.0-ai-setup/PACT_ai_release.mp4>
+  — [YouTube upload title and description](./docs/VIDEO_UPLOAD.md). The old upload
+  <https://youtu.be/PKR43OuwzXg> is historical; the replacement URL is pending.
 - **Public source repository:** <https://github.com/Roojool/pact> — source, setup, graph queries and tests are published.
 - **Demo video & pitch deck:** **published** (historical, earlier interface) in release
   [`v1.0.0`](https://github.com/Roojool/pact/releases/tag/v1.0.0); downloadable asset
@@ -668,7 +669,7 @@ closes its shared FalkorDB connection in teardown, so it exits normally without
 `--test-force-exit`.
 
 **Live deployment evidence (executed before this pass, not re-run here):** the
-**current India production release** (commit `3985edf`, 2026-10-15) was independently
+**historical Golden Hour India release** (commit `3985edf`, 2026-10-15) was independently
 reviewed live: the full deterministic production
 check/repair/human-approval/persisted-allocation/owner-task/grounded-recall journey
 passed on desktop and mobile, with **0 provider calls**, **49 source graphs
@@ -733,15 +734,18 @@ decisions, and should personally validate the code before submission.
 | Artifact | Status |
 | --- | --- |
 | Live deployment (HTTPS) | ✅ **AI business setup deployed and production-verified** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com>, application commit `27664aa`, Hyderabad / `indiasouthcentral`. Original graphs and shared $5 cap retained. |
-| Demo watchpage (HTTPS) | ✅ **verified playback and captions (historical media)** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo> (self-hosted video + captions of the earlier interface; replacement recording pending; the <https://youtu.be/PKR43OuwzXg> upload is likewise historical). |
+| Demo watchpage (HTTPS) | ✅ **current AI setup video, playback and captions verified** — <https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#ai-setup>; both historical demos remain available below it. |
 | Public source repository | ✅ **published** — <https://github.com/Roojool/pact> (integrated business setup, source, graph model, Cypher and tests) |
-| Demo video & pitch deck | ✅ **published and reviewed (historical, earlier interface)** — release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). Kept as drafts/history; a replacement recording of this release is pending. |
+| Demo video & pitch deck | ✅ **published and reviewed (historical, earlier interface)** — release `v1.0.0` assets: [PACT_demo.mp4](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.mp4), [PACT_pitch_final.pptx](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pptx), [PACT_pitch_final.pdf](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_pitch_final.pdf), [PACT_demo.srt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.srt), [PACT_demo.vtt](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo.vtt), [PACT_demo_narration.md](https://github.com/Roojool/pact/releases/download/v1.0.0/PACT_demo_narration.md). Kept as historical media; current AI setup footage is published separately. |
+| AI setup demo | ✅ **published and independently reviewed** — [MP4, SRT, VTT, transcript and poster](https://github.com/Roojool/pact/releases/tag/v1.2.0-ai-setup). Local Kokoro neural narration; genuine production footage plus labelled illustrations. New YouTube URL awaits participant upload. |
 | Live AI session | ✅ **historical verification of both roles and live memory** — the 2026-10-15 session recorded a $0.136371 cumulative application estimate; a later historical checkpoint was $0.855696. These are not current balances or provider bills; no fresh two-role live call in this release recording. |
 | AI business-setup generation | ✅ **production verified on 18 Oct 2026 IST** — one request in the new capture returned two team members, three tasks and seven reviewable assumptions; request estimate $0.021897. The subsequent cumulative ledger checkpoint was $0.926307 of the unchanged $5 cap, $0 reserved. Earlier local verification is separately dated 2026-10-16. |
 | Participant walkthrough | ⏳ **not yet completed** — see [`docs/AI_ASSISTANCE.md`](./docs/AI_ASSISTANCE.md) |
 | LinkedIn post & profile | ✅ **unchanged** — <https://lnkd.in/p/dnpZSBgW> and the profile stay as published |
 
-The app, watchpage and six release assets are public. The 159.83-second H264/AAC
+The app, updated watchpage and current AI setup media are public. Current media verification is in [ai-release-media.json](docs/verification/ai-release-media.json).
+
+The six original release assets remain public. The 159.83-second H264/AAC
 video passed actual browser playback, all 43 caption cues loaded, byte-range
 streaming worked, and the media page was checked at desktop and 390px mobile widths.
 See [final release verification](docs/RELEASE_VERIFICATION.md). That verification

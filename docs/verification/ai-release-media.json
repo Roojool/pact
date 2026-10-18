@@ -1,0 +1,88 @@
+{
+  "acceptedAt": "2026-10-18T08:20:48.501Z",
+  "applicationCommit": "27664aad02377c5c6a92baf5c1294b4b6a6daa08",
+  "release": "https://github.com/Roojool/pact/releases/tag/v1.2.0-ai-setup",
+  "watchpage": "https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#ai-setup",
+  "voice": {
+    "engine": "Kokoro-82M via kokoro-onnx, local CPU",
+    "voice": "am_michael",
+    "synthetic": true,
+    "paidVoiceService": false
+  },
+  "localMediaVerification": {
+    "durationSeconds": 100.426,
+    "video": {
+      "codec": "h264",
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "pixFmt": "yuv420p"
+    },
+    "audio": {
+      "codec": "aac",
+      "channels": 2,
+      "sampleRate": "48000"
+    },
+    "decodeErrors": "",
+    "loudness": {
+      "integratedLufs": -16.07,
+      "truePeakDb": -1.78,
+      "lra": 2.5
+    },
+    "captionCues": 27,
+    "captionsMatchNarration": true,
+    "allEightScenesVisuallyReviewed": true,
+    "productionFootageAndFreezeHoldFraction": 0.6418,
+    "illustrationsLabelled": true,
+    "noAdditionalRecordingOrProviderRequests": true
+  },
+  "publicVerification": {
+    "passed": true,
+    "checkedAt": "2026-10-18T08:24:06.525Z",
+    "url": "https://pact-roojool-20261016.indiasouthcentral.cloudapp.azure.com/demo#ai-setup",
+    "facts": {
+      "duration": 100.426,
+      "width": 1920,
+      "height": 1080,
+      "error": null
+    },
+    "captionCues": 27,
+    "rangeStreaming": true,
+    "shaVerifiedAssets": 5,
+    "historicalVideosPreserved": 2,
+    "mobileWidth": 390,
+    "providerCalls": 0,
+    "pageErrors": []
+  },
+  "assets": [
+    {
+      "name": "PACT_ai_release.mp4",
+      "bytes": 5960270,
+      "sha256": "bf0f38d3b91f50cac9b7b757c28b397de633b398316b75af59fc2c2afcc86634"
+    },
+    {
+      "name": "PACT_ai_release.srt",
+      "bytes": 2239,
+      "sha256": "dd1135da0e2210a98e01ac60545b6d49b9f776c6148d31b5b7e9182224b6a78f"
+    },
+    {
+      "name": "PACT_ai_release.vtt",
+      "bytes": 2247,
+      "sha256": "3f9173231a73153b4145fcd28fc7cd921748374c5ee6f81ac1bd2620af8615c7"
+    },
+    {
+      "name": "PACT_ai_release_transcript.md",
+      "bytes": 3531,
+      "sha256": "079f33ffb14bfd191b14e016b0510dc8bcaa2aa05be83b9c2acc6aa5321e2885"
+    },
+    {
+      "name": "PACT_ai_release_poster.png",
+      "bytes": 520679,
+      "sha256": "986d8c57dbf3b1d55b83b1124bb8f58909ee8a9ea8d3414fc1458334e5fa6607"
+    }
+  ],
+  "remainingHumanActions": [
+    "Upload the accepted MP4 to YouTube and provide its new URL",
+    "Complete the personal participant walkthrough and edit the submission"
+  ]
+}

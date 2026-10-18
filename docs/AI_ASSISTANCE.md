@@ -66,7 +66,7 @@ the desktop/mobile deterministic journey and one live AI session ran against the
 The graph suite closes its shared FalkorDB connection in teardown, so it exits
 normally without `--test-force-exit`.
 
-**Dated evidence note:** the **current India production release** (commit `3985edf`,
+**Dated evidence note:** the **historical Golden Hour India release** (commit `3985edf`,
 2026-10-15) was independently reviewed live and passed the full deterministic
 production journey with **0 provider calls** and the **$5 cap unchanged**. Earlier,
 on the prior release (commit `6e04796`, 2026-10-15) the deterministic journey against
@@ -152,6 +152,14 @@ The **reviewed source is published** at <https://github.com/Roojool/pact>.
 
 ## AI business-setup release verification — 18 Oct 2026 IST
 
+The replacement demo narration is synthetic neural speech generated locally with
+Kokoro-82M through `kokoro-onnx`, using the `am_michael` voice. It uses no paid
+voice service and does not impersonate a named person. The model is published
+under [Apache-2.0](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/LICENSE);
+the [ONNX runtime package](https://github.com/thewh1teagle/kokoro-onnx) is MIT.
+Real production interactions and explanatory HTML/SVG graphics are labelled
+separately. Older videos retain their original system narration as history.
+
 GLM 5.3 and GLM 5.3 Flash workers through OpenCode implemented/reviewed the
 business-neutral prompts, source-validation regression, UI cleanup and release
 documentation. Codex independently reviewed the changes, corrected integration
@@ -213,3 +221,9 @@ the file and line that proves it.
    enforcement point per transport?
 7. Which Cypher queries are read-only and which mutate? (See `queries/`.)
 8. What is deliberately *not* verified, and why?
+
+## Accepted replacement media — 18 Oct 2026 IST
+
+The current 100.426-second H264/AAC demo is published in [v1.2.0-ai-setup](https://github.com/Roojool/pact/releases/tag/v1.2.0-ai-setup) and on the existing `/demo#ai-setup` page. Root reviewed all eight decoded scenes, including the real assumption, approval and memory holds. Full decode passed; audio measured -16.07 LUFS / -1.78 dBTP. All 27 captions match the narration. The actual public player passed playback, caption loading, byte-range streaming, five SHA-256-verified downloads and desktop/390px review. Core app/database containers stayed unchanged. No new app recording or provider request was made during final assembly/publication.
+
+[Media verification and asset hashes](./verification/ai-release-media.json). YouTube upload and the personal walkthrough remain participant actions.
